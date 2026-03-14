@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="長崎エリア特化のSNS型住まいメディア。Instagram×LINEで若者に届く物件掲載で、見込み客を不動産会社へ送客します。">
+  <title>NAGA ROOM | 長崎の住まいメディア</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #1a1a1a;
+      background: #fff;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; height: auto; display: block; }
+    ul { margin: 0; padding: 0; list-style: none; }
+
+    :root {
+      --cyan: #67e8f9;
+      --cyan-soft: rgba(103, 232, 249, 0.12);
+      --cyan-border: rgba(103, 232, 249, 0.4);
+      --bg: #fff;
+      --bg-card: #f8fafb;
+      --border: rgba(0,0,0,0.08);
+      --text: #1a1a1a;
+      --text-muted: #555;
+      --text-dim: #777;
+      --container: 1280px;
+      --radius: 1.75rem;
+      --header-h: 72px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.8s ease-out both; }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: var(--header-h);
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+    }
+    .header-inner {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .logo-wrap img {
+      height: 36px;
+      width: auto;
+    }
+    .logo-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+    .nav-check { display: none; }
+    .nav-toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      width: 44px;
+      height: 44px;
+      padding: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: #1a1a1a;
+      transition: transform .2s, opacity .2s;
+    }
+    .nav-check:checked ~ .nav-toggle span:nth-child(1) {
+      transform: translateY(8px) rotate(45deg);
+    }
+    .nav-check:checked ~ .nav-toggle span:nth-child(2) { opacity: 0; }
+    .nav-check:checked ~ .nav-toggle span:nth-child(3) {
+      transform: translateY(-8px) rotate(-45deg);
+    }
+    .nav {
+      position: fixed;
+      top: var(--header-h);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #fff;
+      padding: 2rem 1.5rem;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform .25s ease;
+    }
+    .nav-check:checked ~ .nav { transform: translateX(0); }
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .nav-list a {
+      display: block;
+      padding: 0.875rem 0;
+      font-size: 1rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-list a:hover { color: var(--cyan); }
+
+    .header-cta {
+      display: none;
+    }
+    @media (min-width: 768px) {
+      .nav-toggle { display: none; }
+      .nav {
+        position: static;
+        transform: none;
+        padding: 0;
+        background: transparent;
+        overflow: visible;
+      }
+      .nav-list {
+        flex-direction: row;
+        gap: 1.5rem;
+        align-items: center;
+      }
+      .nav-list a { padding: 0.5rem 0; border: none; font-size: 0.9rem; }
+      .header-cta {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #0a0a0a;
+        background: var(--cyan);
+        border-radius: 0.5rem;
+        transition: transform .15s, box-shadow .2s;
+      }
+      .header-cta:hover {
+        transform: scale(1.02);
+        box-shadow: 0 2px 12px rgba(103,232,249,0.35);
+      }
+      .header-cta:focus-visible {
+        outline: 2px solid var(--cyan);
+        outline-offset: 2px;
+      }
+    }
+
+    .container {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      scroll-margin-top: 0;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top right, rgba(103,232,249,0.2), transparent 40%),
+        radial-gradient(circle at bottom left, rgba(0,0,0,0.02), transparent 35%);
+      pointer-events: none;
+    }
+    .hero-inner {
+      position: relative;
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 4rem 1.5rem 5rem;
+    }
+    @media (min-width: 768px) {
+      .hero-inner {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+        padding: 6rem 1.5rem 8rem;
+      }
+    }
+    .hero-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      color: var(--cyan);
+      margin-bottom: 1rem;
+    }
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      line-height: 1.35;
+      margin: 0;
+      color: var(--text);
+    }
+    .hero h1 .accent { color: var(--cyan); }
+    @media (min-width: 768px) {
+      .hero h1 { font-size: 3.5rem; }
+    }
+    .hero-lead {
+      margin-top: 1.5rem;
+      max-width: 32ch;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+    .hero-cta-wrap {
+      margin-top: 2.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .btn-primary {
+      display: inline-block;
+      padding: 1rem 1.5rem;
+      background: var(--cyan);
+      color: #0a0a0a;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 1rem;
+      transition: transform .15s, box-shadow .2s;
+    }
+    .btn-primary:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 30px rgba(103,232,249,0.35);
+    }
+    .btn-primary:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 2px;
+    }
+    .btn-outline {
+      display: inline-block;
+      padding: 1rem 1.5rem;
+      border: 1px solid rgba(0,0,0,0.15);
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 1rem;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-outline:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+    .btn-outline:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 2px;
+    }
+    .hero-badge {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--cyan-soft);
+      border: 1px solid var(--cyan-border);
+      border-radius: 9999px;
+    }
+    .hero-flow-card {
+      margin-top: 2rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 1.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.08);
+    }
+    @media (min-width: 768px) { .hero-flow-card { margin-top: 0; } }
+    .hero-flow-card-inner {
+      border-radius: 1.5rem;
+      border: 1px solid var(--cyan-border);
+      background: var(--bg-card);
+      padding: 1.25rem;
+    }
+    .hero-flow-card p:first-child {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin: 0 0 1rem;
+    }
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .flow-step-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+    }
+    .flow-step-num {
+      flex-shrink: 0;
+      width: 2.5rem;
+      height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--cyan);
+      color: #0a0a0a;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .flow-step-row span { font-size: 0.9rem; color: var(--text-muted); }
+
+    /* Section common */
+    .sec {
+      padding: 5rem 0;
+      scroll-margin-top: var(--header-h);
+    }
+    .sec-alt {
+      background: #f8fafb;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .sec-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--cyan);
+      margin-bottom: 0.75rem;
+    }
+    .sec-title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 0 1rem;
+    }
+    @media (min-width: 768px) { .sec-title { font-size: 2.25rem; } }
+    .sec-lead {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin: 0 0 2rem;
+      max-width: 40ch;
+    }
+
+    /* Services */
+    .services-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .services-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .services-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    .service-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .service-card .icon { font-size: 2rem; margin-bottom: 1rem; }
+    .service-card h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 0 0.75rem;
+    }
+    .service-card p {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .stat-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--cyan);
+    }
+    @media (min-width: 768px) { .stat-value { font-size: 2rem; } }
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    /* Cases */
+    .cases-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .cases-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .case-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 1.75rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .case-card .cat {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      border: 1px solid var(--cyan-border);
+      font-size: 0.75rem;
+      color: var(--cyan);
+      margin-bottom: 1.25rem;
+    }
+    .case-card p {
+      font-size: 0.9rem;
+      line-height: 1.75;
+      color: var(--text-muted);
+      margin: 0 0 0.75rem;
+    }
+    .case-card p strong { color: var(--text); }
+
+    /* Works */
+    .works-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .works-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .work-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .work-card-thumb {
+      height: 12rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--cyan-soft), rgba(0,0,0,0.02));
+      text-align: center;
+      padding: 1rem;
+    }
+    .work-card-thumb p { margin: 0; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--cyan); }
+    .work-card-thumb h4 { margin: 0.5rem 0 0; font-size: 1.1rem; font-weight: 600; color: var(--text); }
+    .work-card-link {
+      display: inline-block;
+      margin-top: 0.75rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--cyan);
+      border: 1px solid var(--cyan-border);
+      border-radius: 0.5rem;
+      transition: background .2s, color .2s;
+    }
+    .work-card-link:hover {
+      background: var(--cyan-soft);
+      color: #0e7490;
+    }
+    .work-card-thumb--instagram {
+      padding: 1.5rem !important;
+    }
+    .work-instagram-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--text);
+    }
+    .work-instagram-link img {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      border-radius: 0.5rem;
+    }
+    .work-instagram-id {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--cyan);
+    }
+    .work-instagram-link:hover .work-instagram-id { text-decoration: underline; }
+    .work-card-body { padding: 1.25rem; }
+    .work-card-body .cat { font-size: 0.8rem; color: var(--cyan); }
+    .work-card-body .desc { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.65; }
+
+    /* Testimonials */
+    .testimonials-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .testimonials-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .testimonial-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 1.75rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .testimonial-card blockquote {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text);
+      margin: 0;
+    }
+    .testimonial-card footer {
+      margin-top: 1.25rem;
+      font-size: 0.9rem;
+      color: var(--cyan);
+    }
+
+    /* Flow */
+    .flow-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .flow-grid { grid-template-columns: repeat(5, 1fr); }
+    }
+    .flow-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .flow-card-num {
+      width: 3rem;
+      height: 3rem;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--cyan);
+      color: #0a0a0a;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .flow-card p {
+      margin: 1rem 0 0;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    /* FAQ */
+    .faq-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .faq-item {
+      border-radius: 1.5rem;
+      border: 1px solid var(--border);
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    .faq-item summary {
+      padding: 1.25rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      list-style: none;
+    }
+    .faq-item summary:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 2px;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: "+"; float: right; }
+    .faq-item[open] summary::after { content: "−"; }
+    .faq-item p {
+      padding: 0 1.5rem 1.25rem;
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.75;
+      color: var(--text-muted);
+    }
+
+    /* Profile + Positioning */
+    .profile-grid {
+      display: grid;
+      gap: 2rem;
+    }
+    @media (min-width: 768px) {
+      .profile-grid { grid-template-columns: 1.2fr 0.8fr; align-items: start; }
+    }
+    .profile-text {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--text-muted);
+    }
+    .profile-cards {
+      margin-top: 1.5rem;
+      display: grid;
+      gap: 1rem;
+    }
+    @media (min-width: 480px) { .profile-cards { grid-template-columns: repeat(2, 1fr); } }
+    .profile-mini-card {
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 1.25rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    .profile-mini-card .label { font-size: 0.8rem; color: var(--cyan); }
+    .profile-mini-card .body { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.6; }
+    .positioning-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .positioning-card h4 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 0 1.5rem;
+    }
+    .positioning-row {
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+    .positioning-row.highlight {
+      border-color: var(--cyan-border);
+      background: var(--cyan-soft);
+    }
+    .positioning-row .small { font-size: 0.8rem; color: var(--text-dim); }
+    .positioning-row .main { font-size: 1.1rem; font-weight: 500; color: var(--text); margin-top: 0.25rem; }
+
+    /* Contact */
+    .contact-grid {
+      display: grid;
+      gap: 2rem;
+    }
+    @media (min-width: 768px) {
+      .contact-grid { grid-template-columns: 1.2fr 0.8fr; }
+    }
+    .contact-form-wrap {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .form-grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+    @media (min-width: 768px) {
+      .form-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      font-size: 1rem;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--cyan); }
+    .form-group input:focus-visible,
+    .form-group textarea:focus-visible { outline: none; }
+    .form-submit:focus-visible {
+      outline: 2px solid var(--text);
+      outline-offset: 2px;
+    }
+    .form-group textarea { min-height: 140px; resize: vertical; }
+    .form-submit {
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 1rem;
+      background: var(--cyan);
+      color: #0a0a0a;
+      cursor: pointer;
+      transition: transform .15s;
+    }
+    .form-submit:hover { transform: scale(1.01); }
+    .contact-sidebar {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #f8fafb;
+      padding: 2rem;
+    }
+    .contact-sidebar .tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--cyan); }
+    .contact-sidebar .company { margin-top: 0.75rem; font-size: 0.95rem; color: var(--text-muted); }
+    .contact-sidebar .info-block { margin-top: 1.5rem; }
+    .contact-sidebar .info-block .label { font-size: 0.8rem; color: var(--text-dim); }
+    .contact-sidebar .info-block .value { font-size: 1rem; color: var(--text); margin-top: 0.25rem; }
+    .contact-monitor-note {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      border-radius: 1rem;
+      border: 1px solid var(--cyan-border);
+      background: var(--cyan-soft);
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: #0e7490;
+    }
+    .contact-cta-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .contact-cta-wrap { flex-direction: row; flex-wrap: wrap; }
+    }
+    .btn-line {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.25rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+      background: #06c755;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      transition: opacity .2s, transform .15s;
+    }
+    .btn-line:hover { opacity: 0.95; transform: scale(1.01); }
+    .btn-line:focus-visible {
+      outline: 2px solid #06c755;
+      outline-offset: 2px;
+    }
+    .btn-line::before {
+      content: "LINE";
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    /* Pricing */
+    .pricing-grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+    @media (min-width: 768px) {
+      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .pricing-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    .pricing-card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 0 0.5rem;
+    }
+    .pricing-card .price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .pricing-card .price-unit { font-size: 0.85rem; font-weight: 400; color: var(--text-muted); }
+    .pricing-card .note {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-top: 0.5rem;
+    }
+    .pricing-monitor {
+      border-color: var(--cyan-border);
+      background: var(--cyan-soft);
+    }
+    .pricing-monitor .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--cyan);
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Benefits (replacing testimonials) */
+    .benefits-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .benefits-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .benefit-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .benefit-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 0 0.5rem;
+    }
+    .benefit-card p {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: var(--text-muted);
+      margin: 0;
+    }
+    .benefit-card .label {
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 2rem 1.5rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner container">
+      <a href="#" class="logo-wrap">
+        <img src="assets/logo.png" alt="NAGA ROOM" width="120" height="36">
+        <p class="logo-sub">長崎の住まいメディア</p>
+      </a>
+      <input type="checkbox" id="nav-check" class="nav-check" aria-hidden="true">
+      <label for="nav-check" class="nav-toggle" aria-label="メニュー">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+      <nav class="nav">
+        <ul class="nav-list">
+          <li><a href="#services">サービス</a></li>
+          <li><a href="#pricing">料金</a></li>
+          <li><a href="#cases">活用イメージ</a></li>
+          <li><a href="#works">制作実績</a></li>
+          <li><a href="#contact">お問い合わせ</a></li>
+        </ul>
+      </nav>
+      <a href="#contact" class="header-cta">相談する</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-inner container">
+        <div class="fade-up">
+          <h1>
+            長崎の若い世代に届く<br>
+            <span class="accent">SNS不動産集客</span>
+          </h1>
+          <p class="hero-lead">
+            住まいメディアとしてInstagram・LINE・チャットボットで物件を発信し、見込み客を不動産会社へつなぎます。
+          </p>
+          <span class="hero-badge">モニター価格で試せます</span>
+          <div class="hero-cta-wrap">
+            <a href="#contact" class="btn-primary">掲載相談をする</a>
+            <a href="#services" class="btn-outline">サービスを見る</a>
+          </div>
+        </div>
+        <div class="hero-flow-card fade-up">
+          <div class="hero-flow-card-inner">
+            <p>集客導線</p>
+            <div class="flow-steps">
+              <div class="flow-step-row">
+                <span class="flow-step-num">1</span>
+                <span>Instagramで認知</span>
+              </div>
+              <div class="flow-step-row">
+                <span class="flow-step-num">2</span>
+                <span>プロフィールからLINE登録</span>
+              </div>
+              <div class="flow-step-row">
+                <span class="flow-step-num">3</span>
+                <span>チャットボットで条件取得</span>
+              </div>
+              <div class="flow-step-row">
+                <span class="flow-step-num">4</span>
+                <span>LPで提案型の物件紹介</span>
+              </div>
+              <div class="flow-step-row">
+                <span class="flow-step-num">5</span>
+                <span>不動産会社へ送客</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="sec">
+      <div class="container">
+        <p class="sec-tag">Services</p>
+        <h2 class="sec-title">NAGA ROOMができること</h2>
+        <p class="sec-lead">
+          中小の不動産会社でも導入しやすいように、SNS集客からLINE導線、チャットボット、LPまで一連の流れで支援します。
+        </p>
+        <div class="services-grid">
+          <article class="service-card fade-up">
+            <div class="icon">📱</div>
+            <h3>Instagram集客支援</h3>
+            <p>長崎エリアに特化したSNS運用で、住まい探し世代との接点をつくり、認知から問い合わせまでを設計します。</p>
+          </article>
+          <article class="service-card fade-up">
+            <div class="icon">💬</div>
+            <h3>LINE導線設計</h3>
+            <p>公式LINEを使って見込み客を獲得し、物件提案や教育導線まで一貫して設計します。</p>
+          </article>
+          <article class="service-card fade-up">
+            <div class="icon">🤖</div>
+            <h3>チャットボット構築</h3>
+            <p>希望エリア・家賃・間取り・条件を取得し、ユーザーごとに最適な物件提案へつなげる診断型ボットを構築します。</p>
+          </article>
+          <article class="service-card fade-up">
+            <div class="icon">🏠</div>
+            <h3>LP・掲載設計</h3>
+            <p>検索型ではなく提案型の物件LPを制作し、SNSから流入したユーザーを問い合わせへつなげます。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing" class="sec sec-alt">
+      <div class="container">
+        <p class="sec-tag">Price</p>
+        <h2 class="sec-title">料金プラン</h2>
+        <p class="sec-lead">1物件あたりの掲載料金です。モニター価格は3ヶ月限定でご案内しています。</p>
+        <div class="pricing-grid">
+          <div class="pricing-card fade-up">
+            <h3>Instagram掲載</h3>
+            <p class="price">30,000<span class="price-unit">円／1物件</span></p>
+          </div>
+          <div class="pricing-card fade-up">
+            <h3>LP掲載</h3>
+            <p class="price">15,000<span class="price-unit">円／1物件</span></p>
+          </div>
+          <div class="pricing-card pricing-monitor fade-up">
+            <span class="badge">3ヶ月限定</span>
+            <h3>モニター：Instagram</h3>
+            <p class="price">10,000<span class="price-unit">円／1物件</span></p>
+          </div>
+          <div class="pricing-card pricing-monitor fade-up">
+            <span class="badge">3ヶ月限定</span>
+            <h3>モニター：LP</h3>
+            <p class="price">5,000<span class="price-unit">円／1物件</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="container">
+        <p class="sec-tag">Target</p>
+        <h2 class="sec-title">目指す運用規模</h2>
+        <p class="sec-lead">初年度の目標として掲げている規模です。</p>
+        <div class="stats-grid">
+          <div class="stat-card fade-up">
+            <div class="stat-value">1,000件</div>
+            <p class="stat-label">初年度掲載目標物件数</p>
+          </div>
+          <div class="stat-card fade-up">
+            <div class="stat-value">1,000人</div>
+            <p class="stat-label">初年度LINE登録者数</p>
+          </div>
+          <div class="stat-card fade-up">
+            <div class="stat-value">1万人</div>
+            <p class="stat-label">Instagramフォロワー目標</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="cases" class="sec">
+      <div class="container">
+        <p class="sec-tag">For</p>
+        <h2 class="sec-title">こんな会社におすすめ</h2>
+        <p class="sec-lead">若年層向けの集客を強化したい、SNSを活用したいという方にご検討いただいています。</p>
+        <div class="cases-grid">
+          <article class="case-card fade-up">
+            <span class="cat">賃貸仲介</span>
+            <p>20代向けの集客を増やしたい、ポータル以外の導線を持ちたい場合に。InstagramからLINEへつなぎ、見込み客を獲得する流れを一緒に設計します。</p>
+          </article>
+          <article class="case-card fade-up">
+            <span class="cat">売買・マンション</span>
+            <p>若年層に物件の良さを伝えたい場合に。物件LPとSNS投稿を組み合わせて、問い合わせにつながる導線をご提案します。</p>
+          </article>
+          <article class="case-card fade-up">
+            <span class="cat">地域密着型</span>
+            <p>街の紹介や住まいのTipsでファンをつくり、比較検討前の層との接点を増やしたい場合に。相談につなげる導線を整えます。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="works" class="sec sec-alt">
+      <div class="container">
+        <p class="sec-tag">Works</p>
+        <h2 class="sec-title">制作実績</h2>
+        <div class="works-grid">
+          <article class="work-card fade-up">
+            <div class="work-card-thumb">
+              <div>
+                <p>Demo</p>
+                <h4>NAGA ROOM サービスLP</h4>
+                <a href="rental.html" class="work-card-link">賃貸ページを見る</a>
+              </div>
+            </div>
+            <div class="work-card-body">
+              <p class="cat">LP制作</p>
+              <p class="desc">SNS起点で反響をつくるための不動産メディア向けサービス紹介ページ。営業で実際に物件を載せる賃貸ページ（チャットで案内→物件一覧）もご用意。</p>
+            </div>
+          </article>
+          <article class="work-card fade-up">
+            <div class="work-card-thumb work-card-thumb--instagram">
+              <a href="https://www.instagram.com/nagaroom_official/" target="_blank" rel="noopener noreferrer" class="work-instagram-link">
+                <img src="assets/instagram-qr.png" alt="NAGA ROOM Instagram QRコード" width="160" height="160">
+                <span class="work-instagram-id">@nagaroom_official</span>
+              </a>
+            </div>
+            <div class="work-card-body">
+              <p class="cat">Instagram運用</p>
+              <p class="desc">若年層に刺さるビジュアルと物語風コピーを組み合わせた投稿テンプレート。公式アカウントはこちらから。</p>
+            </div>
+          </article>
+          <article class="work-card fade-up">
+            <div class="work-card-thumb">
+              <div>
+                <p>Demo</p>
+                <h4>LINE診断導線</h4>
+              </div>
+            </div>
+            <div class="work-card-body">
+              <p class="cat">チャットボット設計</p>
+              <p class="desc">希望条件を自然に取得し、不動産会社への送客までつなげる診断導線。</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec sec-alt">
+      <div class="container">
+        <p class="sec-tag">Merit</p>
+        <h2 class="sec-title">NAGA ROOMを使うメリット</h2>
+        <div class="benefits-grid">
+          <article class="benefit-card fade-up">
+            <p class="label">若年層</p>
+            <h3>若い世代に届く</h3>
+            <p>Instagramを日常的に見る20代〜30代に、住まい情報を届けられます。ポータル検索だけでは触れにくい層へのリーチが可能です。</p>
+          </article>
+          <article class="benefit-card fade-up">
+            <p class="label">制作</p>
+            <h3>投稿制作まで任せられる</h3>
+            <p>掲載用の投稿デザイン・コピーまで一括で対応。自社でSNS運用のノウハウがなくても、メディアとして発信を始められます。</p>
+          </article>
+          <article class="benefit-card fade-up">
+            <p class="label">導線</p>
+            <h3>LINE導線までまとめて整う</h3>
+            <p>InstagramからLINE登録、チャットボットでの条件ヒアリングまで一連の流れを設計。見込み客を無理なく獲得する仕組みをつくれます。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec sec-alt">
+      <div class="container">
+        <p class="sec-tag">Flow</p>
+        <h2 class="sec-title">導入の流れ</h2>
+        <div class="flow-grid">
+          <div class="flow-card fade-up">
+            <div class="flow-card-num">1</div>
+            <p>ヒアリング</p>
+          </div>
+          <div class="flow-card fade-up">
+            <div class="flow-card-num">2</div>
+            <p>戦略設計</p>
+          </div>
+          <div class="flow-card fade-up">
+            <div class="flow-card-num">3</div>
+            <p>SNS・LINE・LP制作</p>
+          </div>
+          <div class="flow-card fade-up">
+            <div class="flow-card-num">4</div>
+            <p>公開・運用開始</p>
+          </div>
+          <div class="flow-card fade-up">
+            <div class="flow-card-num">5</div>
+            <p>改善提案</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="container" style="max-width: 48rem;">
+        <p class="sec-tag">FAQ</p>
+        <h2 class="sec-title">よくある質問</h2>
+        <div class="faq-list">
+          <details class="faq-item fade-up">
+            <summary>どんな不動産会社に向いていますか？</summary>
+            <p>若年層へのアプローチを強化したい会社、SNS集客を始めたい会社、ポータル以外の集客導線を作りたい会社に向いています。</p>
+          </details>
+          <details class="faq-item fade-up">
+            <summary>Instagram運用だけの相談もできますか？</summary>
+            <p>可能です。投稿設計、導線整理、プロフィール改善、LINE誘導まで含めてご提案できます。</p>
+          </details>
+          <details class="faq-item fade-up">
+            <summary>チャットボットやLINEはまだ未導入でも大丈夫ですか？</summary>
+            <p>問題ありません。導入前提で設計し、必要に応じて段階的に整備できるようにご提案します。</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec sec-alt">
+      <div class="container">
+        <div class="profile-grid">
+          <div class="fade-up">
+            <p class="sec-tag">Profile</p>
+            <h2 class="sec-title">プロフィール</h2>
+            <p class="profile-text">
+              NAGA ROOMは、長崎で住まいを探す若い世代に向けて、見つけやすく、相談しやすく、行動しやすい導線をつくるための住まいメディアです。大通エージェンシーが培ってきた広告の知見を土台に、新聞折込とは異なるSNS起点の新しい集客モデルを設計しています。
+            </p>
+            <div class="profile-cards">
+              <div class="profile-mini-card">
+                <p class="label">スキル</p>
+                <p class="body">SNS設計 / LINE導線設計 / チャットボット設計 / LP制作 / 不動産広告設計</p>
+              </div>
+              <div class="profile-mini-card">
+                <p class="label">想い</p>
+                <p class="body">長崎で家探しをする人にとって、もっと自然で、もっと楽しい住まい探し体験をつくること。</p>
+              </div>
+            </div>
+          </div>
+          <div class="positioning-card fade-up">
+            <p class="sec-tag">Positioning</p>
+            <h4>検索型ではなく、提案型へ。</h4>
+            <div class="positioning-row">
+              <p class="small">一般的な不動産ポータル</p>
+              <p class="main">検索型</p>
+            </div>
+            <div class="positioning-row highlight">
+              <p class="small">NAGA ROOM</p>
+              <p class="main">SNSで惹きつける提案型</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="sec">
+      <div class="container">
+        <p class="sec-tag">Contact</p>
+        <h2 class="sec-title">お問い合わせ</h2>
+        <p class="sec-lead">
+          長崎で若い世代向けの不動産集客を強化したい方へ。SNS運用、LINE導線、チャットボット、LP掲載までまとめてご相談いただけます。
+        </p>
+        <div class="contact-cta-wrap fade-up">
+          <a href="#" class="btn-line" aria-label="LINEで相談">LINEで気軽に相談</a>
+        </div>
+        <div class="contact-grid">
+          <div class="contact-form-wrap fade-up">
+            <form class="contact-form" action="#" method="post">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="company">会社名</label>
+                  <input type="text" id="company" name="company" placeholder="株式会社〇〇">
+                </div>
+                <div class="form-group">
+                  <label for="name">ご担当者名</label>
+                  <input type="text" id="name" name="name" placeholder="山田 太郎">
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="email">メールアドレス</label>
+                  <input type="email" id="email" name="email" placeholder="example@nagaroom.jp" required>
+                </div>
+                <div class="form-group">
+                  <label for="tel">電話番号</label>
+                  <input type="tel" id="tel" name="tel" placeholder="095-000-0000">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="message">ご相談内容</label>
+                <textarea id="message" name="message" placeholder="Instagram掲載、LINE導線、LP制作などご相談内容をご記入ください。" required></textarea>
+              </div>
+              <button type="submit" class="form-submit">送信する</button>
+            </form>
+          </div>
+          <div class="contact-sidebar fade-up">
+            <p class="tag">Info</p>
+            <p class="company">大通エージェンシー / NAGA ROOM</p>
+            <div class="info-block">
+              <p class="label">メール</p>
+              <p class="value">contact@nagaroom.jp</p>
+            </div>
+            <div class="info-block">
+              <p class="label">Instagram</p>
+              <p class="value">@nagaroom_official</p>
+            </div>
+            <div class="info-block">
+              <p class="label">LINE</p>
+              <p class="value">公式LINEでご相談受付中</p>
+            </div>
+            <div class="contact-monitor-note">
+              <strong>モニター価格（3ヶ月限定）</strong><br>
+              Instagram 10,000円／LP 5,000円（1物件あたり）。まずはお気軽にご相談ください。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 大通エージェンシー / NAGA ROOM</p>
+    </div>
+  </footer>
+
+  <!-- Dify チャットボット（デモ） -->
+  <script>
+    window.difyChatbotConfig = {
+      token: '7k6lrRG6adicH9qD',
+      inputs: {},
+      systemVariables: {},
+      userVariables: {},
+    };
+  </script>
+  <script
+    src="https://udify.app/embed.min.js"
+    id="7k6lrRG6adicH9qD"
+    defer>
+  </script>
+  <style>
+    /* チャット全体をビューポートに固定：スクロールしても常に同じ位置に表示 */
+    [id^="dify-chatbot-"][id$="-container"],
+    .dify-chatbot-bubble-container {
+      position: fixed !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      left: auto !important;
+      top: auto !important;
+      z-index: 99999 !important;
+    }
+    /* バブルボタン：LPの水色アクセント */
+    #dify-chatbot-bubble-button {
+      background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 100%) !important;
+      width: 56px !important;
+      height: 56px !important;
+      border-radius: 50% !important;
+      box-shadow: 0 4px 20px rgba(103, 232, 249, 0.45), 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+      border: 2px solid rgba(255, 255, 255, 0.9) !important;
+      transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    }
+    #dify-chatbot-bubble-button:hover {
+      transform: scale(1.08) !important;
+      box-shadow: 0 8px 28px rgba(103, 232, 249, 0.5), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+    /* チャットウィンドウ：固定＋LP世界観（白基調・水色アクセント） */
+    #dify-chatbot-bubble-window {
+      position: fixed !important;
+      right: 1rem !important;
+      bottom: 5.5rem !important;
+      left: auto !important;
+      top: auto !important;
+      width: 32rem !important;
+      max-width: calc(100vw - 2rem) !important;
+      height: 48rem !important;
+      max-height: calc(100vh - 6rem) !important;
+      border-radius: 1.5rem !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(103, 232, 249, 0.25) !important;
+      overflow: hidden !important;
+      background: #fff !important;
+      border: 1px solid rgba(103, 232, 249, 0.3) !important;
+    }
+    /* ウィンドウ内のヘッダー風エリア（udifyが付与するクラスがあれば効く） */
+    #dify-chatbot-bubble-window iframe {
+      border-radius: 0 0 1.5rem 1.5rem !important;
+    }
+  </style>
+</body>
+</html>

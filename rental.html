@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="長崎の賃貸物件をチャットで相談。NAGA ROOMが希望に合うお部屋をご提案します。">
+  <title>賃貸物件 | NAGA ROOM 長崎の住まいメディア</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #1a1a1a;
+      background: #fff;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; height: auto; display: block; }
+    ul { margin: 0; padding: 0; list-style: none; }
+
+    :root {
+      --cyan: #67e8f9;
+      --cyan-soft: rgba(103, 232, 249, 0.12);
+      --cyan-border: rgba(103, 232, 249, 0.4);
+      --text: #1a1a1a;
+      --text-muted: #555;
+      --border: rgba(0,0,0,0.08);
+      --radius: 1.5rem;
+    }
+
+    /* Header */
+    .rental-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 64px;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+    .rental-header .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .rental-header .logo-wrap img { height: 32px; width: auto; }
+    .rental-header .logo-sub { font-size: 0.7rem; color: var(--text-muted); margin: 0; }
+    .btn-list {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.6rem 1.1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      border: 1px solid var(--cyan-border);
+      border-radius: 9999px;
+      background: var(--cyan-soft);
+      transition: background .2s, border-color .2s, box-shadow .2s;
+    }
+    .btn-list:hover {
+      background: rgba(103, 232, 249, 0.2);
+      border-color: var(--cyan);
+      box-shadow: 0 4px 12px rgba(103, 232, 249, 0.2);
+    }
+
+    /* Hero: 全画面チャット訴求 */
+    .rental-hero {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6rem 1.5rem 4rem;
+      text-align: center;
+      background: linear-gradient(180deg, #fff 0%, #f8fcfd 50%, #fff 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .rental-hero::before {
+      content: "";
+      position: absolute;
+      top: 10%;
+      right: -5%;
+      width: 50%;
+      max-width: 400px;
+      height: 50%;
+      max-height: 400px;
+      background: radial-gradient(circle, rgba(103, 232, 249, 0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .rental-hero-inner { position: relative; z-index: 1; }
+    .rental-hero-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--cyan);
+      margin-bottom: 0.75rem;
+    }
+    .rental-hero h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1.4;
+      margin: 0 0 1rem;
+      color: var(--text);
+    }
+    @media (min-width: 768px) {
+      .rental-hero h1 { font-size: 2.5rem; }
+    }
+    .rental-hero-lead {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin: 0 0 2rem;
+      max-width: 28ch;
+    }
+    .rental-hero-cta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    /* 物件一覧ボタン（固定・世界観合わせ） */
+    .rental-float-btn {
+      position: fixed;
+      bottom: 6rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9998;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #0a0a0a;
+      background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 100%);
+      border: 2px solid rgba(255,255,255,0.9);
+      border-radius: 9999px;
+      box-shadow: 0 4px 20px rgba(103, 232, 249, 0.4);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .rental-float-btn:hover {
+      transform: translateX(-50%) scale(1.04);
+      box-shadow: 0 8px 28px rgba(103, 232, 249, 0.45);
+    }
+
+    /* 物件一覧セクション */
+    .rental-list-sec {
+      padding: 4rem 1.5rem 5rem;
+      background: #f8fafb;
+      border-top: 1px solid var(--border);
+    }
+    .rental-list-sec .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .rental-list-sec h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      color: var(--text);
+    }
+    .rental-list-sec .lead {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 0 0 2rem;
+    }
+    .rental-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .rental-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .rental-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .rental-card {
+      background: #fff;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      transition: box-shadow .2s, border-color .2s;
+    }
+    .rental-card:hover {
+      box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+      border-color: var(--cyan-border);
+    }
+    .rental-card-img {
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, var(--cyan-soft) 0%, rgba(0,0,0,0.03) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      color: var(--cyan);
+    }
+    .rental-card-body {
+      padding: 1.25rem;
+    }
+    .rental-card-body .area {
+      font-size: 0.75rem;
+      color: var(--cyan);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+    .rental-card-body .price {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+    .rental-card-body .spec {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .rental-back {
+      display: inline-block;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: var(--cyan);
+      font-weight: 600;
+    }
+    .rental-back:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header class="rental-header">
+    <a href="index.html" class="logo-wrap">
+      <img src="assets/logo.png" alt="NAGA ROOM" width="100" height="32">
+      <span class="logo-sub">長崎の住まいメディア</span>
+    </a>
+    <a href="#property-list" class="btn-list">物件一覧を見る</a>
+  </header>
+
+  <main>
+    <section class="rental-hero">
+      <div class="rental-hero-inner">
+        <p class="rental-hero-tag">Chat First</p>
+        <h1>チャットで、<br>理想の部屋を見つけよう</h1>
+        <p class="rental-hero-lead">希望のエリア・予算・間取りを話すだけで、あなたに合った長崎の賃貸物件をご提案します。</p>
+        <p class="rental-hero-cta">▼ 右下のチャットボタンからどうぞ</p>
+      </div>
+    </section>
+
+    <a href="#property-list" class="rental-float-btn">物件一覧を見る</a>
+
+    <section id="property-list" class="rental-list-sec">
+      <div class="container">
+        <h2>物件一覧</h2>
+        <p class="lead">いきなり一覧から探したい方へ。気になる物件があればチャットで詳細・内見予約ができます。</p>
+        <div class="rental-grid">
+          <article class="rental-card">
+            <div class="rental-card-img">🏠</div>
+            <div class="rental-card-body">
+              <p class="area">長崎駅 徒歩5分</p>
+              <p class="price">4.5万円〜</p>
+              <p class="spec">1R / ワンルーム</p>
+            </div>
+          </article>
+          <article class="rental-card">
+            <div class="rental-card-img">🏠</div>
+            <div class="rental-card-body">
+              <p class="area">浦上</p>
+              <p class="price">5.2万円〜</p>
+              <p class="spec">1K / キッチン付き</p>
+            </div>
+          </article>
+          <article class="rental-card">
+            <div class="rental-card-img">🏠</div>
+            <div class="rental-card-body">
+              <p class="area">宝町</p>
+              <p class="price">4.8万円〜</p>
+              <p class="spec">1R / 新築風</p>
+            </div>
+          </article>
+        </div>
+        <a href="index.html" class="rental-back">← サービスLPに戻る</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Dify チャットボット（全画面メイン導線） -->
+  <script>
+    window.difyChatbotConfig = {
+      token: '7k6lrRG6adicH9qD',
+      inputs: {},
+      systemVariables: {},
+      userVariables: {},
+    };
+  </script>
+  <script
+    src="https://udify.app/embed.min.js"
+    id="7k6lrRG6adicH9qD"
+    defer>
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        var btn = document.getElementById('dify-chatbot-bubble-button');
+        if (btn) btn.click();
+      }, 800);
+    });
+  </script>
+  <style>
+    [id^="dify-chatbot-"][id$="-container"],
+    .dify-chatbot-bubble-container {
+      position: fixed !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      z-index: 99999 !important;
+    }
+    #dify-chatbot-bubble-button {
+      background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 100%) !important;
+      width: 56px !important;
+      height: 56px !important;
+      border-radius: 50% !important;
+      box-shadow: 0 4px 20px rgba(103, 232, 249, 0.45) !important;
+      border: 2px solid rgba(255, 255, 255, 0.9) !important;
+    }
+    #dify-chatbot-bubble-window {
+      position: fixed !important;
+      right: 1rem !important;
+      bottom: 5.5rem !important;
+      width: min(32rem, calc(100vw - 2rem)) !important;
+      height: min(48rem, calc(100vh - 6rem)) !important;
+      max-height: 85vh !important;
+      border-radius: 1.5rem !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(103, 232, 249, 0.25) !important;
+      overflow: hidden !important;
+      background: #fff !important;
+      border: 1px solid rgba(103, 232, 249, 0.3) !important;
+    }
+  </style>
+</body>
+</html>
