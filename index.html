@@ -32,7 +32,10 @@
       --text-dim: #777;
       --container: 1280px;
       --radius: 1.75rem;
-      --header-h: 72px;
+      --header-h: 76px;
+    }
+    @media (min-width: 768px) {
+      :root { --header-h: 88px; }
     }
 
     @keyframes fadeUp {
@@ -63,16 +66,28 @@
     .logo-wrap {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.85rem;
+      padding: 0.6rem 1.25rem 0.6rem 1rem;
+      border-left: 4px solid var(--cyan);
+      margin-left: -0.25rem;
     }
     .logo-wrap img {
-      height: 36px;
+      height: 52px;
       width: auto;
+      display: block;
+    }
+    @media (min-width: 768px) {
+      .logo-wrap img { height: 68px; }
+      .logo-wrap { padding: 0.75rem 1.5rem 0.75rem 1.25rem; gap: 1rem; border-left-width: 4px; }
     }
     .logo-sub {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
       margin: 0;
+      letter-spacing: 0.02em;
+    }
+    @media (min-width: 768px) {
+      .logo-sub { font-size: 0.75rem; }
     }
     .nav-check { display: none; }
     .nav-toggle {
@@ -548,24 +563,37 @@
     }
 
     /* Flow */
+    .flow-lead {
+      font-size: 1rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin: 0 auto 2rem;
+      max-width: 36ch;
+      line-height: 1.8;
+    }
     .flow-grid {
       display: grid;
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
     @media (min-width: 768px) {
-      .flow-grid { grid-template-columns: repeat(5, 1fr); }
+      .flow-grid { grid-template-columns: repeat(5, 1fr); gap: 1rem; }
     }
     .flow-card {
       border-radius: var(--radius);
       border: 1px solid var(--border);
       background: #fff;
-      padding: 1.5rem;
+      padding: 1.5rem 1.25rem;
       text-align: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      transition: box-shadow .2s, border-color .2s;
+    }
+    .flow-card:hover {
+      border-color: var(--cyan-border);
+      box-shadow: 0 8px 28px rgba(103, 232, 249, 0.1);
     }
     .flow-card-num {
-      width: 3rem;
-      height: 3rem;
+      width: 2.75rem;
+      height: 2.75rem;
       margin: 0 auto;
       display: flex;
       align-items: center;
@@ -573,13 +601,19 @@
       border-radius: 50%;
       background: var(--cyan);
       color: #0a0a0a;
-      font-weight: 600;
-      font-size: 1.1rem;
+      font-weight: 700;
+      font-size: 1rem;
     }
-    .flow-card p {
-      margin: 1rem 0 0;
-      font-size: 0.9rem;
-      font-weight: 500;
+    .flow-card .flow-step-title {
+      margin: 0.75rem 0 0.35rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .flow-card .flow-step-desc {
+      margin: 0;
+      font-size: 0.8rem;
+      line-height: 1.5;
       color: var(--text-muted);
     }
 
@@ -791,12 +825,29 @@
     }
 
     /* Pricing */
+    .pricing-monitor-box {
+      max-width: 32rem;
+      margin: 0 auto 1.5rem;
+      padding: 1.25rem;
+      border: 1px solid var(--cyan-border);
+      border-radius: 1rem;
+      background: var(--cyan-soft);
+      text-align: center;
+    }
+    .pricing-monitor-box .period { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+    .pricing-monitor-box .note { font-size: 0.8rem; color: var(--text-dim); margin: 0; }
+    .pricing-lead-note {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-top: 0.5rem;
+    }
     .pricing-grid {
       display: grid;
       gap: 1.25rem;
+      margin-top: 1.5rem;
     }
     @media (min-width: 768px) {
-      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+      .pricing-grid { grid-template-columns: 1fr 1.12fr 1fr; align-items: stretch; }
     }
     .pricing-card {
       border-radius: var(--radius);
@@ -804,37 +855,85 @@
       background: #fff;
       padding: 1.5rem;
       box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
     }
-    .pricing-card h3 {
-      font-size: 0.95rem;
-      font-weight: 600;
+    .pricing-card .plan-name {
+      font-size: 1rem;
+      font-weight: 700;
       color: var(--text);
-      margin: 0 0 0.5rem;
+      margin: 0 0 0.25rem;
     }
-    .pricing-card .price {
+    .pricing-card .plan-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--cyan);
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      margin-bottom: 0.75rem;
+    }
+    .pricing-card .price-area {
+      margin-bottom: 1rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .pricing-card .price-regular-row {
+      margin-bottom: 0.5rem;
+    }
+    .pricing-card .price-label { font-size: 0.7rem; color: var(--text-dim); margin-bottom: 0.15rem; }
+    .pricing-card .price-regular {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+    .pricing-card .price-regular .unit { font-size: 0.85rem; font-weight: 500; }
+    .pricing-card .price-monitor-row {
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed var(--border);
+    }
+    .pricing-card .price-monitor-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #0e7490;
+      background: var(--cyan-soft);
+      padding: 0.2rem 0.45rem;
+      border-radius: 0.2rem;
+      margin-bottom: 0.25rem;
+    }
+    .pricing-card .price-monitor {
       font-size: 1.5rem;
       font-weight: 700;
       color: var(--text);
     }
-    .pricing-card .price-unit { font-size: 0.85rem; font-weight: 400; color: var(--text-muted); }
-    .pricing-card .note {
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      margin-top: 0.5rem;
+    .pricing-card .price-monitor .unit { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); }
+    .pricing-card .plan-contents {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0 0 0.75rem;
+      padding-left: 1rem;
+      line-height: 1.6;
     }
-    .pricing-monitor {
-      border-color: var(--cyan-border);
+    .pricing-card .plan-contents li { margin-bottom: 0.2rem; }
+    .pricing-card.pricing-pro {
+      border: 2px solid var(--cyan-border);
       background: var(--cyan-soft);
+      box-shadow: 0 4px 20px rgba(103, 232, 249, 0.12);
     }
-    .pricing-monitor .badge {
-      display: inline-block;
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: var(--text);
-      background: var(--cyan);
-      padding: 0.2rem 0.5rem;
-      border-radius: 0.25rem;
-      margin-bottom: 0.5rem;
+    @media (min-width: 768px) {
+      .pricing-card.pricing-pro { transform: scale(1.03); }
+    }
+    .pricing-upgrade-note {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
     }
 
     /* Benefits (replacing testimonials) */
@@ -898,8 +997,10 @@
         <ul class="nav-list">
           <li><a href="#services">サービス</a></li>
           <li><a href="#pricing">料金</a></li>
+          <li><a href="#flow">導入の流れ</a></li>
           <li><a href="#cases">活用イメージ</a></li>
           <li><a href="#works">制作実績</a></li>
+          <li><a href="bestroom.html">限定記事</a></li>
           <li><a href="#contact">お問い合わせ</a></li>
         </ul>
       </nav>
@@ -990,28 +1091,78 @@
     <section id="pricing" class="sec sec-alt">
       <div class="container">
         <p class="sec-tag">Price</p>
-        <h2 class="sec-title">料金プラン</h2>
-        <p class="sec-lead">1物件あたりの掲載料金です。モニター価格は3ヶ月限定でご案内しています。</p>
+        <h2 class="sec-title">掲載モニター募集（期間限定）</h2>
+        <p class="sec-lead">現在、サービス開始に伴いモニター価格で掲載いただける不動産会社様を募集しています。</p>
+        <div class="pricing-monitor-box fade-up">
+          <p class="period">モニター期間：最初の3ヶ月</p>
+          <p class="note">その後は通常料金へ移行します。</p>
+        </div>
+        <h3 class="sec-title" style="font-size:1.2rem; margin-top:0.5rem;">料金プラン</h3>
+        <p class="sec-lead">Basicから始めて、必要に応じて追加料金でPro・Premiumへアップグレードできます。</p>
+        <p class="pricing-lead-note">※LP制作費は別途（目安：5,000円〜10,000円／1物件）またはPro以上に含める形でご相談できます。</p>
         <div class="pricing-grid">
           <div class="pricing-card fade-up">
-            <h3>Instagram掲載</h3>
-            <p class="price">30,000<span class="price-unit">円／1物件</span></p>
+            <h3 class="plan-name">Basic</h3>
+            <div class="price-area">
+              <div class="price-regular-row">
+                <p class="price-label">通常価格</p>
+                <p class="price-regular">月 15,000<span class="unit">円</span></p>
+              </div>
+              <div class="price-monitor-row">
+                <span class="price-monitor-badge">モニター期間中</span>
+                <p class="price-monitor">月 5,000<span class="unit">円</span></p>
+              </div>
+            </div>
+            <ul class="plan-contents">
+              <li>物件LP掲載</li>
+              <li>写真掲載</li>
+              <li>基本情報掲載</li>
+              <li>お問い合わせ導線</li>
+            </ul>
+          </div>
+          <div class="pricing-card pricing-pro fade-up">
+            <span class="plan-badge">おすすめ</span>
+            <h3 class="plan-name">Pro</h3>
+            <div class="price-area">
+              <div class="price-regular-row">
+                <p class="price-label">通常価格</p>
+                <p class="price-regular">月 ＋20,000<span class="unit">円</span></p>
+              </div>
+              <div class="price-monitor-row">
+                <span class="price-monitor-badge">モニター期間中</span>
+                <p class="price-monitor">月 ＋10,000<span class="unit">円</span></p>
+              </div>
+            </div>
+            <ul class="plan-contents">
+              <li>物件LP掲載</li>
+              <li>AIキャッチコピー</li>
+              <li>Instagram投稿 1回</li>
+              <li>おすすめ表示</li>
+              <li>LINE紹介</li>
+            </ul>
           </div>
           <div class="pricing-card fade-up">
-            <h3>LP掲載</h3>
-            <p class="price">15,000<span class="price-unit">円／1物件</span></p>
-          </div>
-          <div class="pricing-card pricing-monitor fade-up">
-            <span class="badge">3ヶ月限定</span>
-            <h3>モニター：Instagram</h3>
-            <p class="price">10,000<span class="price-unit">円／1物件</span></p>
-          </div>
-          <div class="pricing-card pricing-monitor fade-up">
-            <span class="badge">3ヶ月限定</span>
-            <h3>モニター：LP</h3>
-            <p class="price">5,000<span class="price-unit">円／1物件</span></p>
+            <h3 class="plan-name">Premium</h3>
+            <div class="price-area">
+              <div class="price-regular-row">
+                <p class="price-label">通常価格</p>
+                <p class="price-regular">月 ＋50,000<span class="unit">円</span></p>
+              </div>
+              <div class="price-monitor-row">
+                <span class="price-monitor-badge">モニター期間中</span>
+                <p class="price-monitor">月 ＋30,000<span class="unit">円</span></p>
+              </div>
+            </div>
+            <ul class="plan-contents">
+              <li>物件LP掲載</li>
+              <li>Instagram投稿 3回</li>
+              <li>ストーリー掲載</li>
+              <li>トップ優先表示</li>
+              <li>エリア特集掲載</li>
+            </ul>
           </div>
         </div>
+        <p class="pricing-upgrade-note fade-up">※Pro・PremiumはBasicへの追加料金です。まずBasicで掲載を始め、SNS露出を増やしたい場合にご検討ください。</p>
       </div>
     </section>
 
@@ -1129,30 +1280,36 @@
       </div>
     </section>
 
-    <section class="sec sec-alt">
+    <section id="flow" class="sec sec-alt">
       <div class="container">
         <p class="sec-tag">Flow</p>
         <h2 class="sec-title">導入の流れ</h2>
+        <p class="flow-lead">ご契約から運用開始まで一貫してサポート。貴社に合った設計で、無理なく始められます。</p>
         <div class="flow-grid">
           <div class="flow-card fade-up">
             <div class="flow-card-num">1</div>
-            <p>ヒアリング</p>
+            <p class="flow-step-title">ヒアリング</p>
+            <p class="flow-step-desc">課題・目標をお聞きします</p>
           </div>
           <div class="flow-card fade-up">
             <div class="flow-card-num">2</div>
-            <p>戦略設計</p>
+            <p class="flow-step-title">戦略設計</p>
+            <p class="flow-step-desc">最適な導線を提案</p>
           </div>
           <div class="flow-card fade-up">
             <div class="flow-card-num">3</div>
-            <p>SNS・LINE・LP制作</p>
+            <p class="flow-step-title">SNS・LINE・LP制作</p>
+            <p class="flow-step-desc">掲載に必要なものを一式制作</p>
           </div>
           <div class="flow-card fade-up">
             <div class="flow-card-num">4</div>
-            <p>公開・運用開始</p>
+            <p class="flow-step-title">公開・運用開始</p>
+            <p class="flow-step-desc">物件掲載スタート</p>
           </div>
           <div class="flow-card fade-up">
             <div class="flow-card-num">5</div>
-            <p>改善提案</p>
+            <p class="flow-step-title">改善提案</p>
+            <p class="flow-step-desc">効果を見ながら継続サポート</p>
           </div>
         </div>
       </div>
@@ -1271,8 +1428,8 @@
               <p class="value">公式LINEでご相談受付中</p>
             </div>
             <div class="contact-monitor-note">
-              <strong>モニター価格（3ヶ月限定）</strong><br>
-              Instagram 10,000円／LP 5,000円（1物件あたり）。まずはお気軽にご相談ください。
+              <strong>料金プラン</strong><br>
+              Basic 5,000円／月〜。LP制作費の別途・込みなど、ご希望に合わせてご案内します。
             </div>
           </div>
         </div>

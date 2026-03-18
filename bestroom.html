@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAGA ROOM - 特別なご案内</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --base-bg-color: #FAFAFA;
+            --main-text-color: #333333;
+            --accent-blue: #B0E0E6;
+            --accent-blue-hover: #8FCDDA;
+            --font-family-japanese: 'Noto Serif JP', serif;
+            --font-size-base: 16px;
+            --line-height-base: 2.0;
+            --section-padding-mobile: 80px 20px;
+            --section-padding-desktop: 100px 40px;
+            --fade-in-distance: 20px;
+            --fade-in-duration: 0.8s;
+        }
+
+        html {
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--base-bg-color);
+            color: var(--main-text-color);
+            font-family: var(--font-family-japanese);
+            font-size: var(--font-size-base);
+            line-height: var(--line-height-base);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        section {
+            padding: var(--section-padding-mobile);
+        }
+        @media (min-width: 768px) {
+            section {
+                padding: var(--section-padding-desktop);
+            }
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.4;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(var(--fade-in-distance));
+            transition: opacity var(--fade-in-duration) ease-out, transform var(--fade-in-duration) ease-out;
+        }
+        .fade-in.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            text-align: center;
+            color: #fff;
+        }
+
+        .hero-media {
+            position: absolute;
+            inset: 0;
+            opacity: 0.8;
+            mix-blend-mode: normal;
+            background:
+                linear-gradient(to bottom, rgba(0,0,0,0.20), rgba(0,0,0,0.65)),
+                url("名称未設定のデザイン.png") left center/cover no-repeat;
+            z-index: -1;
+        }
+        @media (min-width: 768px) {
+            .hero-media {
+                background:
+                    linear-gradient(to bottom, rgba(0,0,0,0.20), rgba(0,0,0,0.65)),
+                    url("名称未設定のデザイン.png") center right/cover no-repeat;
+            }
+        }
+
+        .hero-content {
+            z-index: 1;
+            max-width: 90%;
+        }
+
+        .hero-title {
+            font-size: 1.4rem;
+            line-height: 1.35;
+            margin-bottom: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 0.08rem;
+        }
+        @media (min-width: 768px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+        }
+
+        .scroll-arrow {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scrollDown 2s infinite;
+            font-size: 1.5rem;
+        }
+        @keyframes scrollDown {
+            0% { transform: translateX(-50%) translateY(0); opacity: 0; }
+            50% { transform: translateX(-50%) translateY(10px); opacity: 1; }
+            100% { transform: translateX(-50%) translateY(20px); opacity: 0; }
+        }
+
+        .intro {
+            background-color: #F0F0F0;
+            position: relative;
+        }
+
+        .chapter1 {
+            border-left: 5px solid var(--accent-blue);
+        }
+
+        .chapter2 {
+            background-color: var(--base-bg-color);
+            text-align: center;
+        }
+        .chapter2-visual {
+            font-family: serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--accent-blue);
+            letter-spacing: 0.2rem;
+        }
+        @media (min-width: 768px) {
+            .chapter2-visual {
+                font-size: 3.5rem;
+            }
+        }
+
+        .chapter3 {
+            background-color: var(--base-bg-color);
+        }
+
+        .closing {
+            background-color: var(--base-bg-color);
+            text-align: center;
+        }
+
+        .button-area {
+            margin-top: 4rem;
+        }
+
+        .btn-main {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border: 2px solid var(--accent-blue-hover);
+            background: var(--accent-blue);
+            color: #ffffff;
+            font-family: var(--font-family-japanese);
+            text-decoration: none;
+            transition: background-color 0.4s, color 0.4s;
+            cursor: pointer;
+            width: 100%;
+            max-width: 350px;
+            margin-bottom: 1.5rem;
+            box-sizing: border-box;
+            box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+            border-radius: 9999px;
+        }
+        .btn-main:hover {
+            background-color: var(--accent-blue-hover);
+            color: #ffffff;
+        }
+
+        .btn-sub {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            color: var(--main-text-color);
+            font-family: var(--font-family-japanese);
+            text-decoration: none;
+            cursor: pointer;
+            position: relative;
+        }
+        .btn-sub::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 1px;
+            background-color: var(--main-text-color);
+            transition: width 0.4s;
+        }
+        .btn-sub:hover::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header></header>
+
+    <section class="hero">
+        <div class="hero-media"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                私たちは<br>
+                不動産会社ではありません
+            </h1>
+        </div>
+        <div class="scroll-arrow">↓</div>
+    </section>
+
+    <section class="intro fade-in">
+        <h2>お部屋探し、疲れていませんか。</h2>
+        <p>
+            ポータルサイトを何時間もスクロールし、似たような間取り図を眺める日々。<br>
+            勇気を出して不動産屋に行けば、「早くしないと埋まりますよ」と急かされる。<br>
+            本当にこの部屋でいいのか、モヤモヤしたまま契約のサインをしてしまう。
+        </p>
+        <p>
+            もし、あなたが今、そんな息苦しさを感じているなら。<br>
+            この手紙は、あなたのためのものです。
+        </p>
+        <p>
+            なぜ、多くのお部屋探しは「妥協」で終わってしまうのか。<br>
+            この3分間だけ、少し業界の「裏側」のお話をさせてください。
+        </p>
+        <p>
+            これを読み終える頃、あなたのお部屋探しの常識は、180度変わっているはずです。
+        </p>
+    </section>
+
+    <section class="chapter1 fade-in">
+        <h2>本当に「あなたのため」の提案ですか？</h2>
+        <p>
+            結論から言います。<br>
+            従来の不動産探しが上手くいかない最大の理由。<br>
+            それは、あなたが「不動産会社が売りたい部屋」を無意識に押し付けられているからです。
+        </p>
+        <p>
+            多くの不動産会社には、自社で管理している物件や、「これを成約させれば利益が大きい（両手仲介など）」という、企業側の都合が存在します。<br>
+            ビジネスである以上、それは当然のことかもしれません。
+        </p>
+        <p>
+            しかし、その「大人の事情」のせいで、あなたにとって本当にベストな物件が、意図的に隠されてしまっているとしたらどうでしょうか。<br>
+            「条件には合っていますよ」と笑顔で差し出されたその部屋は、実は彼らにとって一番“都合のいい”部屋に過ぎないのです。
+        </p>
+        <p>
+            私たちは、そこに強い違和感を覚えました。<br>
+            暮らしの拠点を決める大切な選択が、誰かのノルマのために消費されてはいけない、と。
+        </p>
+    </section>
+
+    <section class="chapter2 fade-in">
+        <div class="chapter2-visual">WE ARE NOT A REAL ESTATE AGENCY.</div>
+        <h2>私たちは、不動産会社ではありません。</h2>
+        <p>
+            ここで少し、私たちの種明かしをさせてください。<br>
+            NAGA ROOMを運営しているのは、長崎で35年間、情報を届けるプロフェッショナルとして歩んってきた「広告代理店」です。
+        </p>
+        <p>
+            なぜ、広告会社が住まい探しを？<br>
+            そう思われたかもしれません。
+        </p>
+        <p>
+            答えはシンプルです。<br>
+            「私たちには、無理に埋めなければならない自社物件（ノルマ）が存在しないから」です。
+        </p>
+        <p>
+            私たちの使命は、家を売ることでも、貸すことでもありません。<br>
+            「本当に価値のある情報を、フラットな目線で見極め、必要とする人に最も美しい形でマッチングさせること」。<br>
+            それこそが、広告会社として私たちが何十年も磨き続けてきたDNAです。
+        </p>
+        <p>
+            不動産業界のしがらみが一切ない、完全な第三者であること。<br>
+            だからこそNAGA ROOMは、忖度のない「100%あなた目線の、本当にいい部屋」だけを厳選し、ご提案できるのです。
+        </p>
+    </section>
+
+    <section class="chapter3 fade-in">
+        <h2>「条件」ではなく、「あなたらしさ」で出会う。</h2>
+        <p>
+            もう、ポータルサイトの膨大な情報に振り回される必要はありません。<br>
+            ガツガツとした営業マンのプレッシャーに耐える必要もありません。
+        </p>
+        <p>
+            NAGA ROOMがご用意したのは、上質なライフスタイル雑誌をめくるような、静かで心地よいお部屋探しの体験です。
+        </p>
+        <p>
+            家賃や駅からの距離といった無機質な「条件」だけでなく。<br>
+            朝の光の入り方、休日のコーヒーを飲む時間の心地よさ、あなたが大切にしたい「空気感」。
+        </p>
+        <p>
+            それらを、私たちの最新のAIチャットボットが優しく読み解き、長崎の街を知り尽くした広告のプロフェッショナルとしての視点で、あなたにぴったりの暮らしをパーソナライズしてご提案します。
+        </p>
+    </section>
+
+    <section class="closing fade-in">
+        <p>
+            ここまで読んでいただき、ありがとうございます。<br>
+            この長い手紙を最後まで読んでくださった、感度の高いあなたにこそ、NAGA ROOMのサービスは真価を発揮します。
+        </p>
+        <p>
+            不動産会社の都合で作られた箱を選ぶのは、もう終わりにしましょう。<br>
+            今日から、あなた自身のライフスタイルをデザインする「新しい住まい探し」を始めませんか。
+        </p>
+        <p>
+            準備はできています。<br>
+            以下のボタンから、あなたの理想の暮らしについて、少しだけAIに教えてください。
+        </p>
+        <div class="button-area">
+            <a href="rental.html" class="btn-main">AIで、自分にぴったりの住まいを探す ＞</a><br>
+            <a href="#" class="btn-sub">LINEでスタッフに直接相談する ＞</a>
+        </div>
+    </section>
+
+    <footer></footer>
+
+    <script>
+        function handleFadeIn() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            fadeElements.forEach(element => {
+                const rect = element.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                const offset = windowHeight * 0.8;
+                if (rect.top < offset) {
+                    element.classList.add('is-visible');
+                }
+            });
+        }
+        window.addEventListener('load', handleFadeIn);
+        window.addEventListener('scroll', handleFadeIn);
+    </script>
+</body>
+</html>
+
