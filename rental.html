@@ -396,31 +396,61 @@
     .line-cta-inner .desc {
       font-size: 0.9rem;
       color: var(--text-muted);
-      margin: 0 0 1.5rem;
+      margin: 0 0 1.25rem;
       line-height: 1.7;
     }
-    .line-cta-btn {
+    .line-cta-prep {
+      font-size: 0.9rem;
+      color: var(--text);
+      margin: 0 0 1.25rem;
+      line-height: 1.7;
+    }
+    .line-cta-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .cta-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      padding: 1rem 1.75rem;
-      font-size: 1rem;
+      padding: 0.95rem 1.75rem;
+      font-size: 0.98rem;
       font-weight: 600;
+      border-radius: 9999px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      text-decoration: none;
+      transition: opacity .2s, transform .1s, box-shadow .2s, background .2s, color .2s;
+    }
+    .cta-btn-ai {
+      color: var(--text);
+      background: #fff;
+      border: 1px solid var(--cyan-border);
+      box-shadow: var(--shadow-soft);
+    }
+    .cta-btn-ai:hover {
+      background: var(--cyan-soft);
+      transform: translateY(-1px);
+    }
+    .cta-btn-ai:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 2px;
+    }
+    .cta-btn-line {
       color: #fff;
       background: #06c755;
       border: none;
-      border-radius: 9999px;
-      cursor: pointer;
-      transition: opacity .2s, transform .1s;
-      -webkit-tap-highlight-color: transparent;
-      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(6, 199, 85, 0.35);
     }
-    .line-cta-btn:hover {
-      opacity: 0.95;
-      transform: scale(1.02);
+    .cta-btn-line:hover {
+      opacity: 0.96;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(6, 199, 85, 0.45);
     }
-    .line-cta-btn:focus-visible {
+    .cta-btn-line:focus-visible {
       outline: 2px solid #06c755;
       outline-offset: 2px;
     }
@@ -434,6 +464,26 @@
       font-weight: 600;
     }
     .rental-back:hover { text-decoration: underline; }
+
+    .line-guide-box {
+      border: 2px solid var(--cyan-border);
+      border-radius: 1rem;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0 0;
+      background: var(--cyan-soft);
+    }
+    .line-guide-box p {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.85;
+      color: var(--text);
+    }
+    .line-guide-accent {
+      font-weight: 700;
+      color: #0e7490;
+      background: linear-gradient(transparent 65%, rgba(103, 232, 249, 0.4) 65%);
+      padding: 0 0.25em;
+    }
   </style>
 </head>
 <body>
@@ -454,7 +504,7 @@
     </section>
 
     <!-- 2 チャットエリア + 3 条件まとめ + 4 おすすめ物件 -->
-    <section class="main-wrap">
+    <section class="main-wrap" id="chatArea">
       <div class="container">
         <div class="chat-block">
           <p class="chat-area-label">住まい探しチャットエリア</p>
@@ -503,19 +553,33 @@
       <div class="line-cta-inner">
         <p class="title">LINEでさらにお部屋紹介を受ける</p>
         <p class="desc">条件に合う物件を紹介してもらいたい、内見の相談をしたい方は公式LINEへ。スタッフがご案内します。</p>
-        <a href="https://line.me/R/oaMessage/@081nnswr/?%E7%9B%B8%E8%AB%87"
-           class="line-cta-btn"
-           aria-label="LINEで相談"
-           target="_blank"
-           rel="noopener noreferrer">
-          LINEでスタッフに相談する
-        </a>
+        <p class="line-cta-prep">
+          準備はできています。<br>
+          以下のボタンから、あなたの理想の暮らしについて、少しだけAIに教えてください。
+        </p>
+        <div class="line-cta-buttons">
+          <a href="#chatArea" class="cta-btn cta-btn-ai">
+            AIで自分にぴったりの住まいを探す
+          </a>
+          <a href="https://line.me/R/oaMessage/@081nnswr/?%E7%9B%B8%E8%AB%87"
+             class="cta-btn cta-btn-line"
+             aria-label="LINEでスタッフに直接相談する"
+             target="_blank"
+             rel="noopener noreferrer">
+            LINEでスタッフに直接相談する ＞
+          </a>
+        </div>
+        <div class="line-guide-box">
+          <p>
+            ボタンを押すと、LINEの入力欄に「<span class="line-guide-accent">相談</span>」というメッセージが自動で入ります。<br>
+            そのまま一度だけ送信していただくと、専用のご案内がスタートします。
+          </p>
+        </div>
       </div>
     </section>
 
     <div class="container">
       <a href="bestroom.html" class="rental-back">限定記事を読む →</a>
-      <a href="index.html" class="rental-back">← サービスLPに戻る</a>
     </div>
   </main>
 

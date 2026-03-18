@@ -173,50 +173,76 @@
             margin-top: 4rem;
         }
 
-        .btn-main {
-            display: inline-block;
-            padding: 1rem 2rem;
-            border: 2px solid var(--accent-blue-hover);
-            background: var(--accent-blue);
-            color: #ffffff;
-            font-family: var(--font-family-japanese);
-            text-decoration: none;
-            transition: background-color 0.4s, color 0.4s;
+        .line-cta-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.95rem 1.75rem;
+            font-size: 0.98rem;
+            font-weight: 600;
+            border-radius: 9999px;
             cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s, background 0.2s, color 0.2s;
             width: 100%;
             max-width: 350px;
-            margin-bottom: 1.5rem;
             box-sizing: border-box;
-            box-shadow: 0 10px 22px rgba(0,0,0,0.18);
-            border-radius: 9999px;
-            text-shadow: 0 0 3px rgba(0,0,0,0.8);
         }
-        .btn-main:hover {
-            background-color: var(--accent-blue-hover);
+        .cta-btn-ai {
+            color: var(--main-text-color);
+            background: #ffffff;
+            border: 1px solid rgba(176, 224, 230, 0.85);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .cta-btn-ai:hover {
+            background: rgba(176, 224, 230, 0.18);
+            transform: translateY(-1px);
+        }
+        .cta-btn-ai:focus-visible {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
+        }
+        .cta-btn-line {
             color: #ffffff;
+            background: #06c755;
+            border: none;
+            box-shadow: 0 4px 14px rgba(6, 199, 85, 0.35);
+        }
+        .cta-btn-line:hover {
+            opacity: 0.96;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(6, 199, 85, 0.45);
+        }
+        .cta-btn-line:focus-visible {
+            outline: 2px solid #06c755;
+            outline-offset: 2px;
         }
 
-        .btn-sub {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            color: var(--main-text-color);
-            font-family: var(--font-family-japanese);
-            text-decoration: none;
-            cursor: pointer;
-            position: relative;
+        .line-guide-box {
+            border: 2px solid var(--accent-blue);
+            border-radius: 1rem;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0 1.5rem;
+            background: rgba(176, 224, 230, 0.12);
         }
-        .btn-sub::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 0;
-            height: 1px;
-            background-color: var(--main-text-color);
-            transition: width 0.4s;
+        .line-guide-box p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.85;
         }
-        .btn-sub:hover::after {
-            width: 100%;
+        .line-guide-accent {
+            font-weight: 700;
+            color: #0e7490;
+            background: linear-gradient(transparent 65%, rgba(176, 224, 230, 0.5) 65%);
+            padding: 0 0.25em;
         }
     </style>
 </head>
@@ -333,13 +359,21 @@
             以下のボタンから、あなたの理想の暮らしについて、少しだけAIに教えてください。
         </p>
         <div class="button-area">
-            <a href="rental.html" class="btn-main">AIで、自分にぴったりの住まいを探す ＞</a><br>
-            <a href="https://line.me/R/oaMessage/@081nnswr/?%E7%9B%B8%E8%AB%87"
-               class="btn-sub"
-               target="_blank"
-               rel="noopener noreferrer">
-              LINEでスタッフに直接相談する ＞
-            </a>
+            <div class="line-cta-buttons">
+                <a href="rental.html" class="cta-btn cta-btn-ai">AIで、自分にぴったりの住まいを探す ＞</a>
+                <a href="https://line.me/R/oaMessage/@081nnswr/?%E7%9B%B8%E8%AB%87"
+                   class="cta-btn cta-btn-line"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                  LINEでスタッフに直接相談する ＞
+                </a>
+            </div>
+        </div>
+        <div class="line-guide-box">
+            <p>
+                ボタンを押すと、LINEの入力欄に「<span class="line-guide-accent">相談</span>」というメッセージが自動で入ります。<br>
+                そのまま一度だけ送信していただくと、専用のご案内がスタートします。
+            </p>
         </div>
     </section>
 
