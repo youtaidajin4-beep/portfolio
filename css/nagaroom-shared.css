@@ -1,0 +1,952 @@
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Zen Kaku Gothic New", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      font-size: 16px;
+      line-height: 1.75;
+      color: #343330;
+      background: #f6f7f8;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; }
+
+    :root {
+      --ink: #343330;
+      --ink-muted: #6f6c67;
+      --ink-faint: #9a9690;
+      --surface: #ffffff;
+      --page: #f6f7f8;
+      /* 上質な「空気のきれいさ」— 白に近いグレーがかった水色（主張は弱く） */
+      --aqua-whisper: #f2f8ff;
+      --aqua-mist: #eaf6ff;
+      --aqua-tint: #dceeff;
+      --aqua-border: rgba(165, 195, 218, 0.42);
+      --aqua-border-soft: rgba(185, 210, 228, 0.38);
+      --aqua-glow: rgba(210, 230, 245, 0.55);
+      --aqua-ink: #4a5d6c;
+      --aqua-link: #6d8fa3;
+      --aqua-link-hover: #5c7d91;
+      --aqua-dot: #a3b8c9;
+      --aqua-cta-bg: #e2eef8;
+      --aqua-cta-bg-hover: #d7e6f3;
+      --aqua-cta-border: rgba(160, 192, 215, 0.55);
+      --aqua-send: #6d8a9c;
+      --aqua-send-hover: #5d7a8c;
+      --mist: #eef1f4;
+      --bot-bg: #eef4f9;
+      --bot-border: rgba(165, 195, 218, 0.32);
+      --user-bg: #fafaf8;
+      --user-border: rgba(52, 51, 48, 0.08);
+      --accent: #6d8a9c;
+      --accent-soft: rgba(109, 138, 156, 0.14);
+      --shadow-card: 0 20px 56px rgba(52, 60, 68, 0.07);
+      --shadow-soft: 0 2px 16px rgba(52, 60, 68, 0.045);
+      --shadow-prop: 0 4px 20px rgba(52, 60, 68, 0.055);
+      --radius-chat: 1.85rem;
+      --radius-bubble: 1.2rem;
+      --radius-card: 1.1rem;
+      --max-content: 22.5rem;
+      --max-listing: 26.5rem;
+    }
+
+    body.has-nr-header { padding-top: 3.25rem; }
+
+    .nr-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--aqua-border-soft);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .nr-header-inner {
+      max-width: 42rem;
+      margin: 0 auto;
+      padding: 0.6rem 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .nr-brand {
+      font-family: "Shippori Mincho", "Hiragino Mincho ProN", serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+    .nr-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 0.25rem;
+    }
+    .nr-nav a {
+      font-size: 0.68rem;
+      padding: 0.42rem 0.62rem;
+      color: var(--ink-muted);
+      border-radius: 9999px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nr-nav a:hover {
+      color: var(--aqua-ink);
+      background: var(--aqua-whisper);
+    }
+    .nr-nav a[aria-current="page"] {
+      color: var(--aqua-ink);
+      background: var(--aqua-mist);
+      font-weight: 600;
+    }
+
+    /* —— チャットページ・ヒーロー（白・光・静かな空気） —— */
+    .hero {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      text-align: center;
+      background: #fdfdfd;
+      padding: 5.25rem 1.35rem 3.5rem;
+    }
+    @media (min-width: 640px) {
+      .hero {
+        padding: 6rem 2rem 4rem;
+      }
+    }
+    @media (min-width: 900px) {
+      .hero {
+        padding: 6.5rem 2rem 4.25rem;
+      }
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    /* ごく薄い水色のぼかし（右上・強めblur・低不透明度） */
+    .hero-blob {
+      position: absolute;
+      width: min(120vw, 32rem);
+      height: min(120vw, 32rem);
+      border-radius: 50%;
+      opacity: 0.16;
+      filter: blur(80px);
+      -webkit-filter: blur(80px);
+      transform: translate3d(0, 0, 0);
+    }
+    .hero-blob--tr {
+      top: -18%;
+      right: -22%;
+      background: radial-gradient(
+        circle at 40% 45%,
+        rgba(200, 225, 245, 0.95) 0%,
+        rgba(230, 242, 252, 0.45) 42%,
+        transparent 72%
+      );
+    }
+    /* 微細ノイズ（目立たない） */
+    .hero-noise {
+      position: absolute;
+      inset: 0;
+      opacity: 0.04;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 180px 180px;
+    }
+    /* ヒーロー全面のごく薄いガラス層（背後のみぼかし） */
+    .hero-frost {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: rgba(255, 255, 255, 0.38);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 22.5rem;
+      margin: 0 auto;
+    }
+    @media (min-width: 640px) {
+      .hero-inner {
+        max-width: 26rem;
+      }
+    }
+
+    .hero-title {
+      margin: 0;
+      font-family: "Shippori Mincho", "Hiragino Mincho ProN", serif;
+      color: var(--ink);
+    }
+    /* キャッチ1文 — ヒーロー内で最大サイズ・前後に余白 */
+    .hero-title-hook {
+      display: block;
+      font-size: clamp(1.62rem, 6.2vw, 2.12rem);
+      font-weight: 600;
+      line-height: 1.42;
+      letter-spacing: 0.045em;
+      margin: 0 0 1.45rem;
+      padding: 0.2rem 0 0.35rem;
+    }
+    @media (min-width: 640px) {
+      .hero-title-hook {
+        margin-bottom: 1.55rem;
+        padding-bottom: 0.45rem;
+        letter-spacing: 0.04em;
+      }
+    }
+    /* 続きの2行 — フックより一段小さく、落ち着いたバランス */
+    .hero-title-sub {
+      display: block;
+      font-size: clamp(1.2rem, 3.65vw, 1.48rem);
+      font-weight: 600;
+      line-height: 1.74;
+      letter-spacing: 0.035em;
+    }
+    @media (min-width: 640px) {
+      .hero-title-sub {
+        line-height: 1.7;
+        letter-spacing: 0.032em;
+      }
+    }
+    .hero-lead {
+      margin: 1.85rem 0 0;
+      font-size: clamp(0.92rem, 2.9vw, 0.98rem);
+      line-height: 1.78;
+      color: var(--ink-muted);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+    @media (min-width: 640px) {
+      .hero-lead {
+        line-height: 1.74;
+        margin-top: 1.95rem;
+      }
+    }
+    /* 「これがいいかも」— 控えめな水色トーンで軽く際立たせる */
+    .hero-em {
+      font-weight: 600;
+      color: var(--aqua-ink);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .hero-divider {
+      width: 2rem;
+      height: 1px;
+      background: rgba(180, 205, 222, 0.35);
+      margin: 2.35rem auto 0;
+    }
+    /* ヒーロー下端の極細ライン */
+    .hero-rule {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      bottom: 0;
+      height: 1px;
+      z-index: 2;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(190, 212, 228, 0.55) 20%,
+        rgba(190, 212, 228, 0.55) 80%,
+        transparent
+      );
+      pointer-events: none;
+    }
+    .hero-line-cta { margin: 1.35rem 0 0; }
+    .hero-line-link {
+      font-size: 0.76rem;
+      color: var(--aqua-link);
+      text-decoration: underline;
+      text-underline-offset: 0.22em;
+      text-decoration-color: rgba(109, 143, 163, 0.35);
+    }
+    .hero-line-link:hover { color: var(--aqua-link-hover); }
+
+    .sub-nav-section {
+      width: 100%;
+      max-width: var(--max-content);
+      margin-top: 1.65rem;
+      padding: 0 0.35rem;
+      text-align: center;
+    }
+    .sub-nav-text {
+      font-size: 0.72rem;
+      color: var(--ink-faint);
+      line-height: 1.75;
+      margin: 0;
+    }
+    .sub-nav-text a {
+      color: var(--aqua-link);
+      text-decoration: underline;
+      text-underline-offset: 0.18em;
+      text-decoration-color: rgba(109, 143, 163, 0.3);
+    }
+    .sub-nav-text a:hover { color: var(--aqua-link-hover); }
+
+    .footer-cta-section {
+      width: 100%;
+      max-width: var(--max-content);
+      margin-top: 2rem;
+      padding: 0 0.35rem 0.5rem;
+    }
+    .footer-cta-inner {
+      background: var(--aqua-whisper);
+      border: 1px solid var(--aqua-border-soft);
+      border-radius: 1.1rem;
+      padding: 1.15rem 1.1rem 1.2rem;
+      text-align: center;
+    }
+    .footer-cta-inner p {
+      margin: 0 0 0.8rem;
+      font-size: 0.76rem;
+      color: var(--ink-muted);
+      line-height: 1.75;
+    }
+
+    .nr-page-footer {
+      padding: 1.35rem 1.25rem 2rem;
+      text-align: center;
+      font-size: 0.65rem;
+      color: var(--ink-faint);
+      border-top: 1px solid var(--aqua-border-soft);
+      background: var(--page);
+      line-height: 1.8;
+    }
+    .nr-page-footer a {
+      color: var(--ink-muted);
+      margin: 0 0.4rem;
+    }
+    .nr-page-footer a:hover { color: var(--aqua-link-hover); }
+
+    .main {
+      padding: 2.25rem 1.35rem 4rem;
+      background: var(--page);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    @media (min-width: 640px) {
+      .main { padding: 2.75rem 2rem 4.5rem; }
+    }
+    /* ヒーロー拡張後もチャットへ自然な距離 */
+    body.page-chat .main {
+      padding-top: 2.5rem;
+    }
+    @media (min-width: 640px) {
+      body.page-chat .main {
+        padding-top: 2.85rem;
+      }
+    }
+
+    .chat-wrap {
+      width: 100%;
+      max-width: var(--max-content);
+    }
+
+    .chat-intro {
+      text-align: center;
+      margin-bottom: 1.1rem;
+    }
+    .chat-intro-title {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.04em;
+      margin: 0 0 0.35rem;
+    }
+    .chat-intro-title::after {
+      content: '';
+      display: block;
+      width: 1.75rem;
+      height: 2px;
+      margin: 0.55rem auto 0;
+      background: var(--aqua-tint);
+      border-radius: 2px;
+      opacity: 0.55;
+    }
+    .chat-intro-desc {
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    .chat-shell {
+      background: var(--surface);
+      border-radius: var(--radius-chat);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--aqua-border-soft);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: min(58dvh, 520px);
+      max-height: none;
+    }
+
+    .chat-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 1.4rem 1.2rem 1rem;
+      -webkit-overflow-scrolling: touch;
+      max-height: min(65dvh, 620px);
+    }
+    .chat-scroll::-webkit-scrollbar { width: 3px; }
+    .chat-scroll::-webkit-scrollbar-thumb {
+      background: rgba(160, 190, 210, 0.45);
+      border-radius: 3px;
+    }
+
+    .chat-log {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .bubble-row { display: flex; width: 100%; }
+    .bubble-row--bot { justify-content: flex-start; }
+    .bubble-row--user { justify-content: flex-end; }
+
+    .bubble {
+      max-width: 92%;
+      padding: 0.95rem 1.08rem;
+      font-size: 0.9375rem;
+      line-height: 1.82;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .bubble--bot {
+      background: var(--bot-bg);
+      border: 1px solid var(--bot-border);
+      border-radius: var(--radius-bubble) var(--radius-bubble) var(--radius-bubble) 0.28rem;
+      color: var(--ink);
+      box-shadow: var(--shadow-soft);
+    }
+    .bubble--user {
+      background: var(--user-bg);
+      border: 1px solid var(--user-border);
+      border-radius: var(--radius-bubble) var(--radius-bubble) 0.28rem var(--radius-bubble);
+      color: var(--ink);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .typing-row { display: flex; justify-content: flex-start; }
+    .typing-bubble {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0.78rem 1rem;
+      background: var(--bot-bg);
+      border: 1px solid var(--bot-border);
+      border-radius: var(--radius-bubble) var(--radius-bubble) var(--radius-bubble) 0.28rem;
+      box-shadow: var(--shadow-soft);
+    }
+    .typing-bubble span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--aqua-dot);
+      opacity: 0.45;
+      animation: dot 1.1s ease-in-out infinite;
+    }
+    .typing-bubble span:nth-child(2) { animation-delay: 0.16s; }
+    .typing-bubble span:nth-child(3) { animation-delay: 0.32s; }
+    @keyframes dot {
+      0%, 70%, 100% { opacity: 0.18; transform: translateY(0); }
+      35% { opacity: 0.55; transform: translateY(-2px); }
+    }
+
+    .entry-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 0.1rem;
+    }
+    .entry-choice {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 1.05rem 1.15rem;
+      border: 1px solid rgba(52, 51, 48, 0.08);
+      border-radius: 1rem;
+      background: var(--surface);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .entry-choice:hover,
+    .entry-choice:focus-visible {
+      border-color: var(--aqua-border);
+      box-shadow: 0 2px 16px rgba(200, 220, 235, 0.35);
+      background: #fbfdff;
+      outline: none;
+    }
+    .entry-choice-title {
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 0 0 0.38rem;
+    }
+    .entry-choice-desc {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      line-height: 1.58;
+      margin: 0;
+    }
+    .entry-hint {
+      margin: 0.45rem 0 0;
+      font-size: 0.72rem;
+      color: var(--ink-faint);
+      line-height: 1.5;
+    }
+
+    .quick-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.42rem;
+      justify-content: flex-start;
+      padding: 0.1rem 0 0.15rem;
+    }
+    .quick-btn {
+      padding: 0.58rem 0.95rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid rgba(52, 51, 48, 0.1);
+      border-radius: 9999px;
+      transition: background 0.2s, border-color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .quick-btn:hover,
+    .quick-btn:focus-visible {
+      background: var(--aqua-mist);
+      border-color: var(--aqua-border-soft);
+      outline: none;
+    }
+    .quick-btn:focus-visible {
+      box-shadow: 0 0 0 2px var(--aqua-glow);
+    }
+    .quick-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+
+    /* 物件提案エリア（会話の延長） */
+    .property-suggest {
+      margin-top: 0.35rem;
+      padding: 1rem 0.85rem 1.1rem;
+      background: #f0f5f9;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--aqua-border-soft);
+      animation: suggestIn 0.45s ease-out both;
+    }
+    @keyframes suggestIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .property-suggest-label {
+      display: inline-block;
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      color: var(--aqua-ink);
+      margin: 0 0 0.75rem;
+      font-weight: 600;
+      padding: 0.35rem 0.65rem;
+      background: var(--aqua-mist);
+      border: 1px solid var(--aqua-border-soft);
+      border-radius: 9999px;
+    }
+    .property-card {
+      background: var(--surface);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      border: 1px solid rgba(52, 51, 48, 0.05);
+      border-left: 2px solid var(--aqua-tint);
+      box-shadow: var(--shadow-prop);
+      margin-bottom: 0.85rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .property-card:hover {
+      border-left-color: #b8cfe0;
+      box-shadow: 0 6px 24px rgba(160, 190, 210, 0.18);
+    }
+    .property-card:last-of-type { margin-bottom: 0; }
+    .property-card-img {
+      aspect-ratio: 16 / 10;
+      background: #e8e6e2;
+      overflow: hidden;
+    }
+    .property-card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .property-card-body { padding: 0.95rem 1rem 1rem; }
+    .property-card-name {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 0 0 0.35rem;
+      line-height: 1.45;
+    }
+    .property-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem 0.45rem;
+      margin: 0 0 0.65rem;
+      line-height: 1.4;
+    }
+    .property-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--aqua-ink);
+      padding: 0.22rem 0.5rem;
+      background: var(--aqua-whisper);
+      border: 1px solid var(--aqua-border-soft);
+      border-radius: 0.4rem;
+    }
+    .property-card-comment {
+      font-size: 0.82rem;
+      color: var(--ink);
+      line-height: 1.7;
+      margin: 0 0 0.85rem;
+      padding-top: 0.65rem;
+      border-top: 1px solid var(--aqua-border-soft);
+    }
+    .property-card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .btn-ghost {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0.72rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid rgba(52, 51, 48, 0.1);
+      border-radius: 0.75rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-ghost:hover {
+      background: var(--aqua-whisper);
+      border-color: var(--aqua-border-soft);
+    }
+    .btn-fill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--aqua-ink);
+      background: var(--aqua-cta-bg);
+      border: 1px solid var(--aqua-cta-border);
+      border-radius: 0.75rem;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+    .btn-fill:hover {
+      background: var(--aqua-cta-bg-hover);
+      border-color: var(--aqua-border);
+      color: var(--ink);
+    }
+
+    .suggest-foot {
+      margin-top: 1.05rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--aqua-border-soft);
+    }
+    .suggest-foot-note {
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      line-height: 1.75;
+      margin: 0 0 0.85rem;
+    }
+    .suggest-foot-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .suggest-foot-links button,
+    .suggest-foot-links a {
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      text-align: left;
+      padding: 0.35rem 0;
+      background: none;
+      border: none;
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+      text-decoration-color: rgba(52, 51, 48, 0.2);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .suggest-foot-links a:hover,
+    .suggest-foot-links button:hover { color: var(--aqua-link-hover); }
+
+    .cta-block {
+      margin-top: 0.5rem;
+      padding: 1rem 1rem 1.05rem;
+      background: var(--aqua-whisper);
+      border-radius: 1rem;
+      border: 1px solid var(--aqua-border-soft);
+    }
+    .cta-block p {
+      margin: 0 0 0.75rem;
+      font-size: 0.78rem;
+      line-height: 1.75;
+      color: var(--ink-muted);
+    }
+    .cta-block .btn-fill { margin-top: 0.15rem; }
+
+    .composer {
+      padding: 1rem 1.15rem 1.2rem;
+      border-top: 1px solid var(--aqua-border-soft);
+      background: #fbfcfe;
+    }
+    .composer-note {
+      font-size: 0.68rem;
+      color: var(--ink-faint);
+      text-align: center;
+      margin: 0 0 0.6rem;
+      line-height: 1.5;
+    }
+    .composer-row { display: flex; gap: 0.5rem; align-items: flex-end; }
+    .composer-input {
+      flex: 1;
+      min-height: 48px;
+      max-height: 120px;
+      padding: 0.72rem 1rem;
+      font-size: 1rem;
+      line-height: 1.55;
+      color: var(--ink);
+      background: #fafcfd;
+      border: 1px solid var(--aqua-border-soft);
+      border-radius: 1.3rem;
+      resize: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .composer-input::placeholder { color: #a8aeb4; }
+    .composer-input:focus {
+      outline: none;
+      border-color: #c5d8e8;
+      box-shadow: 0 0 0 3px rgba(220, 238, 255, 0.65);
+      background: var(--surface);
+    }
+    .composer-send {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: #fff;
+      background: var(--aqua-send);
+      border: none;
+      border-radius: 50%;
+      transition: transform 0.12s, opacity 0.2s, background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .composer-send:hover {
+      transform: scale(1.03);
+      background: var(--aqua-send-hover);
+    }
+    .composer-send:disabled { opacity: 0.32; cursor: not-allowed; transform: none; }
+    .composer-send:focus-visible {
+      outline: 2px solid var(--aqua-tint);
+      outline-offset: 2px;
+    }
+
+    /* ========== 物件一覧ページ ========== */
+    .page-listing .listing-main {
+      padding: 1.5rem 1.2rem 2.5rem;
+      max-width: var(--max-listing);
+      margin: 0 auto;
+    }
+    .listing-hero {
+      text-align: center;
+      padding: 0.25rem 0 1.25rem;
+    }
+    .listing-hero h1 {
+      margin: 0;
+      font-family: "Shippori Mincho", "Hiragino Mincho ProN", serif;
+      font-size: clamp(1.12rem, 3.8vw, 1.35rem);
+      font-weight: 600;
+      line-height: 1.65;
+      color: var(--ink);
+      letter-spacing: 0.03em;
+    }
+    .listing-hero-lead {
+      margin: 0.75rem 0 0;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      line-height: 1.75;
+    }
+
+    .listing-chat-banner {
+      background: var(--aqua-whisper);
+      border: 1px solid var(--aqua-border-soft);
+      border-radius: var(--radius-card);
+      padding: 1.1rem 1.05rem 1.15rem;
+      margin-bottom: 1.35rem;
+      text-align: center;
+    }
+    .listing-chat-banner p {
+      margin: 0 0 0.75rem;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      line-height: 1.75;
+    }
+    .listing-chat-banner .btn-to-chat {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.72rem 1.25rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--aqua-ink);
+      background: var(--surface);
+      border: 1px solid var(--aqua-border);
+      border-radius: 9999px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .listing-chat-banner .btn-to-chat:hover {
+      background: var(--aqua-mist);
+    }
+
+    .listing-line-inline {
+      margin: 0 0 1.25rem;
+      text-align: center;
+    }
+    .listing-line-inline a {
+      font-size: 0.72rem;
+      color: var(--aqua-link);
+      text-decoration: underline;
+      text-underline-offset: 0.18em;
+    }
+    .listing-line-inline a:hover { color: var(--aqua-link-hover); }
+
+    .filter-panel {
+      background: var(--surface);
+      border: 1px solid var(--aqua-border-soft);
+      border-radius: var(--radius-card);
+      padding: 1rem 0.95rem 1.05rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-soft);
+    }
+    .filter-panel-title {
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      color: var(--ink-faint);
+      margin: 0 0 0.75rem;
+      font-weight: 600;
+    }
+    .filter-grid {
+      display: grid;
+      gap: 0.65rem;
+    }
+    .filter-field label {
+      display: block;
+      font-size: 0.68rem;
+      color: var(--ink-muted);
+      margin-bottom: 0.3rem;
+    }
+    .filter-field select {
+      width: 100%;
+      padding: 0.58rem 0.75rem;
+      font-size: 0.82rem;
+      font-family: inherit;
+      color: var(--ink);
+      background: #fafcfd;
+      border: 1px solid var(--aqua-border-soft);
+      border-radius: 0.65rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .filter-field select:focus {
+      outline: none;
+      border-color: #c5d8e8;
+      box-shadow: 0 0 0 2px rgba(220, 238, 255, 0.55);
+    }
+    .filter-count {
+      margin-top: 0.75rem;
+      font-size: 0.7rem;
+      color: var(--ink-faint);
+      text-align: center;
+    }
+
+    .listing-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .listing-grid .property-card { margin-bottom: 0; }
+
+    .listing-mid-cta {
+      margin: 1.5rem 0;
+      padding: 1rem 1rem 1.05rem;
+      background: var(--aqua-mist);
+      border: 1px solid var(--aqua-border-soft);
+      border-radius: var(--radius-card);
+      text-align: center;
+    }
+    .listing-mid-cta p {
+      margin: 0 0 0.65rem;
+      font-size: 0.74rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    .listing-bottom-cta {
+      margin-top: 2rem;
+      padding: 1.15rem 1rem;
+      text-align: center;
+      border-top: 1px solid var(--aqua-border-soft);
+    }
+    .listing-bottom-cta p {
+      margin: 0 0 0.75rem;
+      font-size: 0.74rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+    .listing-back-chat {
+      margin-top: 1.25rem;
+      text-align: center;
+    }
+    .listing-back-chat a {
+      font-size: 0.72rem;
+      color: var(--aqua-link);
+      text-decoration: underline;
+      text-underline-offset: 0.18em;
+    }
+
+    .listing-empty {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      padding: 2rem 0;
+      line-height: 1.7;
+    }
+    .listing-empty a {
+      color: var(--aqua-link);
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }

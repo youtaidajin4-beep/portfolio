@@ -509,6 +509,16 @@
       background: var(--cyan-soft);
       color: #0e7490;
     }
+    .work-card-demo-links {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.5rem;
+    }
+    .work-card-demo-links .work-card-link {
+      margin-top: 0;
+    }
     .work-card-thumb--instagram {
       padding: 1.5rem !important;
     }
@@ -1015,10 +1025,11 @@
         <div class="fade-up">
           <h1>
             長崎の若い世代に届く<br>
-            <span class="accent">SNS不動産集客</span>
+            <span class="accent">「長崎版SUUMO × Instagram × AI」</span>
           </h1>
           <p class="hero-lead">
-            住まいメディアとしてInstagram・LINE・チャットボットで物件を発信し、見込み客を不動産会社へつなぎます。
+            Instagramで惹きつけて、LINEで条件を取り、AIで提案して、貴社へ送客。<br>
+            <strong>“ユーザー（見込み客）を集めて不動産会社に流す”</strong>、長崎特化の体験型不動産メディアです。
           </p>
           <span class="hero-badge">モニター価格で試せます</span>
           <div class="hero-cta-wrap">
@@ -1052,6 +1063,44 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="container">
+        <p class="sec-tag">Business Model</p>
+        <h2 class="sec-title">集客〜送客までの仕組み</h2>
+        <p class="sec-lead">
+          物件の“掲載枠”を売るのではなく、<strong>見込み客データを資産化</strong>し、送客の質を上げていくモデルです。
+        </p>
+        <div class="stats-grid">
+          <div class="stat-card fade-up">
+            <div class="stat-value">Instagram</div>
+            <p class="stat-label">おしゃれ物件・街情報で認知を獲得</p>
+          </div>
+          <div class="stat-card fade-up">
+            <div class="stat-value">LINE</div>
+            <p class="stat-label">登録でリード獲得（相談の入口）</p>
+          </div>
+          <div class="stat-card fade-up">
+            <div class="stat-value">AI診断</div>
+            <p class="stat-label">希望条件ヒアリング→物件提案</p>
+          </div>
+        </div>
+        <div class="cases-grid" style="margin-top: 1.25rem;">
+          <article class="case-card fade-up">
+            <span class="cat">送客</span>
+            <p>条件に合うユーザーを、加盟（掲載）不動産会社へ送客します。</p>
+          </article>
+          <article class="case-card fade-up">
+            <span class="cat">データ</span>
+            <p>家賃・エリア・引越し時期・間取りなど、<strong>不動産会社が一番欲しい見込み客データ</strong>が蓄積します。</p>
+          </article>
+          <article class="case-card fade-up">
+            <span class="cat">改善</span>
+            <p>データが溜まるほど提案精度が上がり、送客の質・単価も上がっていきます。</p>
+          </article>
         </div>
       </div>
     </section>
@@ -1091,18 +1140,18 @@
     <section id="pricing" class="sec sec-alt">
       <div class="container">
         <p class="sec-tag">Price</p>
-        <h2 class="sec-title">掲載モニター募集（期間限定）</h2>
-        <p class="sec-lead">現在、サービス開始に伴いモニター価格で掲載いただける不動産会社様を募集しています。</p>
+        <h2 class="sec-title">料金（掲載 × SNS × 送客）</h2>
+        <p class="sec-lead">まずは「LP掲載」から。必要に応じて「SNS掲載」「優先送客」「広告」を組み合わせて単価を上げられます。</p>
         <div class="pricing-monitor-box fade-up">
-          <p class="period">モニター期間：最初の3ヶ月</p>
-          <p class="note">その後は通常料金へ移行します。</p>
+          <p class="period">モニター枠（任意）：最初の3ヶ月</p>
+          <p class="note">枠が埋まり次第終了。詳細はお問い合わせください。</p>
         </div>
         <h3 class="sec-title" style="font-size:1.2rem; margin-top:0.5rem;">料金プラン</h3>
-        <p class="sec-lead">Basicから始めて、必要に応じて追加料金でPro・Premiumへアップグレードできます。</p>
-        <p class="pricing-lead-note">※LP制作費は別途（目安：5,000円〜10,000円／1物件）またはPro以上に含める形でご相談できます。</p>
+        <p class="sec-lead">物件単位の掲載をベースに、SNS露出・送客優先度を追加できます。</p>
+        <p class="pricing-lead-note">※LP制作費（撮影/原稿整備含む）は内容により調整。既存素材がある場合は軽くできます。</p>
         <div class="pricing-grid">
           <div class="pricing-card fade-up">
-            <h3 class="plan-name">Basic</h3>
+            <h3 class="plan-name">LP掲載</h3>
             <div class="price-area">
               <div class="price-regular-row">
                 <p class="price-label">通常価格</p>
@@ -1117,16 +1166,16 @@
               <li>物件LP掲載</li>
               <li>写真掲載</li>
               <li>基本情報掲載</li>
-              <li>お問い合わせ導線</li>
+              <li>問い合わせ導線（LINE/フォーム）</li>
             </ul>
           </div>
           <div class="pricing-card pricing-pro fade-up">
             <span class="plan-badge">おすすめ</span>
-            <h3 class="plan-name">Pro</h3>
+            <h3 class="plan-name">SNS掲載（任意）</h3>
             <div class="price-area">
               <div class="price-regular-row">
                 <p class="price-label">通常価格</p>
-                <p class="price-regular">月 ＋20,000<span class="unit">円</span></p>
+                <p class="price-regular">月 ＋30,000<span class="unit">円</span></p>
               </div>
               <div class="price-monitor-row">
                 <span class="price-monitor-badge">モニター期間中</span>
@@ -1137,52 +1186,51 @@
               <li>物件LP掲載</li>
               <li>AIキャッチコピー</li>
               <li>Instagram投稿 1回</li>
-              <li>おすすめ表示</li>
-              <li>LINE紹介</li>
+              <li>ストーリー掲載（応相談）</li>
+              <li>LINEでの紹介導線</li>
             </ul>
           </div>
           <div class="pricing-card fade-up">
-            <h3 class="plan-name">Premium</h3>
+            <h3 class="plan-name">優先送客 / 広告</h3>
             <div class="price-area">
               <div class="price-regular-row">
                 <p class="price-label">通常価格</p>
-                <p class="price-regular">月 ＋50,000<span class="unit">円</span></p>
+                <p class="price-regular">別途お見積り</p>
               </div>
               <div class="price-monitor-row">
                 <span class="price-monitor-badge">モニター期間中</span>
-                <p class="price-monitor">月 ＋30,000<span class="unit">円</span></p>
+                <p class="price-monitor">応相談</p>
               </div>
             </div>
             <ul class="plan-contents">
-              <li>物件LP掲載</li>
-              <li>Instagram投稿 3回</li>
-              <li>ストーリー掲載</li>
-              <li>トップ優先表示</li>
-              <li>エリア特集掲載</li>
+              <li>優先紹介（エリア/条件別）</li>
+              <li>特集枠（街・沿線・ライフスタイル）</li>
+              <li>広告配信（任意）</li>
+              <li>送客レポート（任意）</li>
             </ul>
           </div>
         </div>
-        <p class="pricing-upgrade-note fade-up">※Pro・PremiumはBasicへの追加料金です。まずBasicで掲載を始め、SNS露出を増やしたい場合にご検討ください。</p>
+        <p class="pricing-upgrade-note fade-up">※基本は「LP掲載（15,000円/物件）」＋「SNS掲載（30,000円/任意）」の組み合わせで設計します。掲載数が増えるほど相乗効果が出ます。</p>
       </div>
     </section>
 
     <section class="sec">
       <div class="container">
         <p class="sec-tag">Target</p>
-        <h2 class="sec-title">目指す運用規模</h2>
-        <p class="sec-lead">初年度の目標として掲げている規模です。</p>
+        <h2 class="sec-title">市場規模と売上イメージ</h2>
+        <p class="sec-lead">長崎の賃貸物件は数千〜1万件規模。仮に500物件掲載できた場合の試算です。</p>
         <div class="stats-grid">
           <div class="stat-card fade-up">
-            <div class="stat-value">1,000件</div>
-            <p class="stat-label">初年度掲載目標物件数</p>
+            <div class="stat-value">500件</div>
+            <p class="stat-label">掲載物件数（例）</p>
           </div>
           <div class="stat-card fade-up">
-            <div class="stat-value">1,000人</div>
-            <p class="stat-label">初年度LINE登録者数</p>
+            <div class="stat-value">750万/月</div>
+            <p class="stat-label">LP掲載のみ（15,000×500）</p>
           </div>
           <div class="stat-card fade-up">
-            <div class="stat-value">1万人</div>
-            <p class="stat-label">Instagramフォロワー目標</p>
+            <div class="stat-value">〜1000万/月</div>
+            <p class="stat-label">SNS掲載・優先送客・広告を組合せ</p>
           </div>
         </div>
       </div>
@@ -1220,12 +1268,15 @@
               <div>
                 <p>Demo</p>
                 <h4>NAGA ROOM サービスLP</h4>
-                <a href="rental.html" class="work-card-link">賃貸ページを見る</a>
+                <div class="work-card-demo-links">
+                  <a href="rental.html" class="work-card-link">会話で探す</a>
+                  <a href="listings.html" class="work-card-link">一覧で見る</a>
+                </div>
               </div>
             </div>
             <div class="work-card-body">
               <p class="cat">LP制作</p>
-              <p class="desc">SNS起点で反響をつくるための不動産メディア向けサービス紹介ページ。営業で実際に物件を載せる賃貸ページ（チャットで案内→物件一覧）もご用意。</p>
+              <p class="desc">会話から始まる住まい探し（チャット体験）と、掲載物件の一覧ページを分離。どちらからもLINE相談へ自然につながる構成です。</p>
             </div>
           </article>
           <article class="work-card fade-up">

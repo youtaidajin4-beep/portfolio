@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NAGA ROOM — 長崎の掲載物件を一覧から。条件で絞り込み、気になるお部屋を見比べられます。">
+  <title>掲載物件一覧 | NAGA ROOM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/nagaroom-shared.css">
+</head>
+<body class="has-nr-header page-listing">
+  <header class="nr-header">
+    <div class="nr-header-inner">
+      <a href="index.html" class="nr-brand">NAGA ROOM</a>
+      <nav class="nr-nav" aria-label="主要ナビ">
+        <a href="rental.html">会話で探す</a>
+        <a href="listings.html" aria-current="page">一覧で見る</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="listing-main">
+    <header class="listing-hero">
+      <h1>掲載物件一覧</h1>
+      <p class="listing-hero-lead">長崎エリアのお部屋を、落ち着いた見え方でご覧いただけます。気になるものだけ、ゆっくり比べてください。</p>
+    </header>
+
+    <section class="listing-chat-banner" aria-label="会話で探す案内">
+      <p>条件がまだふんわりしている方、迷った方へ。会話しながら希望を整理して、あなたに合いそうなお部屋をご提案することもできます。</p>
+      <a class="btn-to-chat" href="rental.html">会話で探す</a>
+    </section>
+
+    <p class="listing-line-inline">
+      <a id="topLineLink" href="#" target="_blank" rel="noopener noreferrer">条件の整理から、メッセージで相談する</a>
+    </p>
+
+    <section class="filter-panel" aria-label="条件で絞り込み">
+      <p class="filter-panel-title">条件で絞り込み</p>
+      <div class="filter-grid">
+        <div class="filter-field">
+          <label for="f-area">エリア</label>
+          <select id="f-area">
+            <option value="all">すべて</option>
+            <option value="nagasaki">長崎市</option>
+            <option value="isahaya">諫早市</option>
+            <option value="omura">大村市</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="f-rent">家賃の目安</label>
+          <select id="f-rent">
+            <option value="all">すべて</option>
+            <option value="to55">〜5.5万円くらい</option>
+            <option value="to70">〜7万円くらい</option>
+            <option value="over70">7万円より上</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="f-layout">間取り</label>
+          <select id="f-layout">
+            <option value="all">すべて</option>
+            <option value="compact">1R・1K</option>
+            <option value="mid">1DK</option>
+            <option value="wide">1LDK〜</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="f-feature">こだわり</label>
+          <select id="f-feature">
+            <option value="all">指定なし</option>
+            <option value="station">駅・生活導線を重視</option>
+            <option value="pet">ペット相談可の例</option>
+            <option value="new">築浅・内装きれいめ</option>
+          </select>
+        </div>
+      </div>
+      <p class="filter-count" id="filterCount" aria-live="polite"></p>
+    </section>
+
+    <div class="listing-grid" id="listingGrid"></div>
+
+    <section class="listing-mid-cta">
+      <p>気になるお部屋がいくつかあっても大丈夫です。まとめて送っていただければ、一緒に整理します。</p>
+      <a class="btn-fill" id="midLineBtn" href="#" target="_blank" rel="noopener noreferrer">メッセージで相談する</a>
+    </section>
+
+    <section class="listing-bottom-cta">
+      <p>掲載の見方や、他エリアの希望なども、遠慮なくどうぞ。</p>
+      <a class="btn-fill" id="bottomLineBtn" href="#" target="_blank" rel="noopener noreferrer">メッセージで続きを相談</a>
+    </section>
+
+    <p class="listing-back-chat">
+      <a href="rental.html">← 会話から探すページに戻る</a>
+    </p>
+  </main>
+
+  <footer class="nr-page-footer">
+    <a href="index.html">サービスTOP</a>
+    <a href="rental.html">会話で探す</a>
+    <a href="listings.html">一覧で見る</a>
+  </footer>
+
+  <script src="js/nagaroom-data.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var NR = window.NAGA_ROOM || { PROPERTIES: [], LINE_URL: '#' };
+    var LINE_URL = NR.LINE_URL;
+    var allProps = NR.PROPERTIES || [];
+
+    document.getElementById('topLineLink').href = LINE_URL;
+    document.getElementById('midLineBtn').href = LINE_URL;
+    document.getElementById('bottomLineBtn').href = LINE_URL;
+
+    var elGrid = document.getElementById('listingGrid');
+    var elCount = document.getElementById('filterCount');
+    var fArea = document.getElementById('f-area');
+    var fRent = document.getElementById('f-rent');
+    var fLayout = document.getElementById('f-layout');
+    var fFeature = document.getElementById('f-feature');
+
+    function escapeHtml(s) {
+      var d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function rentOk(p, rentVal) {
+      if (rentVal === 'all') return true;
+      var r = p.rentMan;
+      if (rentVal === 'to55') return r <= 5.5;
+      if (rentVal === 'to70') return r <= 7;
+      if (rentVal === 'over70') return r > 7;
+      return true;
+    }
+
+    function featureOk(p, feat) {
+      if (feat === 'all') return true;
+      var f = p.features || [];
+      return f.indexOf(feat) !== -1;
+    }
+
+    function filterList() {
+      var a = fArea.value;
+      var r = fRent.value;
+      var l = fLayout.value;
+      var feat = fFeature.value;
+      return allProps.filter(function (p) {
+        if (a !== 'all' && p.filterRegion !== a) return false;
+        if (!rentOk(p, r)) return false;
+        if (l !== 'all' && p.layoutGroup !== l) return false;
+        if (!featureOk(p, feat)) return false;
+        return true;
+      });
+    }
+
+    function render() {
+      var list = filterList();
+      elCount.textContent = list.length + '件が条件に合います';
+      elGrid.innerHTML = '';
+      if (list.length === 0) {
+        elGrid.innerHTML = '<p class="listing-empty">条件に合う物件がありません。条件を変えるか、<a href="rental.html">会話で探す</a>もご利用ください。</p>';
+        return;
+      }
+      list.forEach(function (p) {
+        var article = document.createElement('article');
+        article.className = 'property-card';
+        article.setAttribute('data-property-id', p.id);
+        article.innerHTML =
+          '<div class="property-card-img"><img src="' + escapeHtml(p.image) + '" alt="' + escapeHtml(p.name) + 'のイメージ" loading="lazy" width="320" height="200"></div>' +
+          '<div class="property-card-body">' +
+            '<h3 class="property-card-name">' + escapeHtml(p.name) + '</h3>' +
+            '<p class="property-card-meta">' +
+              '<span class="property-tag">' + escapeHtml(p.area) + '</span>' +
+              '<span class="property-tag">' + escapeHtml(p.rent) + '</span>' +
+              '<span class="property-tag">' + escapeHtml(p.layout) + '</span>' +
+            '</p>' +
+            '<p class="property-card-comment">' + escapeHtml(p.comment) + '</p>' +
+            '<div class="property-card-actions">' +
+              '<a class="btn-ghost" href="' + escapeHtml(p.detailUrl) + '">詳細を見る</a>' +
+              '<a class="btn-fill" href="' + LINE_URL + '" target="_blank" rel="noopener noreferrer">この物件について相談する</a>' +
+            '</div>' +
+          '</div>';
+        elGrid.appendChild(article);
+      });
+    }
+
+    [fArea, fRent, fLayout, fFeature].forEach(function (el) {
+      el.addEventListener('change', render);
+    });
+    render();
+  })();
+  </script>
+</body>
+</html>

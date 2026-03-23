@@ -3,851 +3,661 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="長崎で会話しながら自分に合う部屋を探す。NAGA ROOMが一緒に条件を整理してご紹介します。">
-  <title>賃貸・住まい探し | NAGA ROOM 長崎の住まいメディア</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-      font-size: 16px;
-      line-height: 1.7;
-      color: #1a1a1a;
-      background: #fff;
-    }
-    a { color: inherit; text-decoration: none; }
-    img { max-width: 100%; height: auto; display: block; }
-    ul { margin: 0; padding: 0; list-style: none; }
-
-    :root {
-      --cyan: #67e8f9;
-      --cyan-soft: rgba(103, 232, 249, 0.15);
-      --cyan-border: rgba(103, 232, 249, 0.45);
-      --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.06);
-      --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.07);
-      --text: #1a1a1a;
-      --text-muted: #555;
-      --border: rgba(0,0,0,0.08);
-      --radius: 1.25rem;
-      --radius-sm: 0.875rem;
-      --container: 1100px;
-    }
-
-    /* Header */
-    .rental-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      min-height: 72px;
-      padding: 0 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(255,255,255,0.98);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(12px);
-    }
-    @media (min-width: 768px) {
-      .rental-header { min-height: 84px; padding: 0 1.5rem; }
-    }
-    .rental-header .logo-wrap {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.6rem 1.25rem 0.6rem 1rem;
-      border-left: 4px solid var(--cyan);
-      margin-left: -0.25rem;
-    }
-    .rental-header .logo-wrap img {
-      height: 52px;
-      width: auto;
-      display: block;
-    }
-    @media (min-width: 768px) {
-      .rental-header .logo-wrap img { height: 64px; }
-      .rental-header .logo-wrap { padding: 0.75rem 1.5rem 0.75rem 1.25rem; gap: 1rem; }
-    }
-    .rental-header .logo-sub { font-size: 0.7rem; color: var(--text-muted); margin: 0; }
-    @media (min-width: 768px) {
-      .rental-header .logo-sub { font-size: 0.75rem; }
-    }
-
-    .container { max-width: var(--container); margin: 0 auto; padding: 0 1.25rem; }
-
-    /* ========== 1 ファーストビュー ========== */
-    .rental-hero {
-      padding: 2.5rem 0 2rem;
-      text-align: center;
-      background: linear-gradient(180deg, #fff 0%, #f6fcfe 50%, #fff 100%);
-    }
-    .rental-hero h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      line-height: 1.45;
-      margin: 0 0 0.75rem;
-      color: var(--text);
-      letter-spacing: 0.02em;
-    }
-    @media (min-width: 768px) {
-      .rental-hero h1 { font-size: 1.9rem; }
-    }
-    .rental-hero-lead {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      margin: 0;
-      line-height: 1.8;
-    }
-
-    /* ========== 2 チャットエリア + 3 条件まとめ（PCは2カラム） ========== */
-    .main-wrap {
-      padding: 1rem 0 2rem;
-    }
-    @media (min-width: 900px) {
-      .main-wrap .container {
-        display: grid;
-        grid-template-columns: 1fr 320px;
-        gap: 2rem;
-        align-items: start;
-      }
-    }
-    .chat-block {
-      min-width: 0;
-    }
-    .chat-area-label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--cyan);
-      letter-spacing: 0.08em;
-      margin-bottom: 1rem;
-      padding-left: 0.25rem;
-    }
-    .chat-box {
-      background: #fafbfc;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-soft);
-      padding: 1.25rem;
-      margin-bottom: 1rem;
-    }
-    @media (min-width: 768px) {
-      .chat-box { padding: 1.5rem; }
-    }
-
-    /* チャット吹き出し */
-    .chat-log {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      min-height: 200px;
-      max-height: 420px;
-      overflow-y: auto;
-      padding: 0.25rem 0;
-      margin-bottom: 1.25rem;
-    }
-    .chat-log::-webkit-scrollbar { width: 6px; }
-    .chat-log::-webkit-scrollbar-thumb { background: var(--cyan-border); border-radius: 3px; }
-    .chat-msg {
-      display: flex;
-      max-width: 88%;
-      padding: 0.95rem 1.2rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.95rem;
-      line-height: 1.65;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .chat-msg.ai {
-      align-self: flex-start;
-      background: #fff;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-soft);
-      color: var(--text);
-      border-radius: 1rem 1rem 1rem 0.25rem;
-    }
-    .chat-msg.user {
-      align-self: flex-end;
-      background: var(--cyan-soft);
-      border: 1px solid var(--cyan-border);
-      color: var(--text);
-      border-radius: 1rem 1rem 0.25rem 1rem;
-      box-shadow: 0 2px 12px rgba(103, 232, 249, 0.15);
-    }
-
-    /* 入力エリア */
-    .chat-input-wrap {
-      display: flex;
-      gap: 0.5rem;
-      align-items: flex-end;
-      margin-bottom: 1rem;
-    }
-    .chat-input {
-      flex: 1;
-      min-height: 48px;
-      padding: 0.75rem 1.1rem;
-      font-size: 1rem;
-      font-family: inherit;
-      color: var(--text);
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      resize: none;
-      transition: border-color .2s, box-shadow .2s;
-    }
-    .chat-input::placeholder { color: #999; }
-    .chat-input:focus {
-      outline: none;
-      border-color: var(--cyan-border);
-      box-shadow: 0 0 0 3px rgba(103, 232, 249, 0.15);
-    }
-    .chat-send {
-      flex-shrink: 0;
-      width: 48px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      color: #fff;
-      background: linear-gradient(135deg, var(--cyan) 0%, #22d3ee 100%);
-      border: none;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(103, 232, 249, 0.4);
-      transition: transform .15s, box-shadow .2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .chat-send:hover { transform: scale(1.05); box-shadow: 0 6px 18px rgba(103, 232, 249, 0.45); }
-    .chat-send:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
-    .chat-send:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-    /* 選択ボタン */
-    .chat-quick-btns {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-    }
-    .chat-quick-btns button {
-      padding: 0.7rem 1.1rem;
-      font-size: 0.9rem;
-      font-weight: 500;
-      font-family: inherit;
-      color: var(--text);
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 9999px;
-      cursor: pointer;
-      transition: background .2s, border-color .2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .chat-quick-btns button:hover {
-      background: var(--cyan-soft);
-      border-color: var(--cyan-border);
-    }
-    .chat-quick-btns button:focus-visible {
-      outline: 2px solid var(--cyan);
-      outline-offset: 2px;
-    }
-
-    /* ========== 3 条件まとめエリア ========== */
-    .sidebar-block {
-      position: sticky;
-      top: 6rem;
-    }
-    @media (max-width: 899px) {
-      .sidebar-block { margin-top: 2rem; }
-    }
-    .condition-panel {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-soft);
-      padding: 1.35rem;
-      margin-bottom: 1.5rem;
-    }
-    .condition-panel h3 {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 0.05em;
-      margin: 0 0 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .condition-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding: 0.5rem 0;
-      font-size: 0.9rem;
-    }
-    .condition-row .label { color: var(--text-muted); }
-    .condition-row .value {
-      font-weight: 600;
-      color: var(--text);
-    }
-    .condition-row .value.empty { color: #bbb; font-weight: 400; }
-
-    /* ========== 4 おすすめ物件エリア ========== */
-    .property-sec {
-      margin-top: 1.5rem;
-    }
-    @media (min-width: 900px) {
-      .property-sec { grid-column: 1 / -1; }
-    }
-    .property-sec .ai-intro {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 1rem 1.2rem;
-      margin-bottom: 1.25rem;
-      font-size: 0.95rem;
-      line-height: 1.65;
-      color: var(--text);
-      box-shadow: var(--shadow-soft);
-      max-width: 88%;
-      border-radius: 1rem 1rem 1rem 0.25rem;
-    }
-    .property-sec .heading {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--text);
-      margin: 0 0 1rem;
-    }
-    .property-grid {
-      display: grid;
-      gap: 1.25rem;
-    }
-    @media (min-width: 600px) {
-      .property-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (min-width: 900px) {
-      .property-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    .property-card {
-      background: #fff;
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-soft);
-      transition: box-shadow .2s, border-color .2s, transform .15s;
-    }
-    .property-card:hover {
-      border-color: var(--cyan-border);
-      box-shadow: var(--shadow-card);
-      transform: translateY(-2px);
-    }
-    .property-card-img {
-      aspect-ratio: 4/3;
-      background: linear-gradient(135deg, var(--cyan-soft) 0%, rgba(0,0,0,0.04) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-    }
-    .property-card-body {
-      padding: 1.25rem;
-    }
-    .property-card-body .area {
-      font-size: 0.75rem;
-      color: var(--cyan);
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.35rem;
-    }
-    .property-card-body .price {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 0.25rem;
-    }
-    .property-card-body .spec {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 0.9rem;
-    }
-    .property-card-body .detail-link {
-      display: inline-block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--cyan);
-    }
-    .property-card-body .detail-link:hover { text-decoration: underline; }
-
-    /* ========== 5 LINE相談CTA ========== */
-    .line-cta-sec {
-      padding: 2.5rem 0 3rem;
-      background: linear-gradient(180deg, #f8fcfe 0%, #fff 100%);
-      border-top: 1px solid var(--border);
-      margin-top: 2rem;
-    }
-    .line-cta-inner {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 0 1.25rem;
-      text-align: center;
-    }
-    .line-cta-inner .title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--text);
-      margin: 0 0 0.5rem;
-    }
-    .line-cta-inner .desc {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin: 0 0 1.25rem;
-      line-height: 1.7;
-    }
-    .line-cta-prep {
-      font-size: 0.9rem;
-      color: var(--text);
-      margin: 0 0 1.25rem;
-      line-height: 1.7;
-    }
-    .line-cta-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-    }
-    .cta-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 0.95rem 1.75rem;
-      font-size: 0.98rem;
-      font-weight: 600;
-      border-radius: 9999px;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      text-decoration: none;
-      transition: opacity .2s, transform .1s, box-shadow .2s, background .2s, color .2s;
-    }
-    .cta-btn-ai {
-      color: var(--text);
-      background: #fff;
-      border: 1px solid var(--cyan-border);
-      box-shadow: var(--shadow-soft);
-    }
-    .cta-btn-ai:hover {
-      background: var(--cyan-soft);
-      transform: translateY(-1px);
-    }
-    .cta-btn-ai:focus-visible {
-      outline: 2px solid var(--cyan);
-      outline-offset: 2px;
-    }
-    .cta-btn-line {
-      color: #fff;
-      background: #06c755;
-      border: none;
-      box-shadow: 0 4px 14px rgba(6, 199, 85, 0.35);
-    }
-    .cta-btn-line:hover {
-      opacity: 0.96;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(6, 199, 85, 0.45);
-    }
-    .cta-btn-line:focus-visible {
-      outline: 2px solid #06c755;
-      outline-offset: 2px;
-    }
-
-    .rental-back {
-      display: block;
-      text-align: center;
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: var(--cyan);
-      font-weight: 600;
-    }
-    .rental-back:hover { text-decoration: underline; }
-
-    .line-guide-box {
-      border: 2px solid var(--cyan-border);
-      border-radius: 1rem;
-      padding: 1.25rem 1.5rem;
-      margin: 1.5rem 0 0;
-      background: var(--cyan-soft);
-    }
-    .line-guide-box p {
-      margin: 0;
-      font-size: 0.95rem;
-      line-height: 1.85;
-      color: var(--text);
-    }
-    .line-guide-accent {
-      font-weight: 700;
-      color: #0e7490;
-      background: linear-gradient(transparent 65%, rgba(103, 232, 249, 0.4) 65%);
-      padding: 0 0.25em;
-    }
-  </style>
+  <meta name="description" content="NAGA ROOM — 会話しながら、長崎で自分に合うお部屋に出会える体験。">
+  <title>お部屋探し | NAGA ROOM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/nagaroom-shared.css">
 </head>
-<body>
-  <header class="rental-header">
-    <a href="index.html" class="logo-wrap">
-      <img src="assets/logo.png" alt="NAGA ROOM" width="100" height="32">
-      <span class="logo-sub">長崎の住まいメディア</span>
-    </a>
+<body class="has-nr-header page-chat">
+  <header class="nr-header">
+    <div class="nr-header-inner">
+      <a href="index.html" class="nr-brand">NAGA ROOM</a>
+      <nav class="nr-nav" aria-label="主要ナビ">
+        <a href="rental.html" aria-current="page">会話で探す</a>
+        <a href="listings.html">一覧で見る</a>
+      </nav>
+    </div>
   </header>
 
-  <main>
-    <!-- 1 ファーストビュー -->
-    <section class="rental-hero">
-      <div class="container">
-        <h1>長崎で、自分に合う部屋を見つける。</h1>
-        <p class="rental-hero-lead">希望を少し話すだけで<br>あなたに合うお部屋をご紹介します。</p>
-      </div>
-    </section>
+  <header class="hero" aria-label="NAGA ROOM 住まい探し">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="hero-blob hero-blob--tr"></div>
+      <div class="hero-noise"></div>
+    </div>
+    <div class="hero-frost" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <h1 class="hero-title">
+        <span class="hero-title-hook">探すより、話してみる。</span>
+        <span class="hero-title-sub">
+          それだけで、<br>
+          自分に合う部屋が見えてきます
+        </span>
+      </h1>
+      <p class="hero-lead">
+        なんとなくでも大丈夫。<br>
+        話していく中で、<br>
+        自然と<span class="hero-em">「これがいいかも」</span>が見えてきます。
+      </p>
+      <div class="hero-divider" aria-hidden="true"></div>
+      <p class="hero-line-cta">
+        <a class="hero-line-link" href="#" id="heroLineLink" target="_blank" rel="noopener noreferrer">続きはメッセージで、ゆっくり一緒に整理できます</a>
+      </p>
+    </div>
+    <div class="hero-rule" aria-hidden="true"></div>
+  </header>
 
-    <!-- 2 チャットエリア + 3 条件まとめ + 4 おすすめ物件 -->
-    <section class="main-wrap" id="chatArea">
-      <div class="container">
-        <div class="chat-block">
-          <p class="chat-area-label">住まい探しチャットエリア</p>
-          <div class="chat-box">
-            <div id="chatLog" class="chat-log" aria-live="polite"></div>
-            <div class="chat-input-wrap">
-              <textarea id="chatInput" class="chat-input" rows="1" placeholder="メッセージを入力..." maxlength="500"></textarea>
-              <button type="button" id="chatSend" class="chat-send" aria-label="送信">➤</button>
-            </div>
-            <div id="chatQuickBtns" class="chat-quick-btns"></div>
-          </div>
+  <main class="main">
+    <div class="chat-wrap">
+      <div class="chat-intro">
+        <p class="chat-intro-title">会話から、あなたへのご提案につながります</p>
+        <p class="chat-intro-desc">お部屋探しの相談を、落ち着いたトーンで。下のカードから、今の気持ちに近いものをどうぞ。</p>
+      </div>
+
+      <section class="chat-shell" aria-label="お部屋探しの会話">
+        <div class="chat-scroll" id="chatScroll" role="log" aria-live="polite" aria-relevant="additions">
+          <div class="chat-log" id="chatLog"></div>
         </div>
 
-        <div class="sidebar-block">
-          <div class="condition-panel">
-            <h3>現在の希望条件</h3>
-            <div class="condition-row">
-              <span class="label">エリア</span>
-              <span id="condArea" class="value empty">—</span>
-            </div>
-            <div class="condition-row">
-              <span class="label">家賃</span>
-              <span id="condRent" class="value empty">—</span>
-            </div>
-            <div class="condition-row">
-              <span class="label">間取り</span>
-              <span id="condLayout" class="value empty">—</span>
-            </div>
-            <div class="condition-row">
-              <span class="label">こだわり</span>
-              <span id="condPreference" class="value empty">—</span>
-            </div>
-          </div>
-
-          <div id="propertySec" class="property-sec" style="display: none;">
-            <p id="propertyAiIntro" class="ai-intro"></p>
-            <h2 class="heading">おすすめ物件</h2>
-            <div id="propertyGrid" class="property-grid"></div>
+        <div class="composer">
+          <p class="composer-note">選ばずに、そのまま文章で送っても大丈夫です</p>
+          <div class="composer-row">
+            <textarea
+              id="freeInput"
+              class="composer-input"
+              rows="1"
+              placeholder="気になっていること、今の気持ちなど"
+              maxlength="500"
+              aria-label="メッセージ入力"></textarea>
+            <button type="button" class="composer-send" id="sendBtn" aria-label="送信">→</button>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- 5 LINE相談CTA -->
-    <section class="line-cta-sec">
-      <div class="line-cta-inner">
-        <p class="title">LINEでさらにお部屋紹介を受ける</p>
-        <p class="desc">条件に合う物件を紹介してもらいたい、内見の相談をしたい方は公式LINEへ。スタッフがご案内します。</p>
-        <p class="line-cta-prep">
-          準備はできています。<br>
-          以下のボタンから、あなたの理想の暮らしについて、少しだけAIに教えてください。
+      <section class="sub-nav-section" aria-label="一覧への案内">
+        <p class="sub-nav-text">
+          条件を自分で見比べたい方は、<a href="listings.html">掲載物件の一覧</a>からもご覧いただけます。
         </p>
-        <div class="line-cta-buttons">
-          <a href="#chatArea" class="cta-btn cta-btn-ai">
-            AIで自分にぴったりの住まいを探す
-          </a>
-          <a href="https://line.me/R/oaMessage/@081nnswr/?%E7%9B%B8%E8%AB%87"
-             class="cta-btn cta-btn-line"
-             aria-label="LINEでスタッフに直接相談する"
-             target="_blank"
-             rel="noopener noreferrer">
-            LINEでスタッフに直接相談する ＞
-          </a>
-        </div>
-        <div class="line-guide-box">
-          <p>
-            ボタンを押すと、LINEの入力欄に「<span class="line-guide-accent">相談</span>」というメッセージが自動で入ります。<br>
-            そのまま一度だけ送信していただくと、専用のご案内がスタートします。
-          </p>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <div class="container">
-      <a href="bestroom.html" class="rental-back">限定記事を読む →</a>
+      <section class="footer-cta-section" aria-label="メッセージでの相談">
+        <div class="footer-cta-inner">
+          <p>気になるお部屋の整理や、まとめてのご相談も、メッセージで続けられます。</p>
+          <a class="btn-fill" id="footerLineBtn" href="#" target="_blank" rel="noopener noreferrer">メッセージで相談する</a>
+        </div>
+      </section>
     </div>
   </main>
 
+  <footer class="nr-page-footer">
+    <a href="index.html">サービスTOP</a>
+    <a href="rental.html">会話で探す</a>
+    <a href="listings.html">一覧で見る</a>
+  </footer>
+
+  <script src="js/nagaroom-data.js"></script>
   <script>
-  (function() {
+  (function () {
+    'use strict';
+
+    var NR = window.NAGA_ROOM || { PROPERTIES: [], LINE_URL: '#' };
+    var PROPERTY_LIST = NR.PROPERTIES;
+
     var CONFIG = {
-      opening: 'こんにちは☺️\n長崎でのお部屋探しですね。\n希望エリアが決まっていたら教えてください🏠',
-      quickButtons: {
-        area: [
-          { label: '浦上', value: '浦上' },
-          { label: '長崎駅', value: '長崎駅周辺' },
-          { label: '諫早', value: '諫早' },
-          { label: 'まだ決まっていない', value: '' }
-        ],
-        rent: [
-          { label: '5万円前後', value: '5万円前後' },
-          { label: '6〜7万円', value: '6〜7万円' },
-          { label: '8万円前後', value: '8万円前後' },
-          { label: '10万円以下', value: '10万円以下' }
-        ],
-        layout: [
-          { label: '1R', value: '1R' },
-          { label: '1K', value: '1K' },
-          { label: '1DK', value: '1DK' },
-          { label: '1LDK', value: '1LDK' }
-        ],
-        preference: [
-          { label: '駅近', value: '駅近' },
-          { label: '新築・築浅', value: '新築・築浅' },
-          { label: 'ペット可', value: 'ペット可' },
-          { label: '特になし', value: '特になし' }
-        ]
-      },
-      properties: [
-        { id: 1, area: '長崎駅周辺', rent: '5〜7万円', layout: '1K', tags: ['駅近'], areaLabel: '長崎駅徒歩5分', price: '5.5万円〜', walk: '徒歩5分', spec: '1K' },
-        { id: 2, area: '長崎駅周辺', rent: '5万円以下', layout: '1R', tags: [], areaLabel: '長崎駅徒歩8分', price: '4.5万円〜', walk: '徒歩8分', spec: '1R' },
-        { id: 3, area: '浦上', rent: '5〜7万円', layout: '1K', tags: [], areaLabel: '浦上駅近く', price: '5.2万円〜', walk: '徒歩3分', spec: '1K' },
-        { id: 4, area: '浦上', rent: '7〜10万円', layout: '1LDK', tags: ['駐車場あり'], areaLabel: '浦上', price: '8.2万円〜', walk: '徒歩7分', spec: '1LDK' },
-        { id: 5, area: '宝町', rent: '5万円以下', layout: '1R', tags: ['新築・築浅'], areaLabel: '宝町', price: '4.8万円〜', walk: '徒歩10分', spec: '1R' },
-        { id: 6, area: '宝町', rent: '5〜7万円', layout: '1DK', tags: [], areaLabel: '宝町', price: '6.0万円〜', walk: '徒歩12分', spec: '1DK' },
-        { id: 7, area: '長崎駅周辺', rent: '7〜10万円', layout: '1LDK', tags: ['駅近'], areaLabel: '長崎駅徒歩3分', price: '8.5万円〜', walk: '徒歩3分', spec: '1LDK' },
-        { id: 8, area: '浦上', rent: '6〜7万円', layout: '1DK', tags: [], areaLabel: '浦上', price: '6.5万円〜', walk: '徒歩5分', spec: '1DK' }
-      ]
+      LINE_URL: NR.LINE_URL,
+      CHAR_MS: 34,
+      TYPING_MIN_MS: 560,
+      TYPING_JITTER_MS: 420,
+      USER_THINK_MS: 400
     };
 
-    var state = {
-      answers: { area: '', rent: '', layout: '', preference: '' },
-      nextTopic: 'area',
-      propertyShown: false
-    };
+    var heroLine = document.getElementById('heroLineLink');
+    var footerLine = document.getElementById('footerLineBtn');
+    if (heroLine) heroLine.href = CONFIG.LINE_URL;
+    if (footerLine) footerLine.href = CONFIG.LINE_URL;
 
-    var chatLog = document.getElementById('chatLog');
-    var chatInput = document.getElementById('chatInput');
-    var chatSend = document.getElementById('chatSend');
-    var chatQuickBtns = document.getElementById('chatQuickBtns');
-    var condArea = document.getElementById('condArea');
-    var condRent = document.getElementById('condRent');
-    var condLayout = document.getElementById('condLayout');
-    var condPreference = document.getElementById('condPreference');
-    var propertySec = document.getElementById('propertySec');
-    var propertyAiIntro = document.getElementById('propertyAiIntro');
-    var propertyGrid = document.getElementById('propertyGrid');
+    /** 会話の状態（物件フィルタの参考用・デモ） */
+    var ctx = { lifestyle: '', rent: '', area: '' };
+
+    var elScroll = document.getElementById('chatScroll');
+    var elLog = document.getElementById('chatLog');
+    var elInput = document.getElementById('freeInput');
+    var elSend = document.getElementById('sendBtn');
+
+    var flowMode = 'idle';
+    var findStep = 0;
+    var inputLocked = false;
+    var lineNudgeFromFreeShown = false;
+
+    function scrollToBottom() {
+      requestAnimationFrame(function () {
+        elScroll.scrollTop = elScroll.scrollHeight;
+      });
+    }
 
     function escapeHtml(s) {
-      var div = document.createElement('div');
-      div.textContent = s;
-      return div.innerHTML;
+      var d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
     }
 
-    function appendMessage(role, text) {
-      var msg = document.createElement('div');
-      msg.className = 'chat-msg ' + role;
-      msg.textContent = text;
-      chatLog.appendChild(msg);
-      chatLog.scrollTop = chatLog.scrollHeight;
+    function appendUserBubble(text) {
+      var row = document.createElement('div');
+      row.className = 'bubble-row bubble-row--user';
+      var b = document.createElement('div');
+      b.className = 'bubble bubble--user';
+      b.textContent = text;
+      row.appendChild(b);
+      elLog.appendChild(row);
+      scrollToBottom();
     }
 
-    function updateConditionPanel() {
-      var a = state.answers;
-      condArea.textContent = a.area || '—';
-      condArea.classList.toggle('empty', !a.area);
-      condRent.textContent = a.rent || '—';
-      condRent.classList.toggle('empty', !a.rent);
-      condLayout.textContent = a.layout || '—';
-      condLayout.classList.toggle('empty', !a.layout);
-      condPreference.textContent = a.preference || '—';
-      condPreference.classList.toggle('empty', !a.preference);
+    function createEmptyBotBubble() {
+      var row = document.createElement('div');
+      row.className = 'bubble-row bubble-row--bot';
+      var b = document.createElement('div');
+      b.className = 'bubble bubble--bot';
+      row.appendChild(b);
+      elLog.appendChild(row);
+      scrollToBottom();
+      return b;
     }
 
-    function parseUserInput(text) {
-      var t = (text || '').replace(/\s+/g, '').toLowerCase();
-      var found = {};
-      if (/まだ決ま|未定|わからない|決めてない/.test(text) && !state.answers.area)
-        found.area = '未定';
-      var areaMap = [
-        ['浦上', '浦上'], ['うらかみ', '浦上'],
-        ['長崎駅', '長崎駅周辺'], ['ながさきえき', '長崎駅周辺'],
-        ['諫早', '諫早'], ['いさはや', '諫早'],
-        ['宝町', '宝町'], ['たからまち', '宝町']
-      ];
-      for (var i = 0; i < areaMap.length; i++) {
-        if (text.indexOf(areaMap[i][0]) !== -1 || t.indexOf(areaMap[i][1].replace(/\s/g, '')) !== -1) {
-          found.area = areaMap[i][1];
-          break;
+    function typeIntoElement(el, fullText, onDone) {
+      var chars = Array.from(fullText);
+      var i = 0;
+      function tick() {
+        if (i < chars.length) {
+          el.textContent += chars[i];
+          i++;
+          scrollToBottom();
+          setTimeout(tick, CONFIG.CHAR_MS);
+        } else if (onDone) {
+          onDone();
         }
       }
-      if (/5万|6万|7万|8万|10万/.test(t)) {
-        if (/5万(?!.*[6-9])/.test(t) || /4万/.test(t)) found.rent = '5万円前後';
-        else if (/6万|7万/.test(t)) found.rent = '6〜7万円';
-        else if (/8万|9万/.test(t)) found.rent = '8万円前後';
-        else if (/10万/.test(t)) found.rent = '10万円以下';
-      }
-      var layoutMap = ['1r', '1k', '1dk', '1ldk', '2k', '2ldk'];
-      for (var j = 0; j < layoutMap.length; j++) {
-        if (t.indexOf(layoutMap[j]) !== -1 || text.indexOf(layoutMap[j].toUpperCase()) !== -1) {
-          found.layout = layoutMap[j].toUpperCase();
-          if (found.layout === '2LDK') found.layout = '2K以上';
-          break;
-        }
-      }
-      if (/駅近|えきちか/.test(t)) found.preference = '駅近';
-      else if (/新築|築浅|しんちく/.test(t)) found.preference = '新築・築浅';
-      else if (/ペット|ぺっと/.test(t)) found.preference = 'ペット可';
-      else if (/駐車場|ちゅうしゃ/.test(t)) found.preference = '駐車場あり';
-      else if (/特になし|特にない|こだわりなし/.test(t)) found.preference = '特になし';
-      return found;
+      tick();
     }
 
-    function getNextTopic() {
-      if (!state.answers.area) return 'area';
-      if (!state.answers.rent) return 'rent';
-      if (!state.answers.layout) return 'layout';
-      if (!state.answers.preference) return 'preference';
-      return null;
+    function showTyping() {
+      var row = document.createElement('div');
+      row.className = 'typing-row';
+      row.setAttribute('data-typing', '1');
+      row.innerHTML =
+        '<div class="typing-bubble" aria-hidden="true">' +
+        '<span></span><span></span><span></span></div>';
+      elLog.appendChild(row);
+      scrollToBottom();
     }
 
-    function getAiReply(userText, parsed) {
-      var a = state.answers;
-      var topic = getNextTopic();
-      if (parsed.area !== undefined && !a.area) {
-        state.answers.area = parsed.area || '未定';
-        if (parsed.area === '未定') return '了解です☺️\nでは家賃の目安はどれくらいを考えていますか？';
-        return 'ありがとうございます🍀\n' + parsed.area + '周辺ですね。\n家賃の目安はどれくらいでしょう？☺️';
-      }
-      if (parsed.rent && !a.rent) {
-        state.answers.rent = parsed.rent;
-        return 'いい条件ですね✨\n家賃' + parsed.rent + 'で、間取りの希望はありますか？🏠';
-      }
-      if (parsed.layout && !a.layout) {
-        state.answers.layout = parsed.layout;
-        return '承知しました🍀\n' + parsed.layout + 'ですね。\nこだわり条件はありますか？（駅近・新築など）';
-      }
-      if (parsed.preference !== undefined && !a.preference) {
-        state.answers.preference = parsed.preference || '特になし';
-        return 'わかりました☺️\nそれならおすすめの物件をご案内しますね🔍';
-      }
-      if (a.area && topic === 'rent') return '家賃の目安を教えてもらえますか？☺️';
-      if (a.rent && topic === 'layout') return '間取りはどうされますか？ 1R・1K・1LDKなど🏠';
-      if (a.layout && topic === 'preference') return 'こだわり条件はありますか？ 特になければ「特になし」でも大丈夫です✨';
-      if (topic === 'area') return '希望のエリアはありますか？ 浦上・長崎駅・諫早など🏠';
-      return 'ほかに気になる条件があれば教えてください☺️';
+    function removeTyping() {
+      var t = elLog.querySelector('.typing-row[data-typing="1"]');
+      if (t) t.remove();
     }
 
-    function renderQuickButtons() {
-      var topic = getNextTopic();
-      if (!topic) {
-        chatQuickBtns.innerHTML = '';
-        return;
-      }
-      var opts = CONFIG.quickButtons[topic];
-      if (!opts) {
-        chatQuickBtns.innerHTML = '';
-        return;
-      }
-      chatQuickBtns.innerHTML = '';
-      opts.forEach(function(opt) {
+    function delay(ms) {
+      return new Promise(function (resolve) {
+        setTimeout(resolve, ms);
+      });
+    }
+
+    function setButtonsDisabled(disabled) {
+      elLog.querySelectorAll('.quick-btn, .entry-choice').forEach(function (btn) {
+        btn.disabled = disabled;
+      });
+    }
+
+    /**
+     * Botの1ターン＝吹き出し1つ・1〜3文を1文字ずつ表示
+     */
+    function sayBotOnce(text, onComplete) {
+      inputLocked = true;
+      setButtonsDisabled(true);
+      showTyping();
+      var tw = CONFIG.TYPING_MIN_MS + Math.random() * CONFIG.TYPING_JITTER_MS;
+      delay(tw).then(function () {
+        removeTyping();
+        var bubbleEl = createEmptyBotBubble();
+        typeIntoElement(bubbleEl, text, function () {
+          inputLocked = false;
+          setButtonsDisabled(false);
+          if (onComplete) onComplete();
+          scrollToBottom();
+        });
+      });
+    }
+
+    function clearQuickHosts() {
+      elLog.querySelectorAll('.quick-replies-host').forEach(function (n) {
+        n.remove();
+      });
+    }
+
+    function removeEntryPanel() {
+      var p = elLog.querySelector('.entry-panel-host');
+      if (p) p.remove();
+    }
+
+    function addQuickReplies(items) {
+      clearQuickHosts();
+      var host = document.createElement('div');
+      host.className = 'quick-replies-host';
+      var wrap = document.createElement('div');
+      wrap.className = 'quick-wrap';
+      items.forEach(function (item) {
         var btn = document.createElement('button');
         btn.type = 'button';
-        btn.textContent = opt.label;
-        btn.addEventListener('click', function() {
-          chatInput.value = opt.value || opt.label;
-          sendUserMessage();
+        btn.className = 'quick-btn';
+        btn.textContent = item.label;
+        btn.addEventListener('click', function () {
+          if (inputLocked) return;
+          item.onClick();
         });
-        chatQuickBtns.appendChild(btn);
+        wrap.appendChild(btn);
       });
+      host.appendChild(wrap);
+      elLog.appendChild(host);
+      scrollToBottom();
     }
 
-    function showRecommendedProperties() {
-      if (state.propertyShown) return;
-      state.propertyShown = true;
-      var a = state.answers;
-      function rentMatch(pr, ar) {
-        if (!ar) return true;
-        if (ar === '5万円前後' || ar === '6〜7万円') return pr === '5〜7万円' || pr === '5万円以下';
-        if (ar === '8万円前後') return pr === '7〜10万円';
-        if (ar === '10万円以下') return pr === '7〜10万円' || pr === '10万円以上';
-        return pr === ar;
+    /** 条件に応じて表示する物件を選ぶ（デモ：API連携時はここを差し替え） */
+    function pickPropertiesForContext() {
+      var list = PROPERTY_LIST.slice();
+      if (ctx.area.indexOf('大村') !== -1) {
+        var withArea = list.filter(function (p) { return p.area.indexOf('大村') !== -1; });
+        var rest = list.filter(function (p) { return p.area.indexOf('大村') === -1; });
+        return withArea.concat(rest).slice(0, 3);
       }
-      function score(p) {
-        var s = 0;
-        if (a.area && a.area !== '未定' && p.area === a.area) s += 3;
-        else if (a.area === '未定') s += 0;
-        if (rentMatch(p.rent, a.rent)) s += 2;
-        if (p.layout === a.layout) s += 2;
-        if (a.preference && a.preference !== '特になし' && p.tags.indexOf(a.preference) >= 0) s += 1;
-        return s;
-      }
-      var list = CONFIG.properties.map(function(p) { return { p: p, score: score(p) }; });
-      list.sort(function(x, y) { return y.score - x.score; });
-      var show = list.slice(0, 6).map(function(x) { return x.p; });
+      return list.slice(0, 3);
+    }
 
-      propertyAiIntro.textContent = 'この条件なら、こんなお部屋が合いそうです🏠';
-      propertyGrid.innerHTML = '';
-      show.forEach(function(prop) {
+    function renderPropertySuggest() {
+      var props = pickPropertiesForContext();
+      var host = document.createElement('div');
+      host.className = 'property-suggest-host';
+
+      var box = document.createElement('div');
+      box.className = 'property-suggest';
+      var label = document.createElement('p');
+      label.className = 'property-suggest-label';
+      label.textContent = '会話からのおすすめ';
+      box.appendChild(label);
+
+      props.forEach(function (p) {
         var card = document.createElement('article');
         card.className = 'property-card';
+        card.setAttribute('data-property-id', p.id);
         card.innerHTML =
-          '<div class="property-card-img">🏠</div>' +
+          '<div class="property-card-img"><img src="' + escapeHtml(p.image) + '" alt="' + escapeHtml(p.name) + 'のイメージ" loading="lazy" width="320" height="200"></div>' +
           '<div class="property-card-body">' +
-            '<p class="area">' + escapeHtml(prop.areaLabel) + ' ' + escapeHtml(prop.walk || '') + '</p>' +
-            '<p class="price">' + escapeHtml(prop.price) + '</p>' +
-            '<p class="spec">' + escapeHtml(prop.spec) + '</p>' +
-            '<a href="#" class="detail-link">詳細を見る</a>' +
+            '<h3 class="property-card-name">' + escapeHtml(p.name) + '</h3>' +
+            '<p class="property-card-meta">' +
+            '<span class="property-tag">' + escapeHtml(p.area) + '</span>' +
+            '<span class="property-tag">' + escapeHtml(p.rent) + '</span>' +
+            '<span class="property-tag">' + escapeHtml(p.layout) + '</span></p>' +
+            '<p class="property-card-comment">' + escapeHtml(p.comment) + '</p>' +
+            '<div class="property-card-actions">' +
+              '<a class="btn-ghost" href="' + escapeHtml(p.detailUrl) + '">詳細を見る</a>' +
+              '<a class="btn-fill" href="' + CONFIG.LINE_URL + '" target="_blank" rel="noopener noreferrer">この物件について相談する</a>' +
+            '</div>' +
           '</div>';
-        propertyGrid.appendChild(card);
+        box.appendChild(card);
       });
-      propertySec.style.display = 'block';
-      propertySec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      var foot = document.createElement('div');
+      foot.className = 'suggest-foot';
+      foot.innerHTML =
+        '<p class="suggest-foot-note">この中で気になるお部屋があれば、メッセージでまとめて相談できます。もう少し条件を整理しながら、合う物件を一緒に見ていくこともできます。</p>' +
+        '<div class="suggest-foot-links">' +
+          '<button type="button" data-action="more">他にも見てみる</button>' +
+          '<a href="listings.html">掲載物件を一覧で見比べる</a>' +
+          '<button type="button" data-action="adjust">条件を少し変えて探す</button>' +
+          '<a href="' + CONFIG.LINE_URL + '" target="_blank" rel="noopener noreferrer">相談しながら紹介してもらう</a>' +
+        '</div>';
+      box.appendChild(foot);
+
+      foot.querySelector('[data-action="more"]').addEventListener('click', function () {
+        if (inputLocked) return;
+        sayBotOnce(
+          'ほかにも、エリアや家賃に合わせたお部屋をご用意できます☺️\n続きはメッセージで、落ち着いて相談しながらご紹介しますね。',
+          appendLineCtaBlock
+        );
+      });
+      foot.querySelector('[data-action="adjust"]').addEventListener('click', function () {
+        if (inputLocked) return;
+        sayBotOnce(
+          '条件が変わったら、また教えてくださいね🍀\n家賃やエリアの希望が動いても、一緒に整理し直せます。',
+          function () {
+            addQuickReplies([
+              { label: '家賃を変えたい', onClick: function () { appendUserBubble('家賃を変えたい'); onAdjustHint(); } },
+              { label: 'エリアを変えたい', onClick: function () { appendUserBubble('エリアを変えたい'); onAdjustHint(); } },
+              { label: '最初からやり直す', onClick: function () { appendUserBubble('最初からやり直したい'); onRestartSoft(); } }
+            ]);
+          }
+        );
+      });
+
+      host.appendChild(box);
+      elLog.appendChild(host);
+      scrollToBottom();
     }
 
-    function sendUserMessage() {
-      var text = (chatInput.value || '').trim();
+    function onAdjustHint() {
+      clearQuickHosts();
+      delay(CONFIG.USER_THINK_MS).then(function () {
+        sayBotOnce(
+          '了解です☺️\n新しい希望を、短くでもいいので送ってもらえれば、また合いそうなお部屋を探しますね。',
+          appendLineCtaBlock
+        );
+      });
+    }
+
+    function onRestartSoft() {
+      clearQuickHosts();
+      delay(CONFIG.USER_THINK_MS).then(function () {
+        sayBotOnce(
+          '大丈夫です🍀\n上の方から、もう一度会話を始めていただいても構いません。\nここでは、今の気持ちに合わせてまたご提案しますね。',
+          appendLineCtaBlock
+        );
+      });
+    }
+
+    function appendLineCtaBlock() {
+      clearQuickHosts();
+      var host = document.createElement('div');
+      host.className = 'quick-replies-host';
+      var block = document.createElement('div');
+      block.className = 'cta-block';
+      block.innerHTML =
+        '<p>写真や細かい条件も送りやすいので、続きはこちらからどうぞ。</p>' +
+        '<a class="btn-fill" href="' + CONFIG.LINE_URL + '" target="_blank" rel="noopener noreferrer">メッセージで相談を続ける</a>';
+      host.appendChild(block);
+      elLog.appendChild(host);
+      scrollToBottom();
+    }
+
+    /* ---------- オープニング（1吹き出し） ---------- */
+    var OPENING_TEXT =
+      'こんにちは☺️\n' +
+      'NAGA ROOMでは、会話をしながらあなたに合うお部屋を一緒に見つけていけます。\n' +
+      'ゆっくりで大丈夫です。今の気持ちに近い方から、選んでみてくださいね🍀';
+
+    function appendEntryPanel() {
+      removeEntryPanel();
+      var host = document.createElement('div');
+      host.className = 'entry-panel-host';
+
+      function card(title, desc, onSelect) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'entry-choice';
+        btn.innerHTML =
+          '<p class="entry-choice-title">' + escapeHtml(title) + '</p>' +
+          '<p class="entry-choice-desc">' + escapeHtml(desc) + '</p>';
+        btn.addEventListener('click', function () {
+          if (inputLocked) return;
+          onSelect();
+        });
+        return btn;
+      }
+
+      var wrap = document.createElement('div');
+      wrap.className = 'entry-choices';
+      wrap.appendChild(
+        card(
+          'お部屋を探す 🏠',
+          '条件を伺いながら、あなた向けのお部屋をご提案します',
+          function () {
+            removeEntryPanel();
+            appendUserBubble('お部屋を探す 🏠');
+            flowMode = 'find';
+            findStep = 0;
+            ctx = { lifestyle: '', rent: '', area: '' };
+            delay(CONFIG.USER_THINK_MS).then(function () {
+              sayBotOnce(
+                'ありがとうございます☺️　一緒に、ちょうどいいお部屋に近づけていきましょう。\n' +
+                'まずは、どんな暮らし方をイメージしていますか？　はじめての一人暮らしでも、ふたり暮らしでも大丈夫です🍀',
+                function () {
+                  addQuickReplies([
+                    { label: '一人暮らし', onClick: function () { onFindLifestyle('一人暮らし'); } },
+                    { label: '同棲', onClick: function () { onFindLifestyle('同棲'); } },
+                    { label: 'ファミリー', onClick: function () { onFindLifestyle('ファミリー'); } },
+                    { label: 'まだふんわり', onClick: function () { onFindLifestyle('まだふんわり'); } }
+                  ]);
+                }
+              );
+            });
+          }
+        )
+      );
+      wrap.appendChild(
+        card(
+          'まず相談したい 🍀',
+          '家賃・エリア・初期費用など、気になることを気軽にどうぞ',
+          function () {
+            removeEntryPanel();
+            appendUserBubble('まず相談したい 🍀');
+            flowMode = 'consult';
+            delay(CONFIG.USER_THINK_MS).then(function () {
+              sayBotOnce(
+                'もちろんです☺️\n' +
+                '最初って、何から決めればいいか迷いますよね。急がなくて大丈夫です🍀\n' +
+                '気になることは下から選んでも、そのまま文章で送ってもらっても構いません。',
+                function () {
+                  showConsultMenu();
+                }
+              );
+            });
+          }
+        )
+      );
+
+      var hint = document.createElement('p');
+      hint.className = 'entry-hint';
+      hint.textContent = 'どちらを選べばいいか迷う方は、そのまま入力でも大丈夫です☺️';
+
+      host.appendChild(wrap);
+      host.appendChild(hint);
+      elLog.appendChild(host);
+      scrollToBottom();
+    }
+
+    function showOpening() {
+      sayBotOnce(OPENING_TEXT, appendEntryPanel);
+    }
+
+    function onFindLifestyle(label) {
+      clearQuickHosts();
+      appendUserBubble(label);
+      ctx.lifestyle = label;
+      delay(CONFIG.USER_THINK_MS).then(function () {
+        sayBotOnce(
+          'いいですね☺️　教えてくれてありがとうございます。\n' +
+          'その暮らし方なら、合いそうなお部屋がいくつかイメージできました。\n' +
+          '家賃は、だいたいどのあたりを考えていますか？　ざっくりの目安で大丈夫です🍀',
+          function () {
+            findStep = 1;
+            addQuickReplies([
+              { label: '〜4万円', onClick: function () { onFindRent('〜4万円'); } },
+              { label: '〜5万円', onClick: function () { onFindRent('〜5万円'); } },
+              { label: '〜6万円', onClick: function () { onFindRent('〜6万円'); } },
+              { label: '相談したい', onClick: function () { onFindRent('相談したい'); } }
+            ]);
+          }
+        );
+      });
+    }
+
+    function onFindRent(label) {
+      clearQuickHosts();
+      appendUserBubble(label);
+      ctx.rent = label;
+      delay(CONFIG.USER_THINK_MS).then(function () {
+        sayBotOnce(
+          'わかりました🍀　無理のないラインを、一緒に見ていきましょう。\n' +
+          'その予算感だと、条件的にいいお部屋が出てきそうな気がしています。\n' +
+          '気になっているエリアはありますか？　まだ決まっていなくても大丈夫です☺️',
+          function () {
+            findStep = 2;
+            addQuickReplies([
+              { label: '長崎市', onClick: function () { onFindArea('長崎市'); } },
+              { label: '諫早市', onClick: function () { onFindArea('諫早市'); } },
+              { label: '大村市', onClick: function () { onFindArea('大村市'); } },
+              { label: 'まだ決まっていない', onClick: function () { onFindArea('まだ決まっていない'); } }
+            ]);
+          }
+        );
+      });
+    }
+
+    function onFindArea(label) {
+      clearQuickHosts();
+      appendUserBubble(label);
+      ctx.area = label;
+      findStep = 3;
+      delay(CONFIG.USER_THINK_MS).then(function () {
+        sayBotOnce(
+          'ありがとうございます☺️　だいぶ、あなたらしい条件が見えてきました。\n' +
+          '条件的に、合いそうなお部屋がいくつかありそうです。\n' +
+          'こんな感じのお部屋から、まず見てみますか？',
+          function () {
+            renderPropertySuggest();
+            flowMode = 'idle';
+            findStep = 0;
+          }
+        );
+      });
+    }
+
+    /* ---------- 相談 ---------- */
+    var CONSULT_TEXT = {
+      '初期費用について':
+        '初期費用、気になりますよね☺️\n' +
+        'だいたいお家賃の4〜5か月分くらいを目安にしておくと、心に余裕が出やすいです。\n' +
+        '物件ごとに差があるので、あなたの条件に合わせて一緒に整理もできます🍀',
+      '家賃の目安について':
+        '家賃のこと、最初はふわっとしていて当然です🍀\n' +
+        '暮らし方やエリアで変わるので、今の「だいたい」で大丈夫です。\n' +
+        '教えてもらえれば、無理のないラインを一緒に探していきますね☺️',
+      'エリア選びについて':
+        'エリア、とても大事なポイントです🏠\n' +
+        'だいたい「通いやすさ」と「休日の過ごし方」、どちらを大事にしたいかで変わることが多いです。\n' +
+        '重視したいことを教えてもらえれば、長崎の中でも合いそうな場所を一緒に絞れます☺️',
+      '何から始めればいいか知りたい':
+        'うんうん、その気持ちよくわかります☺️\n' +
+        'まずは「いつ頃引っ越したいか」と「だいたいの予算」だけでも十分です🍀\n' +
+        '小さく決めて、あとは少しずつ具体化していけば大丈夫です。'
+    };
+
+    function showConsultMenu() {
+      addQuickReplies([
+        { label: '初期費用について', onClick: function () { onConsultPick('初期費用について'); } },
+        { label: '家賃の目安について', onClick: function () { onConsultPick('家賃の目安について'); } },
+        { label: 'エリア選びについて', onClick: function () { onConsultPick('エリア選びについて'); } },
+        { label: '何から始めればいいか知りたい', onClick: function () { onConsultPick('何から始めればいいか知りたい'); } }
+      ]);
+    }
+
+    function onConsultPick(topicLabel) {
+      clearQuickHosts();
+      appendUserBubble(topicLabel);
+      var body = CONSULT_TEXT[topicLabel] ||
+        '気になること、ちゃんと受け止めます☺️\n一緒に、次の一歩を見つけていきましょう🍀';
+      delay(CONFIG.USER_THINK_MS).then(function () {
+        sayBotOnce(body, function () {
+          delay(350).then(function () {
+            sayBotOnce(
+              'お話を少し進めると、あなたに合いそうなお部屋のイメージも、だんだんクリアになります☺️\n' +
+              '方向性に近い例として、こんなお部屋もご紹介できます。\n' +
+              '気になるものがあれば、ゆっくり見比べてみてくださいね🍀',
+              function () {
+                ctx = { lifestyle: '相談', rent: '', area: '' };
+                renderPropertySuggest();
+                flowMode = 'idle';
+              }
+            );
+          });
+        });
+      });
+    }
+
+    /* ---------- 自由入力 ---------- */
+    function freeTextReply(raw) {
+      var t = raw.trim();
+      if (/家賃|予算/.test(t)) {
+        return (
+          '予算のこと、気になって当然です☺️\n' +
+          'ざっくりでもいいので教えてもらえれば、無理のないラインを一緒に考えます。\n' +
+          'そのあたりが見えてくると、合いそうなお部屋のイメージも出てきやすいです🍀'
+        );
+      }
+      if (/初期費用/.test(t)) {
+        return (
+          '初期費用、ドキッとしますよね🍀\n' +
+          '物件や条件で変わるので、不安な点はひとつずつ整理していきましょう。\n' +
+          '整理できたら、あなたに合うプランも探しやすくなります☺️'
+        );
+      }
+      if (/エリア|長崎市|諫早|大村/.test(t)) {
+        return (
+          'エリア、とても大事なポイントです🏠\n' +
+          '「通いやすさ」と「休日の過ごし方」、どちらを優先したいか教えてもらえると助かります。\n' +
+          'そこが見えると、合いそうな街のイメージも一緒につくれます🍀'
+        );
+      }
+      return (
+        'うんうん、ありがとうございます☺️\n' +
+        'まだ言葉になっていなくても大丈夫です。\n' +
+        'もう少しだけ教えてもらえると、一緒に次の一歩が見えやすくなります🍀'
+      );
+    }
+
+    function appendSoftLineFromFree() {
+      if (lineNudgeFromFreeShown) return;
+      lineNudgeFromFreeShown = true;
+      sayBotOnce(
+        'ここまでのお話をもとに、合いそうなお部屋もご提案しやすくなります☺️\n' +
+        '続きはメッセージで、写真や細かい条件も含めてゆっくりどうぞ🍀',
+        appendLineCtaBlock
+      );
+    }
+
+    function onFreeSend() {
+      if (inputLocked) return;
+      var text = (elInput.value || '').trim();
       if (!text) return;
-      chatInput.value = '';
-      appendMessage('user', text);
-      var parsed = parseUserInput(text);
-      if (parsed.area) state.answers.area = parsed.area;
-      if (parsed.rent) state.answers.rent = parsed.rent;
-      if (parsed.layout) state.answers.layout = parsed.layout;
-      if (parsed.preference !== undefined) state.answers.preference = parsed.preference || '特になし';
-      updateConditionPanel();
-      var reply = getAiReply(text, parsed);
-      appendMessage('ai', reply);
-      renderQuickButtons();
-      var filled = [state.answers.area, state.answers.rent, state.answers.layout].filter(Boolean).length;
-      if (filled >= 2 && !state.answers.preference) state.answers.preference = '特になし';
-      if (filled >= 2) showRecommendedProperties();
+
+      elInput.value = '';
+      resizeTextarea();
+      removeEntryPanel();
+      appendUserBubble(text);
+
+      delay(CONFIG.USER_THINK_MS).then(function () {
+        sayBotOnce(freeTextReply(text), function () {
+          if (flowMode === 'idle' && findStep === 0) {
+            delay(450).then(appendSoftLineFromFree);
+          }
+        });
+      });
     }
 
-    chatSend.addEventListener('click', sendUserMessage);
-    chatInput.addEventListener('keydown', function(e) {
+    function resizeTextarea() {
+      elInput.style.height = 'auto';
+      elInput.style.height = Math.min(elInput.scrollHeight, 120) + 'px';
+    }
+
+    elSend.addEventListener('click', onFreeSend);
+    elInput.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        sendUserMessage();
+        onFreeSend();
       }
     });
+    elInput.addEventListener('input', resizeTextarea);
 
-    function init() {
-      appendMessage('ai', CONFIG.opening);
-      updateConditionPanel();
-      renderQuickButtons();
-      chatInput.focus();
-    }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
-      init();
-    }
+    showOpening();
+    resizeTextarea();
   })();
   </script>
 </body>
