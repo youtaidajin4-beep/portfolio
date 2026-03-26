@@ -59,13 +59,22 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  var difyUrl = process.env.DIFY_API_URL;
-  var apiKey = process.env.DIFY_API_KEY;
+  // Vercelの環境変数は前後に空白が入ることがあるためトリムして扱う
+  var difyUrlRaw = process.env.DIFY_API_URL;
+  var apiKeyRaw = process.env.DIFY_API_KEY;
+
+  var difyUrl = typeof difyUrlRaw === 'string' ? difyUrlRaw.trim() : difyUrlRaw;
+  var apiKey = typeof apiKeyRaw === 'string' ? apiKeyRaw.trim() : apiKeyRaw;
 
   if (!difyUrl || !apiKey) {
-    console.error('[api/chat] Missing DIFY_API_URL or DIFY_API_KEY');
+    var missing = {
+      DIFY_API_URL: !difyUrl,
+      DIFY_API_KEY: !apiKey,
+    };
+    console.error('[api/chat] Missing env vars (values are hidden):', missing);
     return res.status(500).json({
       error: 'Server configuration error: set DIFY_API_URL and DIFY_API_KEY in Vercel environment variables.',
+      missing: missing,
     });
   }
 
