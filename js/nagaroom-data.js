@@ -9,6 +9,12 @@
     LINE_URL: 'https://line.me/R/oaMessage/@081nnswr/?%E7%9B%B8%E8%AB%87',
 
     /**
+     * Vercel の /api/chat 経由で Dify と会話する（rental.html の自由入力）
+     * ローカルで index.html を file:// で開いている場合は false のままにしてください。
+     */
+    USE_DIFY_CHAT: true,
+
+    /**
      * 物件一覧
      * filterRegion: nagasaki | isahaya | omura
      * rentMan: 家賃（万円・数値比較用）

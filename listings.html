@@ -81,19 +81,43 @@
 
     <div class="listing-grid" id="listingGrid"></div>
 
-    <section class="listing-mid-cta">
-      <p>気になるお部屋がいくつかあっても大丈夫です。まとめて送っていただければ、一緒に整理します。</p>
-      <a class="btn-fill" id="midLineBtn" href="#" target="_blank" rel="noopener noreferrer">メッセージで相談する</a>
+    <section class="footer-cta-section listing-line-cta-block" aria-label="LINEでスタッフに相談">
+      <div class="footer-cta-inner footer-cta-inner--line">
+        <div class="line-cta-buttons line-cta-buttons--single">
+          <a
+            href="#"
+            id="listingFooterLineBtn"
+            class="cta-btn cta-btn-line"
+            target="_blank"
+            rel="noopener noreferrer"
+          >LINEでスタッフに直接相談する ＞</a>
+        </div>
+        <div class="line-guide-box line-guide-box--emphasis">
+          <p class="line-guide-head">ご利用の流れ</p>
+          <p class="line-guide-main">
+            ボタンを押すとLINEの入力欄に<br>
+            「<span class="line-guide-accent">相談</span>」というメッセージが<br>
+            <strong>自動で入ります</strong>
+          </p>
+          <p class="line-guide-strong">
+            そのまま「<span class="line-guide-accent">相談</span>」の文字を<br>
+            <strong class="line-guide-highlight line-guide-keep">一度だけ送信</strong>していただくと<br>
+            <strong class="line-guide-highlight line-guide-keep">専用のご案内</strong>がスタートします
+          </p>
+        </div>
+      </div>
     </section>
 
-    <section class="listing-bottom-cta">
-      <p>掲載の見方や、他エリアの希望なども、遠慮なくどうぞ。</p>
-      <a class="btn-fill" id="bottomLineBtn" href="#" target="_blank" rel="noopener noreferrer">メッセージで続きを相談</a>
-    </section>
-
-    <p class="listing-back-chat">
-      <a href="rental.html">← 会話から探すページに戻る</a>
-    </p>
+    <nav class="listing-back-chat" aria-label="会話でお部屋を探す">
+      <a href="rental.html" class="listing-back-chat-btn">
+        <span class="listing-back-chat-badge" aria-hidden="true">会話</span>
+        <span class="listing-back-chat-body">
+          <span class="listing-back-chat-title">条件を話して、すぐ提案</span>
+          <span class="listing-back-chat-desc">チャットで整理</span>
+        </span>
+        <span class="listing-back-chat-action" aria-hidden="true">はじめる</span>
+      </a>
+    </nav>
   </main>
 
   <footer class="nr-page-footer">
@@ -112,8 +136,7 @@
     var allProps = NR.PROPERTIES || [];
 
     document.getElementById('topLineLink').href = LINE_URL;
-    document.getElementById('midLineBtn').href = LINE_URL;
-    document.getElementById('bottomLineBtn').href = LINE_URL;
+    document.getElementById('listingFooterLineBtn').href = LINE_URL;
 
     var elGrid = document.getElementById('listingGrid');
     var elCount = document.getElementById('filterCount');

@@ -316,6 +316,129 @@
       line-height: 1.75;
     }
 
+    /* rental フッター：bestroom.html の LINE CTA と同系のボタン・案内 */
+    .footer-cta-inner--line {
+      background: var(--surface);
+      border: 1px solid var(--aqua-border-soft);
+      padding: 1.35rem 1rem 1.4rem;
+    }
+    .footer-cta-section .line-cta-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 0;
+    }
+    .footer-cta-section .line-cta-buttons--single {
+      margin-bottom: 0.25rem;
+    }
+    .footer-cta-section .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.95rem 1.75rem;
+      font-size: 0.98rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s, background 0.2s, color 0.2s;
+      width: 100%;
+      max-width: 350px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    .footer-cta-section .cta-btn-line {
+      color: #ffffff;
+      background: #06c755;
+      border: none;
+      box-shadow: 0 4px 14px rgba(6, 199, 85, 0.35);
+    }
+    .footer-cta-section .cta-btn-line:hover {
+      opacity: 0.96;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(6, 199, 85, 0.45);
+      color: #ffffff;
+    }
+    .footer-cta-section .cta-btn-line:focus-visible {
+      outline: 2px solid #06c755;
+      outline-offset: 2px;
+    }
+    .footer-cta-section .line-guide-box {
+      border: 2px solid #b0e0e6;
+      border-radius: 1rem;
+      padding: 1.25rem 1.35rem;
+      margin: 1.25rem auto 0;
+      max-width: 350px;
+      background: rgba(176, 224, 230, 0.14);
+      text-align: left;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .footer-cta-section .line-guide-box--emphasis {
+      border-width: 2px;
+      box-shadow: 0 2px 12px rgba(14, 116, 144, 0.08);
+    }
+    .footer-cta-section .line-guide-head {
+      margin: 0 0 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: var(--aqua-ink);
+      text-transform: none;
+    }
+    .footer-cta-section .line-guide-main,
+    .footer-cta-section .line-guide-strong {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.9;
+      color: var(--ink);
+    }
+    .footer-cta-section .line-guide-main {
+      font-weight: 500;
+      margin-bottom: 0.85rem;
+    }
+    .footer-cta-section .line-guide-strong {
+      font-size: 1.02rem;
+      font-weight: 600;
+      line-height: 1.82;
+      padding: 0.65rem 0.75rem;
+      border-radius: 0.65rem;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(176, 224, 230, 0.65);
+    }
+    @media (max-width: 380px) {
+      .footer-cta-section .line-guide-main {
+        font-size: 0.9rem;
+        line-height: 1.88;
+      }
+      .footer-cta-section .line-guide-strong {
+        font-size: 0.96rem;
+        line-height: 1.8;
+      }
+    }
+    /* 重要語が行の真ん中で分断されにくくする（極狭幅では解除） */
+    .footer-cta-section .line-guide-keep {
+      white-space: nowrap;
+    }
+    @media (max-width: 320px) {
+      .footer-cta-section .line-guide-keep {
+        white-space: normal;
+      }
+    }
+    .footer-cta-section .line-guide-accent {
+      font-weight: 700;
+      color: #0e7490;
+      background: linear-gradient(transparent 65%, rgba(176, 224, 230, 0.5) 65%);
+      padding: 0 0.25em;
+    }
+    .footer-cta-section .line-guide-highlight {
+      color: #0e7490;
+      font-weight: 700;
+    }
+
     .nr-page-footer {
       padding: 1.35rem 1.25rem 2rem;
       text-align: center;
@@ -776,6 +899,50 @@
       outline-offset: 2px;
     }
 
+    /* 条件が揃ったとき：チャット直下の補助ボタン */
+    .chat-condition-cta {
+      width: 100%;
+      max-width: var(--max-content);
+      margin: 1rem auto 0;
+      padding: 0 0.35rem;
+      text-align: center;
+    }
+    .chat-condition-cta[hidden] {
+      display: none !important;
+    }
+    .chat-condition-cta-btn {
+      width: 100%;
+      max-width: 20rem;
+      margin: 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.85rem 1.25rem;
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--aqua-ink);
+      background: var(--aqua-mist);
+      border: 1px solid var(--aqua-border-soft);
+      border-radius: 9999px;
+      box-shadow: 0 1px 3px rgba(52, 60, 68, 0.05);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .chat-condition-cta-btn:hover {
+      background: var(--aqua-whisper);
+      border-color: var(--aqua-border);
+    }
+    .chat-condition-cta-btn:active {
+      transform: scale(0.99);
+    }
+    .chat-condition-cta-btn:focus-visible {
+      outline: 2px solid var(--aqua-tint);
+      outline-offset: 3px;
+    }
+
     /* ========== 物件一覧ページ ========== */
     .page-listing .listing-main {
       padding: 1.5rem 1.2rem 2.5rem;
@@ -900,42 +1067,118 @@
     }
     .listing-grid .property-card { margin-bottom: 0; }
 
-    .listing-mid-cta {
-      margin: 1.5rem 0;
-      padding: 1rem 1rem 1.05rem;
-      background: var(--aqua-mist);
-      border: 1px solid var(--aqua-border-soft);
-      border-radius: var(--radius-card);
-      text-align: center;
-    }
-    .listing-mid-cta p {
-      margin: 0 0 0.65rem;
-      font-size: 0.74rem;
-      color: var(--ink-muted);
-      line-height: 1.7;
+    /* 一覧ページ末尾の LINE CTA（rental と同一デザイン） */
+    .page-listing .listing-line-cta-block {
+      margin-top: 1.75rem;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 0;
+      padding-right: 0;
     }
 
-    .listing-bottom-cta {
-      margin-top: 2rem;
-      padding: 1.15rem 1rem;
-      text-align: center;
-      border-top: 1px solid var(--aqua-border-soft);
-    }
-    .listing-bottom-cta p {
-      margin: 0 0 0.75rem;
-      font-size: 0.74rem;
-      color: var(--ink-muted);
-      line-height: 1.7;
-    }
+    /* 一覧 → 会話（チャット）への主導線 */
     .listing-back-chat {
-      margin-top: 1.25rem;
-      text-align: center;
+      margin-top: 2rem;
+      margin-bottom: 0.25rem;
     }
-    .listing-back-chat a {
+    .listing-back-chat-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      width: 100%;
+      max-width: var(--max-listing);
+      margin: 0 auto;
+      padding: 1.05rem 1.15rem 1.1rem;
+      text-align: left;
+      text-decoration: none;
+      color: inherit;
+      background: linear-gradient(145deg, #ffffff 0%, var(--aqua-whisper) 48%, var(--aqua-mist) 100%);
+      border: 1px solid var(--aqua-border-soft);
+      border-radius: 1.2rem;
+      box-shadow: 0 6px 24px rgba(52, 60, 68, 0.07), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+      transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .listing-back-chat-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--aqua-border);
+      box-shadow: 0 10px 32px rgba(74, 93, 108, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.85) inset;
+    }
+    .listing-back-chat-btn:active {
+      transform: translateY(0);
+    }
+    .listing-back-chat-btn:focus-visible {
+      outline: 2px solid var(--aqua-tint);
+      outline-offset: 3px;
+    }
+    .listing-back-chat-badge {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 2.65rem;
+      padding: 0.45rem 0.5rem;
+      font-family: "Shippori Mincho", "Hiragino Mincho ProN", serif;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--aqua-ink);
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--aqua-border-soft);
+      border-radius: 0.65rem;
+      line-height: 1.2;
+    }
+    .listing-back-chat-body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .listing-back-chat-title {
+      font-family: "Shippori Mincho", "Hiragino Mincho ProN", serif;
+      font-size: clamp(0.92rem, 2.8vw, 1.05rem);
+      font-weight: 600;
+      line-height: 1.45;
+      letter-spacing: 0.03em;
+      color: var(--ink);
+    }
+    .listing-back-chat-title br { display: none; }
+    .listing-back-chat-desc {
       font-size: 0.72rem;
-      color: var(--aqua-link);
-      text-decoration: underline;
-      text-underline-offset: 0.18em;
+      line-height: 1.65;
+      color: var(--ink-muted);
+    }
+    .listing-back-chat-action {
+      flex-shrink: 0;
+      align-self: center;
+      padding: 0.5rem 0.85rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: #fff;
+      background: var(--aqua-send);
+      border-radius: 9999px;
+      box-shadow: 0 2px 10px rgba(109, 138, 156, 0.35);
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+    .listing-back-chat-btn:hover .listing-back-chat-action {
+      background: var(--aqua-send-hover);
+      transform: scale(1.03);
+    }
+    @media (max-width: 380px) {
+      .listing-back-chat-btn {
+        flex-wrap: wrap;
+        padding: 1rem 1rem 1rem;
+      }
+      .listing-back-chat-action {
+        width: 100%;
+        text-align: center;
+        margin-top: 0.15rem;
+      }
+      .listing-back-chat-desc {
+        display: none;
+      }
     }
 
     .listing-empty {

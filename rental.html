@@ -31,7 +31,7 @@
       <h1 class="hero-title">
         <span class="hero-title-hook">探すより、話してみる。</span>
         <span class="hero-title-sub">
-          それだけで、<br>
+          それだけで<br>
           自分に合う部屋が見えてきます
         </span>
       </h1>
@@ -75,16 +75,42 @@
         </div>
       </section>
 
+      <div id="chatConditionCta" class="chat-condition-cta" hidden aria-hidden="true">
+        <button type="button" class="chat-condition-cta-btn" id="conditionSearchBtn">
+          この条件でお部屋を見る
+        </button>
+      </div>
+
       <section class="sub-nav-section" aria-label="一覧への案内">
         <p class="sub-nav-text">
           条件を自分で見比べたい方は、<a href="listings.html">掲載物件の一覧</a>からもご覧いただけます。
         </p>
       </section>
 
-      <section class="footer-cta-section" aria-label="メッセージでの相談">
-        <div class="footer-cta-inner">
-          <p>気になるお部屋の整理や、まとめてのご相談も、メッセージで続けられます。</p>
-          <a class="btn-fill" id="footerLineBtn" href="#" target="_blank" rel="noopener noreferrer">メッセージで相談する</a>
+      <section class="footer-cta-section" aria-label="LINEでスタッフに相談">
+        <div class="footer-cta-inner footer-cta-inner--line">
+          <div class="line-cta-buttons line-cta-buttons--single">
+            <a
+              href="#"
+              id="footerLineBtn"
+              class="cta-btn cta-btn-line"
+              target="_blank"
+              rel="noopener noreferrer"
+            >LINEでスタッフに直接相談する ＞</a>
+          </div>
+          <div class="line-guide-box line-guide-box--emphasis">
+            <p class="line-guide-head">ご利用の流れ</p>
+            <p class="line-guide-main">
+              ボタンを押すとLINEの入力欄に<br>
+              「<span class="line-guide-accent">相談</span>」というメッセージが<br>
+              <strong>自動で入ります</strong>
+            </p>
+            <p class="line-guide-strong">
+              そのまま「<span class="line-guide-accent">相談</span>」の文字を<br>
+              <strong class="line-guide-highlight line-guide-keep">一度だけ送信</strong>していただくと<br>
+              <strong class="line-guide-highlight line-guide-keep">専用のご案内</strong>がスタートします
+            </p>
+          </div>
         </div>
       </section>
     </div>
@@ -106,11 +132,51 @@
 
     var CONFIG = {
       LINE_URL: NR.LINE_URL,
+      USE_DIFY_CHAT: NR.USE_DIFY_CHAT === true,
       CHAR_MS: 34,
       TYPING_MIN_MS: 560,
       TYPING_JITTER_MS: 420,
       USER_THINK_MS: 400
     };
+
+    /** Dify 会話 ID（/api/chat のレスポンスで更新） */
+    var difyConversationId = null;
+
+    function getOrCreateDifyUserId() {
+      var k = 'nr_dify_user_id';
+      try {
+        var id = localStorage.getItem(k);
+        if (!id) {
+          id = 'lp_' + Date.now() + '_' + Math.random().toString(36).slice(2, 12);
+          localStorage.setItem(k, id);
+        }
+        return id;
+      } catch (e) {
+        return 'lp_anonymous_user';
+      }
+    }
+
+    function fetchDifyChatReply(userMessage) {
+      return fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userMessage: userMessage,
+          conversationId: difyConversationId,
+          userId: getOrCreateDifyUserId()
+        })
+      }).then(function (res) {
+        return res.json().then(function (data) {
+          if (!res.ok) {
+            throw new Error(data.error || data.message || ('HTTP ' + res.status));
+          }
+          if (data.conversationId) {
+            difyConversationId = data.conversationId;
+          }
+          return data.answer != null ? String(data.answer) : '';
+        });
+      });
+    }
 
     var heroLine = document.getElementById('heroLineLink');
     var footerLine = document.getElementById('footerLineBtn');
@@ -120,10 +186,137 @@
     /** 会話の状態（物件フィルタの参考用・デモ） */
     var ctx = { lifestyle: '', rent: '', area: '' };
 
+    /**
+     * ユーザー発言から抽出した条件（一覧URL等で再利用しやすい形）
+     * budget: 月額想定（円・数値） / layout: 正規化した間取り文字列 / features: 英字スラッグの配列
+     */
+    var extractedConditions = { budget: null, layout: '', features: [] };
+
+    var FEATURE_RULES = [
+      { test: /静か|閑静|静寂|騒音|落ち着いた/, slug: 'quiet' },
+      { test: /ペット|犬|猫|動物/, slug: 'pet' },
+      { test: /駅近|駅チカ|駅から近|徒歩\d+\s*分/, slug: 'station' },
+      { test: /独立洗面|洗面\s*独立|洗\s*面\s*台/, slug: 'washstand' },
+      { test: /風呂トイレ別|バス\s*トイレ別|バストイレ別|ＢＴ別/, slug: 'separate_bath' },
+      { test: /南向き|南東|日当たり/, slug: 'south' },
+      { test: /駐車場|駐輪|車庫|車\s*あり/, slug: 'parking' },
+      { test: /新築|築浅|築\s*\d+\s*年/, slug: 'newish' },
+      { test: /リノベ|リフォーム/, slug: 'reno' },
+      { test: /オートロック|セキュリティ/, slug: 'security' },
+      { test: /角部屋|角\s*部屋/, slug: 'corner' }
+    ];
+
+    function normalizeDigits(str) {
+      return String(str).replace(/[０-９]/g, function (c) {
+        return String.fromCharCode(c.charCodeAt(0) - 0xfee0);
+      });
+    }
+
+    function extractBudgetFromText(text) {
+      var s = normalizeDigits(text);
+      var m = s.match(/(?:〜|~|～|から)?\s*([\d.]+)\s*万(?:円)?/);
+      if (m) {
+        var v = parseFloat(m[1], 10);
+        if (!isNaN(v) && v > 0 && v < 500) return Math.round(v * 10000);
+      }
+      m = s.match(/(?:家賃|予算|月額|家賵)\s*[のはが]?\s*(\d{4,6})(?:\s*円)?/);
+      if (m) {
+        var y = parseInt(m[1], 10);
+        if (y >= 10000 && y <= 3000000) return y;
+      }
+      return null;
+    }
+
+    function extractLayoutFromText(text) {
+      var t = normalizeDigits(text).replace(/\s/g, '');
+      t = t.replace(/[ＬＤＫＲ]/g, function (ch) {
+        return { Ｌ: 'L', Ｄ: 'D', Ｋ: 'K', Ｒ: 'R' }[ch] || ch;
+      });
+      var order = ['3LDK', '2LDK', '1LDK', '3DK', '2DK', '1DK', '2K', '1K', '1R'];
+      for (var i = 0; i < order.length; i++) {
+        if (t.indexOf(order[i]) !== -1) return order[i];
+      }
+      if (/ワンルーム|ワン\s*ルーム|１ルーム|1ルーム/.test(text)) return '1R';
+      return '';
+    }
+
+    function extractFeaturesFromText(text) {
+      var found = [];
+      for (var i = 0; i < FEATURE_RULES.length; i++) {
+        var r = FEATURE_RULES[i];
+        if (r.test.test(text) && found.indexOf(r.slug) === -1) found.push(r.slug);
+      }
+      return found;
+    }
+
+    function extractConditionsFromText(text) {
+      return {
+        budget: extractBudgetFromText(text),
+        layout: extractLayoutFromText(text),
+        features: extractFeaturesFromText(text)
+      };
+    }
+
+    function mergeExtractedConditions(patch) {
+      if (patch.budget != null && !isNaN(patch.budget)) {
+        extractedConditions.budget = patch.budget;
+      }
+      if (patch.layout) {
+        extractedConditions.layout = patch.layout;
+      }
+      patch.features.forEach(function (slug) {
+        if (extractedConditions.features.indexOf(slug) === -1) {
+          extractedConditions.features.push(slug);
+        }
+      });
+    }
+
+    function conditionCategoryCount() {
+      var n = 0;
+      if (extractedConditions.budget != null && extractedConditions.budget > 0) n++;
+      if (extractedConditions.layout) n++;
+      if (extractedConditions.features.length > 0) n++;
+      return n;
+    }
+
+    function buildConditionSearchUrl() {
+      var params = new URLSearchParams();
+      if (extractedConditions.budget != null) {
+        params.set('budget', String(extractedConditions.budget));
+      }
+      if (extractedConditions.layout) {
+        params.set('layout', extractedConditions.layout);
+      }
+      if (extractedConditions.features.length) {
+        params.set('features', extractedConditions.features.join(','));
+      }
+      var q = params.toString();
+      return q ? 'rental.html?' + q : 'rental.html';
+    }
+
+    function updateConditionSearchButton() {
+      var wrap = document.getElementById('chatConditionCta');
+      if (!wrap) return;
+      var enough = conditionCategoryCount() >= 2;
+      wrap.hidden = !enough;
+      wrap.setAttribute('aria-hidden', enough ? 'false' : 'true');
+    }
+
+    function processUserUtteranceForConditions(text) {
+      mergeExtractedConditions(extractConditionsFromText(text));
+      updateConditionSearchButton();
+    }
+
     var elScroll = document.getElementById('chatScroll');
     var elLog = document.getElementById('chatLog');
     var elInput = document.getElementById('freeInput');
     var elSend = document.getElementById('sendBtn');
+    var elConditionBtn = document.getElementById('conditionSearchBtn');
+    if (elConditionBtn) {
+      elConditionBtn.addEventListener('click', function () {
+        window.location.href = buildConditionSearchUrl();
+      });
+    }
 
     var flowMode = 'idle';
     var findStep = 0;
@@ -150,6 +343,7 @@
       b.textContent = text;
       row.appendChild(b);
       elLog.appendChild(row);
+      processUserUtteranceForConditions(text);
       scrollToBottom();
     }
 
@@ -632,6 +826,32 @@
       resizeTextarea();
       removeEntryPanel();
       appendUserBubble(text);
+
+      if (CONFIG.USE_DIFY_CHAT) {
+        delay(CONFIG.USER_THINK_MS).then(function () {
+          fetchDifyChatReply(text)
+            .then(function (answer) {
+              var body = answer && answer.trim() ? answer : '（返答が空でした）';
+              sayBotOnce(body, function () {
+                if (flowMode === 'idle' && findStep === 0) {
+                  delay(450).then(appendSoftLineFromFree);
+                }
+              });
+            })
+            .catch(function (err) {
+              console.error(err);
+              sayBotOnce(
+                'ただいま会話に接続しにくい状況です。\n時間をおいて試すか、下のLINEからお問い合わせください。',
+                function () {
+                  if (flowMode === 'idle' && findStep === 0) {
+                    delay(450).then(appendSoftLineFromFree);
+                  }
+                }
+              );
+            });
+        });
+        return;
+      }
 
       delay(CONFIG.USER_THINK_MS).then(function () {
         sayBotOnce(freeTextReply(text), function () {
