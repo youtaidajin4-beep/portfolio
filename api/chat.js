@@ -53,28 +53,53 @@ function extractAnswerAndConversationId(data) {
   return { answer: answer != null ? String(answer) : '', conversationId: conversationId };
 }
 
+function getFirstDefinedEnv(names) {
+  for (var i = 0; i < names.length; i++) {
+    var key = names[i];
+    var val = process.env[key];
+    if (typeof val === 'string' && val.trim()) {
+      return { key: key, value: val.trim() };
+    }
+  }
+  return { key: null, value: '' };
+}
+
+function normalizeDifyUrl(url) {
+  if (!url) return '';
+  var trimmed = String(url).trim();
+  if (/\/v1\/chat-messages\/?$/.test(trimmed)) return trimmed;
+  if (/\/v1\/?$/.test(trimmed)) return trimmed.replace(/\/?$/, '/chat-messages');
+  if (/^https?:\/\/[^/]+\/?$/.test(trimmed)) return trimmed.replace(/\/?$/, '/v1/chat-messages');
+  return trimmed;
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  // Vercelの環境変数は前後に空白が入ることがあるためトリムして扱う
-  var difyUrlRaw = process.env.DIFY_API_URL;
-  var apiKeyRaw = process.env.DIFY_API_KEY;
+  // 変数名ゆれ（DIFY_API_* / DIFY_PROPERTY_API_*）を吸収
+  var difyUrlEnv = getFirstDefinedEnv(['DIFY_API_URL', 'DIFY_PROPERTY_API_URL']);
+  var apiKeyEnv = getFirstDefinedEnv(['DIFY_API_KEY', 'DIFY_PROPERTY_API_KEY']);
 
-  var difyUrl = typeof difyUrlRaw === 'string' ? difyUrlRaw.trim() : difyUrlRaw;
-  var apiKey = typeof apiKeyRaw === 'string' ? apiKeyRaw.trim() : apiKeyRaw;
+  var difyUrl = normalizeDifyUrl(difyUrlEnv.value);
+  var apiKey = apiKeyEnv.value;
 
   if (!difyUrl || !apiKey) {
     var missing = {
       DIFY_API_URL: !difyUrl,
       DIFY_API_KEY: !apiKey,
     };
-    console.error('[api/chat] Missing env vars (values are hidden):', missing);
+    var resolvedFrom = {
+      urlEnv: difyUrlEnv.key,
+      keyEnv: apiKeyEnv.key,
+    };
+    console.error('[api/chat] Missing env vars (values are hidden):', { missing: missing, resolvedFrom: resolvedFrom });
     return res.status(500).json({
       error: 'Server configuration error: set DIFY_API_URL and DIFY_API_KEY in Vercel environment variables.',
       missing: missing,
+      resolvedFrom: resolvedFrom,
     });
   }
 

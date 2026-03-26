@@ -131,9 +131,10 @@
   (function () {
     'use strict';
 
-    var NR = window.NAGA_ROOM || { PROPERTIES: [], LINE_URL: '#' };
+    var NR = window.NAGA_ROOM || { PROPERTIES: [], LINE_URL: '#', PROPERTIES_DATA_URL: 'data/properties.json' };
     var LINE_URL = NR.LINE_URL;
-    var allProps = NR.PROPERTIES || [];
+    var allProps = [];
+    var PROPERTIES_DATA_URL = NR.PROPERTIES_DATA_URL || 'data/properties.json';
 
     document.getElementById('topLineLink').href = LINE_URL;
     document.getElementById('listingFooterLineBtn').href = LINE_URL;
@@ -214,7 +215,25 @@
     [fArea, fRent, fLayout, fFeature].forEach(function (el) {
       el.addEventListener('change', render);
     });
-    render();
+    function loadPropertyList() {
+      return fetch(PROPERTIES_DATA_URL, { cache: 'no-store' })
+        .then(function (res) {
+          if (!res.ok) throw new Error('Failed to load properties.json');
+          return res.json();
+        })
+        .then(function (data) {
+          return Array.isArray(data) ? data : [];
+        })
+        .catch(function (err) {
+          console.error('[listings] properties load error:', err);
+          return Array.isArray(NR.PROPERTIES) ? NR.PROPERTIES : [];
+        });
+    }
+
+    loadPropertyList().then(function (list) {
+      allProps = list;
+      render();
+    });
   })();
   </script>
 </body>

@@ -127,11 +127,12 @@
   (function () {
     'use strict';
 
-    var NR = window.NAGA_ROOM || { PROPERTIES: [], LINE_URL: '#' };
-    var PROPERTY_LIST = NR.PROPERTIES;
+    var NR = window.NAGA_ROOM || { PROPERTIES: [], LINE_URL: '#', PROPERTIES_DATA_URL: 'data/properties.json' };
+    var PROPERTY_LIST = [];
 
     var CONFIG = {
       LINE_URL: NR.LINE_URL,
+      PROPERTIES_DATA_URL: NR.PROPERTIES_DATA_URL || 'data/properties.json',
       USE_DIFY_CHAT: NR.USE_DIFY_CHAT === true,
       CHAR_MS: 34,
       TYPING_MIN_MS: 560,
@@ -139,7 +140,22 @@
       USER_THINK_MS: 400
     };
 
-    /** Dify 会話 ID（/api/chat のレスポンスで更新） */
+    function loadPropertyList() {
+      return fetch(CONFIG.PROPERTIES_DATA_URL, { cache: 'no-store' })
+        .then(function (res) {
+          if (!res.ok) throw new Error('Failed to load properties.json');
+          return res.json();
+        })
+        .then(function (data) {
+          return Array.isArray(data) ? data : [];
+        })
+        .catch(function (err) {
+          console.error('[rental] properties load error:', err);
+          return Array.isArray(NR.PROPERTIES) ? NR.PROPERTIES : [];
+        });
+    }
+
+    /** Dify 会話 ID（USE_DIFY_CHAT=true の時のみ使用） */
     var difyConversationId = null;
 
     function getOrCreateDifyUserId() {
@@ -455,7 +471,7 @@
       scrollToBottom();
     }
 
-    /** 条件に応じて表示する物件を選ぶ（デモ：API連携時はここを差し替え） */
+    /** 条件に応じて表示する物件を選ぶ（現在は物件検索フローを優先） */
     function pickPropertiesForContext() {
       var list = PROPERTY_LIST.slice();
       if (ctx.area.indexOf('大村') !== -1) {
@@ -840,8 +856,9 @@
             })
             .catch(function (err) {
               console.error(err);
+              var reason = (err && err.message) ? ('\n（原因: ' + err.message + '）') : '';
               sayBotOnce(
-                'ただいま会話に接続しにくい状況です。\n時間をおいて試すか、下のLINEからお問い合わせください。',
+                'ただいま会話に接続しにくい状況です。\n時間をおいて試すか、下のLINEからお問い合わせください。' + reason,
                 function () {
                   if (flowMode === 'idle' && findStep === 0) {
                     delay(450).then(appendSoftLineFromFree);
@@ -876,8 +893,11 @@
     });
     elInput.addEventListener('input', resizeTextarea);
 
-    showOpening();
-    resizeTextarea();
+    loadPropertyList().then(function (list) {
+      PROPERTY_LIST = list;
+      showOpening();
+      resizeTextarea();
+    });
   })();
   </script>
 </body>
