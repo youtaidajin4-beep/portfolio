@@ -137,7 +137,8 @@
       CHAR_MS: 34,
       TYPING_MIN_MS: 560,
       TYPING_JITTER_MS: 420,
-      USER_THINK_MS: 400
+      USER_THINK_MS: 400,
+      FAST_RENDER_FOR_DIFY: true
     };
 
     function loadPropertyList() {
@@ -172,6 +173,78 @@
       }
     }
 
+    /**
+     * Dify SSE の1行 data をパースして、answer の断片と conversation_id を取り出す
+     */
+    function extractDifySsePayload(obj) {
+      var delta = '';
+      if (obj.answer != null) delta += String(obj.answer);
+      if (obj.data && obj.data.answer != null) delta += String(obj.data.answer);
+      if (obj.message && obj.message.answer != null) delta += String(obj.message.answer);
+      var cid =
+        obj.conversation_id ||
+        (obj.data && obj.data.conversation_id) ||
+        (obj.message && obj.message.conversation_id) ||
+        null;
+      return { delta: delta, conversationId: cid };
+    }
+
+    /**
+     * /api/chat が text/event-stream を返す場合に読み取り、最終回答文字列を組み立てる
+     * （見た目は従来どおり「1回の応答」として表示するため、Promise は完了時に1回だけ resolve）
+     */
+    function parseDifySseResponse(res) {
+      if (!res.body || typeof res.body.getReader !== 'function') {
+        return res.text().then(function () {
+          throw new Error('Streaming is not supported in this browser');
+        });
+      }
+      var reader = res.body.getReader();
+      var decoder = new TextDecoder();
+      var buffer = '';
+      var fullAnswer = '';
+      var convId = null;
+
+      return new Promise(function (resolve, reject) {
+        function pump() {
+          reader
+            .read()
+            .then(function (result) {
+              if (result.done) {
+                if (convId) difyConversationId = convId;
+                resolve(fullAnswer);
+                return;
+              }
+              buffer += decoder.decode(result.value, { stream: true });
+              var lines = buffer.split(/\r?\n/);
+              buffer = lines.pop() || '';
+              for (var i = 0; i < lines.length; i++) {
+                var line = lines[i].trim();
+                if (!line || line.indexOf('data:') !== 0) continue;
+                var jsonStr = line.replace(/^data:\s*/, '').trim();
+                if (jsonStr === '[DONE]' || jsonStr === '') continue;
+                var obj;
+                try {
+                  obj = JSON.parse(jsonStr);
+                } catch (e) {
+                  continue;
+                }
+                if (obj.event === 'error' && (obj.message || obj.msg || (obj.data && obj.data.message))) {
+                  reject(new Error(obj.message || obj.msg || (obj.data && obj.data.message) || 'Dify stream error'));
+                  return;
+                }
+                var ext = extractDifySsePayload(obj);
+                if (ext.conversationId) convId = ext.conversationId;
+                if (ext.delta) fullAnswer += ext.delta;
+              }
+              pump();
+            })
+            .catch(reject);
+        }
+        pump();
+      });
+    }
+
     function fetchDifyChatReply(userMessage) {
       return fetch('/api/chat', {
         method: 'POST',
@@ -182,9 +255,30 @@
           userId: getOrCreateDifyUserId()
         })
       }).then(function (res) {
-        return res.json().then(function (data) {
-          if (!res.ok) {
-            throw new Error(data.error || data.message || ('HTTP ' + res.status));
+        var ct = res.headers.get('content-type') || '';
+
+        if (!res.ok) {
+          return res.text().then(function (text) {
+            var data;
+            try {
+              data = text ? JSON.parse(text) : {};
+            } catch (e) {
+              throw new Error(text ? text.slice(0, 300) : 'HTTP ' + res.status);
+            }
+            throw new Error(data.error || data.message || 'HTTP ' + res.status);
+          });
+        }
+
+        if (ct.indexOf('text/event-stream') !== -1) {
+          return parseDifySseResponse(res);
+        }
+
+        return res.text().then(function (text) {
+          var data;
+          try {
+            data = text ? JSON.parse(text) : {};
+          } catch (e) {
+            throw new Error(text ? text.slice(0, 300) : 'Invalid response');
           }
           if (data.conversationId) {
             difyConversationId = data.conversationId;
@@ -436,6 +530,19 @@
           scrollToBottom();
         });
       });
+    }
+
+    // Dify応答用: 演出待ちを入れず、即時に吹き出し表示
+    function sayBotFast(text, onComplete) {
+      inputLocked = true;
+      setButtonsDisabled(true);
+      removeTyping();
+      var bubbleEl = createEmptyBotBubble();
+      bubbleEl.textContent = text;
+      inputLocked = false;
+      setButtonsDisabled(false);
+      if (onComplete) onComplete();
+      scrollToBottom();
     }
 
     function clearQuickHosts() {
@@ -844,29 +951,29 @@
       appendUserBubble(text);
 
       if (CONFIG.USE_DIFY_CHAT) {
-        delay(CONFIG.USER_THINK_MS).then(function () {
-          fetchDifyChatReply(text)
-            .then(function (answer) {
-              var body = answer && answer.trim() ? answer : '（返答が空でした）';
-              sayBotOnce(body, function () {
-                if (flowMode === 'idle' && findStep === 0) {
-                  delay(450).then(appendSoftLineFromFree);
-                }
-              });
-            })
-            .catch(function (err) {
-              console.error(err);
-              var reason = (err && err.message) ? ('\n（原因: ' + err.message + '）') : '';
-              sayBotOnce(
-                'ただいま会話に接続しにくい状況です。\n時間をおいて試すか、下のLINEからお問い合わせください。' + reason,
-                function () {
-                  if (flowMode === 'idle' && findStep === 0) {
-                    delay(450).then(appendSoftLineFromFree);
-                  }
-                }
-              );
+        fetchDifyChatReply(text)
+          .then(function (answer) {
+            var body = answer && answer.trim() ? answer : '（返答が空でした）';
+            var render = CONFIG.FAST_RENDER_FOR_DIFY ? sayBotFast : sayBotOnce;
+            render(body, function () {
+              if (flowMode === 'idle' && findStep === 0) {
+                delay(260).then(appendSoftLineFromFree);
+              }
             });
-        });
+          })
+          .catch(function (err) {
+            console.error(err);
+            var reason = (err && err.message) ? ('\n（原因: ' + err.message + '）') : '';
+            var render = CONFIG.FAST_RENDER_FOR_DIFY ? sayBotFast : sayBotOnce;
+            render(
+              'ただいま会話に接続しにくい状況です。\n時間をおいて試すか、下のLINEからお問い合わせください。' + reason,
+              function () {
+                if (flowMode === 'idle' && findStep === 0) {
+                  delay(260).then(appendSoftLineFromFree);
+                }
+              }
+            );
+          });
         return;
       }
 

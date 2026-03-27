@@ -1,12 +1,13 @@
 /**
- * Vercel Serverless Function — Dify Chatflow への中継（blocking）
+ * Vercel Serverless Function — Dify chat-messages への中継（streaming）
  * ルート: POST /api/chat
  *
- * 環境変数（Vercel ダッシュボードで設定）:
- *   - DIFY_API_KEY  … Dify の API キー（必須）
- *   - DIFY_API_URL  … Dify のチャット送信エンドポイントのフルURL（必須）
- *       ▼▼▼ ここに Dify の Chatflow の「API アクセス」に表示されるエンドポイントURLをそのまま貼る想定です。
- *       例: https://api.dify.ai/v1/chat-messages  （お使いのリージョン・パスに合わせてください）
+ * Dify へは response_mode: "streaming" でリクエストし、
+ * 返ってきた text/event-stream をそのままクライアントへ転送します。
+ *
+ * 環境変数（Vercel）:
+ *   DIFY_API_KEY / DIFY_PROPERTY_API_KEY
+ *   DIFY_API_URL / DIFY_PROPERTY_API_URL（chat-messages のフルURL推奨）
  */
 
 async function readJsonBody(req) {
@@ -37,22 +38,6 @@ async function readJsonBody(req) {
   });
 }
 
-function extractAnswerAndConversationId(data) {
-  var answer =
-    data.answer ||
-    (data.data && data.data.answer) ||
-    data.output_text ||
-    (typeof data.text === 'string' ? data.text : undefined);
-
-  var conversationId =
-    data.conversation_id ||
-    (data.data && data.data.conversation_id) ||
-    (data.message && data.message.conversation_id) ||
-    null;
-
-  return { answer: answer != null ? String(answer) : '', conversationId: conversationId };
-}
-
 function getFirstDefinedEnv(names) {
   for (var i = 0; i < names.length; i++) {
     var key = names[i];
@@ -79,7 +64,6 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  // 変数名ゆれ（DIFY_API_* / DIFY_PROPERTY_API_*）を吸収
   var difyUrlEnv = getFirstDefinedEnv(['DIFY_API_URL', 'DIFY_PROPERTY_API_URL']);
   var apiKeyEnv = getFirstDefinedEnv(['DIFY_API_KEY', 'DIFY_PROPERTY_API_KEY']);
 
@@ -95,7 +79,7 @@ module.exports = async function handler(req, res) {
       urlEnv: difyUrlEnv.key,
       keyEnv: apiKeyEnv.key,
     };
-    console.error('[api/chat] Missing env vars (values are hidden):', { missing: missing, resolvedFrom: resolvedFrom });
+    console.error('[api/chat] Missing env vars (values hidden):', { missing: missing, resolvedFrom: resolvedFrom });
     return res.status(500).json({
       error: 'Server configuration error: set DIFY_API_URL and DIFY_API_KEY in Vercel environment variables.',
       missing: missing,
@@ -121,7 +105,7 @@ module.exports = async function handler(req, res) {
   var payload = {
     inputs: {},
     query: String(userMessage),
-    response_mode: 'blocking',
+    response_mode: 'streaming',
     user: String(userId),
   };
 
@@ -129,55 +113,75 @@ module.exports = async function handler(req, res) {
     payload.conversation_id = conversationId;
   }
 
+  var abortController = new AbortController();
+  req.on('close', function () {
+    try {
+      abortController.abort();
+    } catch (e) {}
+  });
+
   try {
-    var r = await fetch(difyUrl, {
+    var upstream = await fetch(difyUrl, {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + apiKey,
         'Content-Type': 'application/json',
+        Accept: 'text/event-stream',
       },
       body: JSON.stringify(payload),
+      signal: abortController.signal,
     });
 
-    var text = await r.text();
-    var data;
-    try {
-      data = text ? JSON.parse(text) : {};
-    } catch (parseErr) {
-      console.error('[api/chat] Dify non-JSON response:', text.slice(0, 800));
+    if (!upstream.ok || !upstream.body) {
+      var errText = '';
+      try {
+        errText = await upstream.text();
+      } catch (e) {}
+      console.error('[api/chat] Dify HTTP error', upstream.status, errText.slice(0, 1200));
+      var errJson;
+      try {
+        errJson = errText ? JSON.parse(errText) : {};
+      } catch (e) {
+        errJson = {};
+      }
       return res.status(500).json({
-        error: 'Invalid response from Dify (not JSON)',
-        raw: text.slice(0, 300),
+        error: errJson.message || errJson.error || 'Dify API request failed',
+        status: upstream.status,
+        details: errJson,
       });
     }
 
-    if (!r.ok) {
-      console.error('[api/chat] Dify HTTP error', r.status, text.slice(0, 1200));
-      return res.status(500).json({
-        error: (data.message || data.error || 'Dify API request failed'),
-        status: r.status,
-        details: data,
-      });
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+
+    if (typeof res.flushHeaders === 'function') {
+      res.flushHeaders();
     }
 
-    if (process.env.DIFY_DEBUG_LOG === '1') {
-      console.log('[api/chat] Dify response keys:', Object.keys(data));
+    var reader = upstream.body.getReader();
+
+    while (true) {
+      var chunk = await reader.read();
+      if (chunk.done) break;
+      if (chunk.value) {
+        res.write(Buffer.from(chunk.value));
+      }
     }
 
-    var extracted = extractAnswerAndConversationId(data);
-
-    if (!extracted.answer && extracted.answer !== '') {
-      console.warn('[api/chat] Empty answer; inspect Dify response shape. Sample:', JSON.stringify(data).slice(0, 1500));
-    }
-
-    return res.status(200).json({
-      answer: extracted.answer,
-      conversationId: extracted.conversationId,
-    });
+    return res.end();
   } catch (err) {
-    console.error('[api/chat]', err);
-    return res.status(500).json({
-      error: err.message || 'Internal server error',
-    });
+    var message = err && err.name === 'AbortError' ? 'Request aborted' : (err && err.message ? err.message : 'Internal server error');
+    console.error('[api/chat]', message);
+    if (!res.headersSent) {
+      return res.status(500).json({ error: message });
+    }
+    try {
+      res.write('event: error\n');
+      res.write('data: ' + JSON.stringify({ error: message }) + '\n\n');
+    } catch (e) {}
+    return res.end();
   }
 };
