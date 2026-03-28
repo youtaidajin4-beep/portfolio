@@ -8,6 +8,11 @@
  * 環境変数（Vercel）:
  *   DIFY_API_KEY / DIFY_PROPERTY_API_KEY
  *   DIFY_API_URL / DIFY_PROPERTY_API_URL（chat-messages のフルURL推奨）
+ *
+ * 切り分け（HTTP 405）:
+ *   - DevTools Network で /api/chat の Request Method が POST か確認（GET だと 405）。
+ *   - PC とスマホで開いている本番 URL が完全一致しているか確認。
+ *   - DIFY_DEBUG_LOG=1 でサーバログに method が出ます。
  */
 
 async function readJsonBody(req) {
@@ -58,11 +63,37 @@ function normalizeDifyUrl(url) {
   return trimmed;
 }
 
+/** 別オリジンから rental を開く場合の CORS（プリフライト OPTIONS で 405 にならないようにする） */
+function applyCors(req, res) {
+  var origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
 module.exports = async function handler(req, res) {
+  if (process.env.DIFY_DEBUG_LOG === '1') {
+    console.log('[api/chat] method=', req.method);
+  }
+
+  if (req.method === 'OPTIONS') {
+    applyCors(req, res);
+    res.setHeader('Access-Control-Max-Age', '86400');
+    return res.status(204).end();
+  }
+
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
+    applyCors(req, res);
+    res.setHeader('Allow', 'POST, OPTIONS');
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
+
+  applyCors(req, res);
 
   var difyUrlEnv = getFirstDefinedEnv(['DIFY_API_URL', 'DIFY_PROPERTY_API_URL']);
   var apiKeyEnv = getFirstDefinedEnv(['DIFY_API_KEY', 'DIFY_PROPERTY_API_KEY']);
