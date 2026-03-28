@@ -81,6 +81,12 @@
         </button>
       </div>
 
+      <section id="gasListingSection" class="gas-listing-section nodot" hidden aria-hidden="true" aria-label="掲載物件一覧">
+        <h2 class="gas-listing-heading">掲載物件</h2>
+        <p id="gasListingEmpty" class="gas-listing-empty" hidden>条件に合うお部屋が見つかりません</p>
+        <div id="gasListingGrid" class="listing-grid gas-listing-grid"></div>
+      </section>
+
       <section class="sub-nav-section" aria-label="一覧への案内">
         <p class="sub-nav-text">
           条件を自分で見比べたい方は、<a href="listings.html">掲載物件の一覧</a>からもご覧いただけます。
@@ -140,7 +146,7 @@
         お呼びするお名前（ニックネームでも大丈夫です）を伺わせてください。
       </p>
       <p class="nr-lead-profile-purpose">
-        いただいたお名前は、お部屋探しの<strong>ご案内・記録</strong>に使い、当社のプライバシーポリシーに従って管理します。
+        いただいたお名前は、お部屋探しの<strong>ご案内・管理</strong>に使い、当社のプライバシーポリシーに従って管理します。
       </p>
       <form id="leadProfileForm" class="nr-lead-profile-form" novalidate>
         <label class="nr-lead-profile-label">
@@ -166,12 +172,19 @@
     'use strict';
 
     var NR = window.NAGA_ROOM || { PROPERTIES: [], LINE_URL: '#', PROPERTIES_DATA_URL: 'data/properties.json' };
+    /** 全物件（GAS または properties.json）。フィルタの元データ */
     var PROPERTY_LIST = [];
+    /** 絞り込み後（描画用。applyPropertyFilters の結果と同等） */
+    var FILTERED_PROPERTY_LIST = [];
+    /** GAS GET が成功し 1 件以上あるときだけ true（一覧セクション表示用。フォールバック時は false） */
+    var gasListingShouldShow = false;
 
     var CONFIG = {
       LINE_URL: NR.LINE_URL,
       LINE_OA_URL_BASE: NR.LINE_OA_URL_BASE || '',
       PROPERTIES_DATA_URL: NR.PROPERTIES_DATA_URL || 'data/properties.json',
+      GAS_PROPERTIES_GET_URL:
+        typeof NR.GAS_PROPERTIES_GET_URL === 'string' ? NR.GAS_PROPERTIES_GET_URL.trim() : '',
       USE_DIFY_CHAT: NR.USE_DIFY_CHAT === true,
       SHOW_LEAD_PROFILE_PROMPT: NR.SHOW_LEAD_PROFILE_PROMPT !== false,
       PRIVACY_POLICY_URL: typeof NR.PRIVACY_POLICY_URL === 'string' ? NR.PRIVACY_POLICY_URL.trim() : '',
@@ -273,6 +286,7 @@
     var sheetStaticLineBound = false;
     var consultConditionsNotified = false;
 
+    /** 同一人物は lead_id（＋ session_id）で識別。シートは1人1行にするため GAS 側で lead_id 行を検索して更新し、無ければ追記してください（docs/GAS_SHEET_UPSERT.md）。 */
     function saveSessionToSheet(data) {
       var sid = getOrCreateSessionId();
       var prev = loadSheetSnapshot();
@@ -370,7 +384,97 @@
       });
     }
 
-    function loadPropertyList() {
+    /** GAS 返却 JSON の配列取り出し（対応: 素の配列 / { items } / { properties } のみ） */
+    function parseGasPropertiesJson(data) {
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data.items)) return data.items;
+      if (data && Array.isArray(data.properties)) return data.properties;
+      return [];
+    }
+
+    var GAS_PROPERTY_PLACEHOLDER_IMG =
+      'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=640&q=80&sat=-100';
+
+    function rentManFromGasValue(rentVal) {
+      if (typeof rentVal === 'number' && !isNaN(rentVal)) return rentVal;
+      var s = String(rentVal || '').replace(/[,，]/g, '');
+      var m = s.match(/(\d+(?:\.\d+)?)/);
+      return m ? parseFloat(m[1]) : NaN;
+    }
+
+    /** GAS / シートの真偽値を UI フィルタ用に統一 */
+    function gasTruthy(val) {
+      if (val === true || val === 1) return true;
+      if (val === false || val === 0 || val == null || val === '') return false;
+      var s = String(val).trim().toLowerCase();
+      return (
+        s === 'true' ||
+        s === 'yes' ||
+        s === '1' ||
+        s === 'はい' ||
+        s === '○' ||
+        s === '◯' ||
+        s === '済' ||
+        s === '可'
+      );
+    }
+
+    /** GAS 1行 → 既存 property-card / renderPropertySuggest 用 */
+    function normalizeGasProperty(raw, rowIndex) {
+      raw = raw || {};
+      var id = raw.id != null ? String(raw.id).trim() : '';
+      if (!id) id = 'gas-row-' + rowIndex;
+      var title = raw.title != null ? String(raw.title).trim() : '';
+      var rentVal = raw.rent;
+      var rentStr = '';
+      if (rentVal != null && rentVal !== '') {
+        rentStr = typeof rentVal === 'number' ? rentVal + '万円' : String(rentVal);
+      }
+      var layout = raw.layout != null ? String(raw.layout).trim() : '';
+      var city = raw.city != null ? String(raw.city).trim() : '';
+      var areaPart = raw.area != null ? String(raw.area).trim() : '';
+      var areaJoined = [city, areaPart].filter(Boolean).join(' ');
+      var area = areaJoined || areaPart || city || '—';
+      var imgRaw = raw.image1 != null ? String(raw.image1).trim() : '';
+      var image = imgRaw || GAS_PROPERTY_PLACEHOLDER_IMG;
+      var comment = raw.story_comment != null ? String(raw.story_comment).trim() : '';
+      var rentMan = rentManFromGasValue(rentVal);
+      var rentYen = null;
+      if (!isNaN(rentMan) && rentMan > 0) {
+        rentYen = Math.round(rentMan * 10000);
+      }
+      return {
+        id: id,
+        name: title || '物件',
+        image: image,
+        area: area,
+        rent: rentStr || '—',
+        rentMan: !isNaN(rentMan) ? rentMan : undefined,
+        rentYen: rentYen,
+        layout: layout || '—',
+        layoutGroup: 'compact',
+        filterRegion: 'nagasaki',
+        features: [],
+        comment: comment,
+        detailUrl: 'property.html?id=' + encodeURIComponent(id),
+        gasPetOk: gasTruthy(raw.pet_ok),
+        gasWashstand: gasTruthy(raw.independent_washstand),
+        gasBathToiletSeparate: gasTruthy(raw.bath_toilet_separate),
+        gasSuperNear: gasTruthy(raw.super_near),
+        gasSchoolNear: gasTruthy(raw.school_near)
+      };
+    }
+
+    /** properties.json 行に rentYen を補完（フィルタ用） */
+    function enrichPropertyForFilter(p) {
+      if (!p || typeof p !== 'object') return p;
+      if (p.rentYen == null && p.rentMan != null && !isNaN(Number(p.rentMan))) {
+        p.rentYen = Math.round(Number(p.rentMan) * 10000);
+      }
+      return p;
+    }
+
+    function fetchLocalPropertiesJson() {
       return fetch(CONFIG.PROPERTIES_DATA_URL, { cache: 'no-store' })
         .then(function (res) {
           if (!res.ok) throw new Error('Failed to load properties.json');
@@ -380,8 +484,35 @@
           return Array.isArray(data) ? data : [];
         })
         .catch(function (err) {
-          console.error('[rental] properties load error:', err);
+          console.log('[rental] properties load error:', err);
           return Array.isArray(NR.PROPERTIES) ? NR.PROPERTIES : [];
+        });
+    }
+
+    function loadPropertyList() {
+      var gasUrl = (CONFIG.GAS_PROPERTIES_GET_URL || '').trim();
+      gasListingShouldShow = false;
+      if (!gasUrl) {
+        return fetchLocalPropertiesJson();
+      }
+      return fetch(gasUrl, { method: 'GET', cache: 'no-store' })
+        .then(function (res) {
+          if (!res.ok) throw new Error('GAS properties HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          var rows = parseGasPropertiesJson(data);
+          var list = rows.map(function (raw, idx) {
+            return normalizeGasProperty(raw, idx);
+          });
+          if (list.length > 0) {
+            gasListingShouldShow = true;
+          }
+          return list;
+        })
+        .catch(function (err) {
+          console.log('[rental] GAS properties load failed, fallback to JSON', err);
+          return fetchLocalPropertiesJson();
         });
     }
 
@@ -622,10 +753,14 @@
     }
 
     function extractAreasFromText(text) {
-      var t = String(text);
+      var t = String(text).trim();
       var found = [];
       function push(a) {
         if (a && found.indexOf(a) === -1) found.push(a);
+      }
+      if (/^(長崎市|諫早市|大村市)$/.test(t)) {
+        push(t);
+        return found;
       }
       if (/浦上/.test(t)) push('浦上');
       if (/大村市|大村駅|玖島/.test(t)) push('大村市');
@@ -646,7 +781,8 @@
     }
 
     function extractLayoutFromText(text) {
-      var t = normalizeDigits(text).replace(/\s/g, '');
+      var raw = String(text);
+      var t = normalizeDigits(raw).replace(/\s/g, '').toUpperCase();
       t = t.replace(/[ＬＤＫＲ]/g, function (ch) {
         return { Ｌ: 'L', Ｄ: 'D', Ｋ: 'K', Ｒ: 'R' }[ch] || ch;
       });
@@ -654,7 +790,8 @@
       for (var i = 0; i < order.length; i++) {
         if (t.indexOf(order[i]) !== -1) return order[i];
       }
-      if (/ワンルーム|ワン\s*ルーム|１ルーム|1ルーム/.test(text)) return '1R';
+      if (/ワンルーム|ワン\s*ルーム|１ルーム|1ルーム/.test(raw)) return '1R';
+      if (/(単身用|単身向け)/.test(raw) && !/(?:\d)?(?:LDK|DK|K|R)(?:\b|[^A-Z])/i.test(t)) return '1K';
       return '';
     }
 
@@ -701,6 +838,148 @@
       });
     }
 
+    /** 会話・URL の features スラッグ → 物件オブジェクトの真偽キー（マップ外はフィルタ無視） */
+    var FEATURE_SLUG_TO_GAS = {
+      pet: 'gasPetOk',
+      washstand: 'gasWashstand',
+      separate_bath: 'gasBathToiletSeparate',
+      station: 'gasSuperNear',
+      school_near: 'gasSchoolNear'
+    };
+
+    function normalizeLayoutForCompare(str) {
+      var t = normalizeDigits(String(str || '')).replace(/\s/g, '').toUpperCase();
+      t = t.replace(/[ＬＤＫＲ]/g, function (ch) {
+        return { Ｌ: 'L', Ｄ: 'D', Ｋ: 'K', Ｒ: 'R' }[ch] || ch;
+      });
+      if (t === '—' || t === '-') return '';
+      return t;
+    }
+
+    function applyPropertyFilters(fullList) {
+      var ec = extractedConditions;
+      var budget = ec.budget != null && ec.budget > 0 ? ec.budget : null;
+      var layoutF = ec.layout ? normalizeLayoutForCompare(ec.layout) : '';
+      var feats = ec.features || [];
+      return (fullList || []).filter(function (p) {
+        if (budget != null) {
+          var ry = p.rentYen;
+          if (ry == null && p.rentMan != null && !isNaN(Number(p.rentMan))) {
+            ry = Math.round(Number(p.rentMan) * 10000);
+          }
+          if (ry == null || ry > budget) return false;
+        }
+        if (layoutF) {
+          var pl = normalizeLayoutForCompare(p.layout || '');
+          if (pl !== layoutF) return false;
+        }
+        for (var i = 0; i < feats.length; i++) {
+          var slug = feats[i];
+          var propKey = FEATURE_SLUG_TO_GAS[slug];
+          if (!propKey) continue;
+          if (!p[propKey]) return false;
+        }
+        return true;
+      });
+    }
+
+    function hasUrlListingFilterParams() {
+      try {
+        var q = new URLSearchParams(window.location.search);
+        return !!(q.get('budget') || q.get('layout') || q.get('features'));
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function hasActiveListingFilters() {
+      var ec = extractedConditions;
+      if (ec.budget != null && ec.budget > 0) return true;
+      if (ec.layout && String(ec.layout).trim()) return true;
+      if (ec.features && ec.features.length > 0) return true;
+      return hasUrlListingFilterParams();
+    }
+
+    function shouldShowPropertyListingSection() {
+      if (!PROPERTY_LIST.length) return false;
+      if (gasListingShouldShow) return true;
+      return hasActiveListingFilters();
+    }
+
+    function applyUrlSearchParamsToExtractedConditions() {
+      try {
+        var q = new URLSearchParams(window.location.search);
+        var b = q.get('budget');
+        if (b != null && String(b).trim() !== '') {
+          var n = parseInt(String(b).replace(/,/g, ''), 10);
+          if (!isNaN(n) && n > 0) mergeExtractedConditions({ budget: n });
+        }
+        var lay = q.get('layout');
+        if (lay != null && String(lay).trim() !== '') {
+          mergeExtractedConditions({ layout: String(lay).trim() });
+        }
+        var feat = q.get('features');
+        if (feat != null && String(feat).trim() !== '') {
+          String(feat)
+            .split(',')
+            .map(function (s) {
+              return s.trim();
+            })
+            .filter(Boolean)
+            .forEach(function (slug) {
+              mergeExtractedConditions({ features: [slug] });
+            });
+        }
+      } catch (e) {}
+    }
+
+    /** load 後・条件更新時に差し替え（定義は renderGasListingSection の直後） */
+    var refreshFilteredListing = function () {};
+
+    applyUrlSearchParamsToExtractedConditions();
+
+    /** クイック返答ラベルと ctx を extractedConditions に確実に反映（シート用） */
+    var FIND_FLOW_RENT_TO_YEN = {
+      '〜4万円': 40000,
+      '〜5万円': 50000,
+      '〜6万円': 60000,
+      '～4万円': 40000,
+      '～5万円': 50000,
+      '～6万円': 60000
+    };
+
+    function reinforceConditionsAfterUserMessage(utterance) {
+      var u = String(utterance || '');
+      if (FIND_FLOW_RENT_TO_YEN.hasOwnProperty(u)) {
+        mergeExtractedConditions({ budget: FIND_FLOW_RENT_TO_YEN[u] });
+      }
+      var c = u.trim();
+      if (/^(長崎市|諫早市|大村市)$/.test(c)) {
+        mergeExtractedConditions({ areas: [c] });
+      }
+      var ctxBlob = [ctx.lifestyle, ctx.rent, ctx.area, u]
+        .filter(function (x) {
+          return x != null && String(x).trim() !== '';
+        })
+        .join(' ');
+      if (ctxBlob) {
+        mergeExtractedConditions(extractConditionsFromText(ctxBlob));
+      }
+      updateConditionSearchButton();
+    }
+
+    function pushConditionFieldsToSheet() {
+      try {
+        var p = buildSheetSnapshotPayload({});
+        saveSessionToSheet({
+          budget_max: p.budget_max,
+          preferred_area: p.preferred_area,
+          layout_preference: p.layout_preference,
+          summary: p.summary
+        });
+      } catch (e) {}
+    }
+
     function conditionCategoryCount() {
       var n = 0;
       if (extractedConditions.budget != null && extractedConditions.budget > 0) n++;
@@ -728,7 +1007,7 @@
     function updateConditionSearchButton() {
       var wrap = document.getElementById('chatConditionCta');
       if (!wrap) return;
-      var enough = conditionCategoryCount() >= 2;
+      var enough = conditionCategoryCount() >= 2 && difyChatPurpose === 'property';
       wrap.hidden = !enough;
       wrap.setAttribute('aria-hidden', enough ? 'false' : 'true');
       if (enough && !consultConditionsNotified) {
@@ -739,6 +1018,7 @@
           console.log('[consult-sheet] conditions_met', e);
         }
       }
+      refreshFilteredListing();
     }
 
     function processUserUtteranceForConditions(text) {
@@ -753,8 +1033,6 @@
         var fromRent = extractConditionsFromText(String(ctx.rent));
         if (fromRent.budget != null) budgetYen = fromRent.budget;
       }
-      var budgetMaxWan =
-        budgetYen != null && budgetYen > 0 ? Math.round((budgetYen / 10000) * 10) / 10 : '';
       var areas = (extractedConditions.areas || []).slice();
       if (ctx.area && String(ctx.area).trim() && ctx.area.indexOf('まだ') === -1) {
         var ca = String(ctx.area).trim();
@@ -792,7 +1070,7 @@
 
       var visitorName = getStoredDisplayName() || '';
       return {
-        budget_max: budgetMaxWan,
+        budget_max: budgetYen != null && budgetYen > 0 ? budgetYen : '',
         preferred_area: areas,
         layout_preference: extractedConditions.layout || '',
         features: feat,
@@ -828,6 +1106,8 @@
         getStoredDisplayName() ||
         '';
       return {
+        lead_id: getOrCreateLeadId(),
+        session_id: getOrCreateSessionId(),
         name: visitorName,
         source: mergedSnap.source || 'lp',
         chat_type: chatType,
@@ -897,6 +1177,60 @@
       d.textContent = s;
       return d.innerHTML;
     }
+
+    /**
+     * 一覧セクション描画。list は絞り込み後（FILTERED_PROPERTY_LIST）。
+     * 表示可否: GAS 取得成功 or URL/会話でフィルタ条件あり。
+     */
+    function renderGasListingSection(filteredList) {
+      var section = document.getElementById('gasListingSection');
+      var grid = document.getElementById('gasListingGrid');
+      var emptyEl = document.getElementById('gasListingEmpty');
+      if (!section || !grid) return;
+      if (!shouldShowPropertyListingSection()) {
+        section.hidden = true;
+        section.setAttribute('aria-hidden', 'true');
+        grid.innerHTML = '';
+        if (emptyEl) {
+          emptyEl.hidden = true;
+          emptyEl.setAttribute('aria-hidden', 'true');
+        }
+        return;
+      }
+      section.hidden = false;
+      section.setAttribute('aria-hidden', 'false');
+      grid.innerHTML = '';
+      var showEmptyMsg = hasActiveListingFilters() && (!filteredList || !filteredList.length);
+      if (emptyEl) {
+        emptyEl.hidden = !showEmptyMsg;
+        emptyEl.setAttribute('aria-hidden', showEmptyMsg ? 'false' : 'true');
+      }
+      if (!filteredList || !filteredList.length) {
+        return;
+      }
+      filteredList.forEach(function (p) {
+        var a = document.createElement('a');
+        a.className = 'property-card gas-list-card';
+        a.href = 'property.html?id=' + encodeURIComponent(p.id);
+        a.setAttribute('data-property-id', p.id);
+        a.innerHTML =
+          '<div class="property-card-img"><img src="' + escapeHtml(p.image) + '" alt="' + escapeHtml(p.name) + 'のイメージ" loading="lazy" width="320" height="200"></div>' +
+          '<div class="property-card-body">' +
+            '<h3 class="property-card-name">' + escapeHtml(p.name) + '</h3>' +
+            '<p class="property-card-meta">' +
+            '<span class="property-tag">' + escapeHtml(p.area) + '</span>' +
+            '<span class="property-tag">' + escapeHtml(p.rent) + '</span>' +
+            '<span class="property-tag">' + escapeHtml(p.layout) + '</span></p>' +
+            '<p class="property-card-comment">' + escapeHtml(p.comment) + '</p>' +
+          '</div>';
+        grid.appendChild(a);
+      });
+    }
+
+    refreshFilteredListing = function () {
+      FILTERED_PROPERTY_LIST = applyPropertyFilters(PROPERTY_LIST);
+      renderGasListingSection(FILTERED_PROPERTY_LIST);
+    };
 
     var PROFILE_GATE_KEY = 'nr_profile_gate_done';
 
@@ -991,6 +1325,7 @@
       row.appendChild(b);
       elLog.appendChild(row);
       processUserUtteranceForConditions(text);
+      reinforceConditionsAfterUserMessage(text);
       scrollToBottom();
     }
 
@@ -1120,9 +1455,10 @@
     /** 条件に応じて表示する物件を選ぶ（現在は物件検索フローを優先） */
     function pickPropertiesForContext() {
       var list = PROPERTY_LIST.slice();
-      if (ctx.area.indexOf('大村') !== -1) {
-        var withArea = list.filter(function (p) { return p.area.indexOf('大村') !== -1; });
-        var rest = list.filter(function (p) { return p.area.indexOf('大村') === -1; });
+      var areaHint = ctx && ctx.area ? String(ctx.area) : '';
+      if (areaHint.indexOf('大村') !== -1) {
+        var withArea = list.filter(function (p) { return (p.area || '').indexOf('大村') !== -1; });
+        var rest = list.filter(function (p) { return (p.area || '').indexOf('大村') === -1; });
         return withArea.concat(rest).slice(0, 3);
       }
       return list.slice(0, 3);
@@ -1354,8 +1690,9 @@
 
     function onFindLifestyle(label) {
       clearQuickHosts();
-      appendUserBubble(label);
       ctx.lifestyle = label;
+      appendUserBubble(label);
+      pushConditionFieldsToSheet();
       delay(CONFIG.USER_THINK_MS).then(function () {
         sayBotOnce(
           'いいですね☺️　教えてくれてありがとうございます。\n' +
@@ -1376,8 +1713,9 @@
 
     function onFindRent(label) {
       clearQuickHosts();
-      appendUserBubble(label);
       ctx.rent = label;
+      appendUserBubble(label);
+      pushConditionFieldsToSheet();
       delay(CONFIG.USER_THINK_MS).then(function () {
         sayBotOnce(
           'わかりました🍀　無理のないラインを、一緒に見ていきましょう。\n' +
@@ -1398,8 +1736,9 @@
 
     function onFindArea(label) {
       clearQuickHosts();
-      appendUserBubble(label);
       ctx.area = label;
+      appendUserBubble(label);
+      pushConditionFieldsToSheet();
       findStep = 3;
       delay(CONFIG.USER_THINK_MS).then(function () {
         sayBotOnce(
@@ -1447,6 +1786,7 @@
     function onConsultPick(topicLabel) {
       clearQuickHosts();
       appendUserBubble(topicLabel);
+      pushConditionFieldsToSheet();
       var body = CONSULT_TEXT[topicLabel] ||
         '気になること、ちゃんと受け止めます☺️\n一緒に、次の一歩を見つけていきましょう🍀';
       delay(CONFIG.USER_THINK_MS).then(function () {
@@ -1528,6 +1868,7 @@
       clearComposerInput();
       removeEntryPanel();
       appendUserBubble(text);
+      pushConditionFieldsToSheet();
       if (CONFIG.USE_DIFY_CHAT && difyChatPurpose) {
         var streamBubble = null;
         inputLocked = true;
@@ -1614,7 +1955,8 @@
 
     loadPropertyList().then(function (list) {
       getOrCreateSessionId();
-      PROPERTY_LIST = list;
+      PROPERTY_LIST = (list || []).map(enrichPropertyForFilter);
+      updateConditionSearchButton();
       refreshStaticLineLinks();
       function beginConversation() {
         if (elInput) elInput.disabled = false;

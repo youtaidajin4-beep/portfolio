@@ -41,6 +41,14 @@
     PROPERTIES_DATA_URL: 'data/properties.json',
 
     /**
+     * Google Apps Script Web アプリ（doGet）の URL（.../exec）。
+     * 空のまま: rental は従来どおり PROPERTIES_DATA_URL の JSON のみ読み込み。
+     * 設定時: ブラウザから GET で JSON を取得し、失敗したら JSON にフォールバック（property.html の詳細表示も同じ URL を参照）。
+     * CORS は GAS 側で Access-Control-Allow-Origin を返すか、後追いで Vercel プロキシを用意してください（docs/GAS_PROPERTIES_GET.md）。
+     */
+    GAS_PROPERTIES_GET_URL: '',
+
+    /**
      * rental.html 表示直後の「お名前（必須）」ゲートモーダルを出すか。
      * false にすると同意モーダルを出さず、そのまま会話が始まります。
      */

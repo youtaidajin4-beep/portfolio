@@ -1118,6 +1118,110 @@
     }
     .listing-grid .property-card { margin-bottom: 0; }
 
+    /* rental: GAS 掲載一覧（カード全体を詳細へのリンクに） */
+    a.property-card.gas-list-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      box-sizing: border-box;
+    }
+    .gas-listing-section {
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .gas-listing-heading {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0 0 0.75rem;
+      color: var(--ink);
+    }
+    .gas-listing-empty {
+      font-size: 0.88rem;
+      color: var(--ink-faint);
+      margin: 0 0 0.75rem;
+      line-height: 1.55;
+    }
+
+    /* property.html: GAS から id 指定で詳細表示 */
+    .property-detail-wrap {
+      padding-top: 1.5rem;
+      padding-bottom: 2rem;
+    }
+    .property-detail-mount {
+      max-width: 42rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .property-detail-page-title {
+      font-size: 1.15rem;
+      margin-bottom: 0.5rem;
+    }
+    .property-detail-lead { margin-bottom: 1rem; }
+    .property-detail-emphasis {
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .property-detail-muted {
+      font-size: 0.8rem;
+      color: var(--ink-faint);
+    }
+    .property-detail-actions { margin-top: 1.25rem; }
+    .property-detail-actions .btn-ghost { max-width: 20rem; margin-left: auto; margin-right: auto; }
+    .property-detail-article { margin-bottom: 0; }
+    .property-detail-h1 {
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+    }
+    .property-detail-gallery {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      padding: 0.65rem 0.65rem 0;
+      background: var(--surface);
+    }
+    @media (min-width: 640px) {
+      .property-detail-gallery {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.45rem;
+      }
+    }
+    .property-detail-gallery-cell {
+      border-radius: 0.5rem;
+      aspect-ratio: 16 / 10;
+    }
+    .property-detail-tags { margin-top: 0.35rem; }
+    .property-detail-spec {
+      margin: 0.75rem 0 0;
+      padding: 0;
+    }
+    .property-detail-row {
+      display: grid;
+      grid-template-columns: 5.5rem 1fr;
+      gap: 0.35rem 0.75rem;
+      align-items: start;
+      margin-bottom: 0.45rem;
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+    .property-detail-dt {
+      margin: 0;
+      font-weight: 600;
+      color: var(--ink-faint);
+    }
+    .property-detail-dd {
+      margin: 0;
+      color: var(--ink);
+    }
+    .property-detail-story { margin-top: 0.85rem; }
+    .property-detail-actions-inner { margin-top: 0.5rem; }
+    .property-detail-mount code {
+      font-size: 0.85em;
+      font-family: ui-monospace, monospace;
+      padding: 0.1em 0.35em;
+      background: var(--aqua-whisper);
+      border-radius: 0.25rem;
+    }
+
     /* 一覧ページ末尾の LINE CTA（rental と同一デザイン） */
     .page-listing .listing-line-cta-block {
       margin-top: 1.75rem;

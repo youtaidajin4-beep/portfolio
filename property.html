@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NAGA ROOM — 物件詳細">
+  <title>物件詳細 | NAGA ROOM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/nagaroom-shared.css">
+</head>
+<body class="has-nr-header page-chat">
+  <!--
+    【初心者向け】物件詳細のデータ元
+    GAS の一覧 JSON を読む URL は、rental と同じ場所に1か所だけ書きます。
+    → js/nagaroom-data.js を開き、GAS_PROPERTIES_GET_URL に Web アプリの doGet URL（.../exec）を貼る。
+    rental の一覧・この詳細ページの両方が同じ URL を参照します（ここでは URL を書かない）。
+  -->
+  <header class="nr-header">
+    <div class="nr-header-inner">
+      <a href="index.html" class="nr-brand">NAGA ROOM</a>
+      <nav class="nr-nav" aria-label="主要ナビ">
+        <a href="rental.html">会話で探す</a>
+        <a href="listings.html">一覧で見る</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="chat-wrap property-detail-wrap">
+      <div id="propertyDetailMount" class="property-detail-mount" aria-live="polite"></div>
+    </div>
+  </main>
+
+  <footer class="nr-page-footer">
+    <a href="index.html">サービスTOP</a>
+    <a href="rental.html">会話で探す</a>
+    <a href="listings.html">一覧で見る</a>
+  </footer>
+
+  <script src="js/nagaroom-data.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var NR = window.NAGA_ROOM || {};
+    var GAS_URL = typeof NR.GAS_PROPERTIES_GET_URL === 'string' ? NR.GAS_PROPERTIES_GET_URL.trim() : '';
+
+    /** rental と同じラップ形式に対応（配列 / items / properties） */
+    function parseGasPropertiesJson(data) {
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data.items)) return data.items;
+      if (data && Array.isArray(data.properties)) return data.properties;
+      return [];
+    }
+
+    function escapeHtml(s) {
+      var d = document.createElement('div');
+      d.textContent = s == null ? '' : String(s);
+      return d.innerHTML;
+    }
+
+    function formatRent(rent) {
+      if (rent == null || rent === '') return '—';
+      if (typeof rent === 'number' && !isNaN(rent)) return rent + '万円';
+      return String(rent);
+    }
+
+    function formatArea(row) {
+      row = row || {};
+      var city = row.city != null ? String(row.city).trim() : '';
+      var area = row.area != null ? String(row.area).trim() : '';
+      var joined = [city, area].filter(Boolean).join(' ');
+      return joined || area || city || '—';
+    }
+
+    function rowId(row) {
+      return row && row.id != null ? String(row.id).trim() : '';
+    }
+
+    function findRowById(rows, wanted) {
+      var w = wanted == null ? '' : String(wanted).trim();
+      if (!w) return null;
+      for (var i = 0; i < rows.length; i++) {
+        if (rowId(rows[i]) === w) return rows[i];
+      }
+      return null;
+    }
+
+    function collectImages(row) {
+      var keys = ['image1', 'image2', 'image3'];
+      var out = [];
+      keys.forEach(function (k) {
+        var u = row[k] != null ? String(row[k]).trim() : '';
+        if (u) out.push(u);
+      });
+      return out;
+    }
+
+    function renderTags(tags) {
+      if (tags == null || tags === '') return '';
+      var parts = [];
+      if (Array.isArray(tags)) {
+        parts = tags.map(function (t) { return String(t).trim(); }).filter(Boolean);
+      } else {
+        String(tags).split(/[,、]/).forEach(function (t) {
+          var x = t.trim();
+          if (x) parts.push(x);
+        });
+      }
+      if (!parts.length) return '';
+      return (
+        '<p class="property-card-meta property-detail-tags">' +
+        parts.map(function (t) {
+          return '<span class="property-tag">' + escapeHtml(t) + '</span>';
+        }).join('') +
+        '</p>'
+      );
+    }
+
+    function renderDlItem(label, value) {
+      var v = value == null || String(value).trim() === '' ? '—' : String(value).trim();
+      return (
+        '<div class="property-detail-row">' +
+        '<dt class="property-detail-dt">' + escapeHtml(label) + '</dt>' +
+        '<dd class="property-detail-dd">' + escapeHtml(v) + '</dd>' +
+        '</div>'
+      );
+    }
+
+    function renderState(html) {
+      var mount = document.getElementById('propertyDetailMount');
+      if (!mount) return;
+      mount.innerHTML = html;
+    }
+
+    function renderLoading() {
+      renderState(
+        '<p class="chat-intro-desc property-detail-lead">読み込み中です…</p>' +
+        '<p class="property-detail-actions"><a class="btn-ghost" href="rental.html">会話で探すに戻る</a></p>'
+      );
+    }
+
+    function renderNoUrl() {
+      renderState(
+        '<h1 class="gas-listing-heading property-detail-page-title">物件詳細</h1>' +
+        '<p class="chat-intro-desc">物件データの取得先（GAS の URL）が設定されていません。</p>' +
+        '<p class="chat-intro-desc">' +
+        '<strong>設定手順:</strong> プロジェクト内の <code>js/nagaroom-data.js</code> を開き、' +
+        '<code>GAS_PROPERTIES_GET_URL</code> に Web アプリの URL（<code>.../exec</code>）を貼って保存してください。' +
+        '</p>' +
+        '<p class="property-detail-actions"><a class="btn-ghost" href="rental.html">会話で探すに戻る</a></p>'
+      );
+    }
+
+    function renderError(msg) {
+      renderState(
+        '<h1 class="gas-listing-heading property-detail-page-title">物件詳細</h1>' +
+        '<p class="chat-intro-desc">データを読み込めませんでした。時間をおいて再度お試しください。</p>' +
+        '<p class="chat-intro-desc property-detail-muted">' + escapeHtml(msg || '') + '</p>' +
+        '<p class="property-detail-actions"><a class="btn-ghost" href="rental.html">会話で探すに戻る</a></p>'
+      );
+    }
+
+    function renderMissingId() {
+      renderState(
+        '<h1 class="gas-listing-heading property-detail-page-title">物件詳細</h1>' +
+        '<p class="chat-intro-desc property-detail-emphasis">物件IDが指定されていません</p>' +
+        '<p class="chat-intro-desc">URL に <code>?id=</code> と物件IDを付けてアクセスしてください。</p>' +
+        '<p class="property-detail-actions"><a class="btn-ghost" href="rental.html">会話で探すに戻る</a></p>'
+      );
+    }
+
+    function renderNotFound(requestedId) {
+      renderState(
+        '<h1 class="gas-listing-heading property-detail-page-title">物件詳細</h1>' +
+        '<p class="chat-intro-desc property-detail-emphasis">物件が見つかりません</p>' +
+        '<p class="chat-intro-desc">指定されたIDの物件は一覧にありませんでした。</p>' +
+        '<p class="chat-intro-desc property-detail-muted">ID: ' + escapeHtml(requestedId) + '</p>' +
+        '<p class="property-detail-actions"><a class="btn-ghost" href="rental.html">会話で探すに戻る</a></p>'
+      );
+    }
+
+    function renderDetail(row) {
+      var title = row.title != null ? String(row.title).trim() : '物件';
+      document.title = title + ' | NAGA ROOM';
+
+      var imgs = collectImages(row);
+      var gallery = '';
+      if (imgs.length) {
+        gallery =
+          '<div class="property-detail-gallery">' +
+          imgs.map(function (src) {
+            return (
+              '<div class="property-card-img property-detail-gallery-cell">' +
+              '<img src="' + escapeHtml(src) + '" alt="' + escapeHtml(title) + 'の写真" loading="lazy" width="640" height="400">' +
+              '</div>'
+            );
+          }).join('') +
+          '</div>';
+      }
+
+      var story = row.story_comment != null ? String(row.story_comment).trim() : '';
+      var station = row.station_info != null ? String(row.station_info).trim() : '';
+
+      var body =
+        '<article class="property-card property-detail-article">' +
+        gallery +
+        '<div class="property-card-body">' +
+        '<h1 class="property-card-name property-detail-h1">' + escapeHtml(title) + '</h1>' +
+        '<p class="property-card-meta">' +
+        '<span class="property-tag">' + escapeHtml(formatRent(row.rent)) + '</span>' +
+        '<span class="property-tag">' + escapeHtml(row.layout != null && String(row.layout).trim() ? String(row.layout).trim() : '—') + '</span>' +
+        '<span class="property-tag">' + escapeHtml(formatArea(row)) + '</span>' +
+        '</p>' +
+        renderTags(row.tags) +
+        '<dl class="property-detail-spec">' +
+        renderDlItem('最寄り', station) +
+        '</dl>' +
+        (story
+          ? '<p class="property-card-comment property-detail-story">' + escapeHtml(story) + '</p>'
+          : '') +
+        '<div class="property-card-actions property-detail-actions-inner">' +
+        '<a class="btn-ghost" href="rental.html">会話で探すに戻る</a>' +
+        '</div>' +
+        '</div>' +
+        '</article>';
+
+      renderState(body);
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var idParam = params.get('id');
+    try {
+      if (idParam) idParam = decodeURIComponent(idParam);
+    } catch (e) {}
+
+    if (!GAS_URL) {
+      renderNoUrl();
+      return;
+    }
+
+    if (!idParam || !String(idParam).trim()) {
+      renderMissingId();
+      return;
+    }
+
+    renderLoading();
+
+    fetch(GAS_URL, { method: 'GET', cache: 'no-store' })
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        var rows = parseGasPropertiesJson(data);
+        var row = findRowById(rows, idParam);
+        if (!row) {
+          renderNotFound(idParam);
+          return;
+        }
+        renderDetail(row);
+      })
+      .catch(function (err) {
+        console.warn('[property] GAS load failed', err);
+        renderError(err && err.message ? err.message : String(err));
+      });
+  })();
+  </script>
+</body>
+</html>
