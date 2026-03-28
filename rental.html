@@ -242,9 +242,20 @@
     }
 
     function getLineUrlWithLead() {
-      var base = (CONFIG.LINE_OA_URL_BASE || CONFIG.LINE_URL.split('?')[0] || '').replace(/\/+$/, '');
       var lead = getOrCreateLeadId();
-      return base + '?' + encodeURIComponent('相談 ' + lead);
+      if (typeof NR.lineMessageUrl === 'function') {
+        return NR.lineMessageUrl('相談 ' + lead);
+      }
+      var id =
+        '@' +
+        String((NR.LINE_BASIC_ID || '081nnswr') + '')
+          .replace(/^@/, '');
+      return (
+        'https://line.me/R/oaMessage/' +
+        encodeURIComponent(id) +
+        '/?' +
+        encodeURIComponent('相談 ' + lead)
+      );
     }
 
     function refreshStaticLineLinks() {

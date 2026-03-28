@@ -5,13 +5,39 @@
 (function (global) {
   'use strict';
 
+  /**
+   * LINE Official Account の「ベーシックID」（@の後ろ。LINE公式の管理画面で確認）
+   * 変更時はここだけ直せば rental / listings の LINE 導線が揃います。
+   */
+  var LINE_BASIC_ID = '081nnswr';
+
+  /**
+   * LINE Developers 推奨: パス上の ID はパーセントエンコード、本文は /? の後に encodeURIComponent
+   * @see https://developers.line.biz/ja/docs/messaging-api/using-line-url-scheme/
+   */
+  function lineMessageUrl(prefillText) {
+    var idWithAt = '@' + String(LINE_BASIC_ID).replace(/^@/, '');
+    var msg =
+      prefillText != null && String(prefillText).length ? String(prefillText) : '相談';
+    return (
+      'https://line.me/R/oaMessage/' +
+      encodeURIComponent(idWithAt) +
+      '/?' +
+      encodeURIComponent(msg)
+    );
+  }
+
   global.NAGA_ROOM = {
-    LINE_URL: 'https://line.me/R/oaMessage/@081nnswr/?%E7%9B%B8%E8%AB%87',
+    LINE_BASIC_ID: LINE_BASIC_ID,
+    /** 入力欄に「相談」が入った状態でトーク画面を開く URL */
+    LINE_URL: lineMessageUrl('相談'),
     /**
-     * LINE 公式アカウントへのメッセージ URL のベース（クエリなし）。
-     * rental.html が Lead ID 付きの事前入力文を付与する際に使用します。
+     * rental.html が Lead 付き文を付けるときのパス部分（末尾スラッシュなし）
      */
-    LINE_OA_URL_BASE: 'https://line.me/R/oaMessage/@081nnswr',
+    LINE_OA_URL_BASE:
+      'https://line.me/R/oaMessage/' + encodeURIComponent('@' + LINE_BASIC_ID.replace(/^@/, '')),
+    /** 任意の事前入力文で URL を組み立てる（例: lineMessageUrl('相談 ' + leadId)） */
+    lineMessageUrl: lineMessageUrl,
     PROPERTIES_DATA_URL: 'data/properties.json',
 
     /**

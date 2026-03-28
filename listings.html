@@ -132,7 +132,10 @@
     'use strict';
 
     var NR = window.NAGA_ROOM || { PROPERTIES: [], LINE_URL: '#', PROPERTIES_DATA_URL: 'data/properties.json' };
-    var LINE_URL = NR.LINE_URL;
+    var LINE_URL =
+      typeof NR.lineMessageUrl === 'function'
+        ? NR.lineMessageUrl('相談')
+        : NR.LINE_URL || '#';
     var allProps = [];
     var PROPERTIES_DATA_URL = NR.PROPERTIES_DATA_URL || 'data/properties.json';
 
