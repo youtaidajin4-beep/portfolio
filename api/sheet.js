@@ -2,7 +2,7 @@
  * Vercel Serverless — GAS スプレッドシート Web アプリへの中継
  * POST /api/sheet
  *
- * フロントは application/json（または text/plain の JSON 文字列）で送る想定。
+ * フロントは display_name（お名前）等を含む application/json（または text/plain の JSON 文字列）で送る想定。
  * 受け取った内容を JSON 文字列に直し、GAS へは text/plain で転送（doPost の postData.contents 互換）。
  *
  * 環境変数（Vercel ダッシュボード）:

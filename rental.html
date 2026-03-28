@@ -133,31 +133,28 @@
   >
     <div class="nr-lead-profile-backdrop" aria-hidden="true"></div>
     <div class="nr-lead-profile-panel">
-      <h2 id="leadProfileTitle" class="nr-lead-profile-title">差し支えなければ（任意）</h2>
+      <p class="nr-lead-profile-kicker" id="leadProfileKicker">これから一緒にお部屋探し</p>
+      <h2 id="leadProfileTitle" class="nr-lead-profile-title">お名前だけ、教えてください</h2>
       <p class="nr-lead-profile-desc">
-        お名前とメールをいただくと、担当がスムーズにご案内できます。<br>
-        あとからでも大丈夫です。LINE やメールからでもスムーズにご案内できます。
+        会話をすこし楽しく、あなたらしく進めたいので、<br>
+        お呼びするお名前（ニックネームでも大丈夫です）を伺わせてください。
       </p>
       <p class="nr-lead-profile-purpose">
-        いただいた情報は、お部屋探しの<strong>相談対応・ご連絡</strong>のために利用し、当社のプライバシーポリシーに従って管理します。
+        いただいたお名前は、お部屋探しの<strong>ご案内・記録</strong>に使い、当社のプライバシーポリシーに従って管理します。
       </p>
       <form id="leadProfileForm" class="nr-lead-profile-form" novalidate>
         <label class="nr-lead-profile-label">
-          <span class="nr-lead-profile-label-text">お名前（ニックネーム可）</span>
-          <input type="text" id="leadProfileName" name="name" class="nr-lead-profile-input" maxlength="80" autocomplete="name" />
+          <span class="nr-lead-profile-label-text">お名前（ニックネーム可）<span class="nr-lead-profile-required">必須</span></span>
+          <input type="text" id="leadProfileName" name="display_name" class="nr-lead-profile-input" maxlength="80" autocomplete="nickname" required />
         </label>
-        <label class="nr-lead-profile-label">
-          <span class="nr-lead-profile-label-text">メールアドレス</span>
-          <input type="email" id="leadProfileEmail" name="email" class="nr-lead-profile-input" maxlength="120" autocomplete="email" />
-        </label>
+        <p class="nr-lead-profile-name-example" id="leadProfileNameExample">例）長崎太郎</p>
         <label class="nr-lead-profile-consent" id="leadProfileConsentLabel">
           <input type="checkbox" id="leadProfileConsent" />
           <span id="leadProfileConsentText" class="nr-lead-profile-consent-text"></span>
         </label>
         <p class="nr-lead-profile-hint" id="leadProfileError" role="alert" hidden></p>
         <div class="nr-lead-profile-actions">
-          <button type="button" class="nr-lead-profile-skip" id="leadProfileSkip">スキップして始める</button>
-          <button type="submit" class="nr-lead-profile-submit" id="leadProfileSubmit">入力して始める</button>
+          <button type="submit" class="nr-lead-profile-submit" id="leadProfileSubmit">さあ、はじめましょう</button>
         </div>
       </form>
     </div>
@@ -176,8 +173,6 @@
       LINE_OA_URL_BASE: NR.LINE_OA_URL_BASE || '',
       PROPERTIES_DATA_URL: NR.PROPERTIES_DATA_URL || 'data/properties.json',
       USE_DIFY_CHAT: NR.USE_DIFY_CHAT === true,
-      LEAD_SYNC_ENABLED: NR.LEAD_SYNC_ENABLED !== false,
-      LEAD_API_BEARER: typeof NR.LEAD_API_BEARER === 'string' ? NR.LEAD_API_BEARER : '',
       SHOW_LEAD_PROFILE_PROMPT: NR.SHOW_LEAD_PROFILE_PROMPT !== false,
       PRIVACY_POLICY_URL: typeof NR.PRIVACY_POLICY_URL === 'string' ? NR.PRIVACY_POLICY_URL.trim() : '',
       API_ORIGIN: typeof NR.API_ORIGIN === 'string' ? NR.API_ORIGIN.replace(/\/+$/, '').trim() : '',
@@ -216,6 +211,22 @@
     }
 
     var SHEET_SNAPSHOT_KEY = 'nr_sheet_snapshot';
+    var DISPLAY_NAME_KEY = 'nr_display_name';
+
+    function getStoredDisplayName() {
+      try {
+        var v = localStorage.getItem(DISPLAY_NAME_KEY);
+        return v != null ? String(v).trim() : '';
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function setStoredDisplayName(name) {
+      try {
+        localStorage.setItem(DISPLAY_NAME_KEY, String(name).trim());
+      } catch (e) {}
+    }
 
     function loadSheetSnapshot() {
       var sid = getOrCreateSessionId();
@@ -254,11 +265,31 @@
       return o;
     }
 
+    var sheetProposalSynced = false;
+    var sheetLineReturnSent = false;
+    var sheetLineConsultSent = false;
+    var sheetPropertyClickedSent = false;
+    var sheetLeadSent = false;
+    var sheetStaticLineBound = false;
+    var consultConditionsNotified = false;
+
     function saveSessionToSheet(data) {
       var sid = getOrCreateSessionId();
       var prev = loadSheetSnapshot();
       var patch = buildSheetRowPatch(data || {});
-      var merged = Object.assign({}, prev, { session_id: sid, lead_id: getOrCreateLeadId() }, patch);
+      var displayName = getStoredDisplayName();
+      /* name … スプレッドシート「相談一覧」列用（モーダル入力と常に同一）。display_name は既存GAS互換 */
+      var merged = Object.assign(
+        {},
+        prev,
+        {
+          session_id: sid,
+          lead_id: getOrCreateLeadId(),
+          name: displayName,
+          display_name: displayName
+        },
+        patch
+      );
       persistSheetSnapshot(merged);
 
       var direct = (CONFIG.GAS_SHEET_WEBHOOK_URL || '').trim();
@@ -273,19 +304,52 @@
         body: JSON.stringify(merged)
       })
         .then(function (res) {
-          if (!res.ok) console.warn('[sheet]', res.status, res.statusText);
+          if (!res.ok) {
+            console.warn('[sheet]', res.status, res.statusText);
+            return;
+          }
+          if (!sheetLeadSent) {
+            sheetLeadSent = true;
+            var snap = loadSheetSnapshot();
+            persistSheetSnapshot(Object.assign({}, snap, { lead_sent: true }));
+            saveSessionToSheet({ lead_sent: true });
+          }
         })
         .catch(function (err) {
           console.warn('[sheet]', err);
         });
     }
 
-    var sheetProposalSynced = false;
-    var sheetLineReturnSent = false;
-    var sheetLineConsultSent = false;
-    var sheetPropertyClickedSent = false;
-    var sheetLeadSent = false;
-    var sheetStaticLineBound = false;
+    /**
+     * 「相談一覧」用: GAS Webhook に JSON を text/plain で POST（UIは変更しない・失敗しても握りつぶす）
+     */
+    function saveConsultToSheet(data) {
+      try {
+        var url = (CONFIG.GAS_SHEET_WEBHOOK_URL || '').trim();
+        if (!url) {
+          if (typeof window !== 'undefined' && window.location.protocol === 'file:') {
+            console.log('[consult-sheet] skip: file:// のためプロキシに届きません');
+            return;
+          }
+          url = apiUrl('/api/sheet');
+        }
+        var body = JSON.stringify(data);
+        console.log('[consult-sheet] POST', url, data);
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: body
+        })
+          .then(function (res) {
+            console.log('[consult-sheet] response', res.status, res.statusText);
+          })
+          .catch(function (err) {
+            console.log('[consult-sheet] fetch error', err);
+          });
+      } catch (e) {
+        console.log('[consult-sheet] error', e);
+      }
+    }
 
     function bindSheetStaticLineListeners() {
       if (sheetStaticLineBound) return;
@@ -297,6 +361,11 @@
           if (sheetLineReturnSent) return;
           sheetLineReturnSent = true;
           saveSessionToSheet({ line_return_clicked: true });
+          try {
+            saveConsultToSheet(buildConsultSheetPayload({ flagPatch: { line_return_clicked: true } }));
+          } catch (e) {
+            console.log('[consult-sheet] line_return', e);
+          }
         });
       });
     }
@@ -374,49 +443,6 @@
       var footerLine = document.getElementById('footerLineBtn');
       if (heroLine) heroLine.href = url;
       if (footerLine) footerLine.href = url;
-    }
-
-    function syncLeadToNotion(overrides) {
-      if (CONFIG.LEAD_SYNC_ENABLED === false) return;
-      var lead_id = getOrCreateLeadId();
-      var payload = {
-        lead_id: lead_id,
-        chat_purpose: difyChatPurpose || '',
-        intent_tags: (extractedConditions.features || []).join(','),
-        context_json: JSON.stringify({
-          lifestyle: ctx.lifestyle,
-          rent: ctx.rent,
-          area: ctx.area,
-          flowMode: flowMode,
-          findStep: findStep
-        })
-      };
-      if (overrides && typeof overrides === 'object') {
-        Object.keys(overrides).forEach(function (k) {
-          payload[k] = overrides[k];
-        });
-      }
-      var clean = {};
-      Object.keys(payload).forEach(function (k) {
-        var v = payload[k];
-        if (v === undefined || v === null) return;
-        if (typeof v === 'string' && v === '' && k !== 'lead_id') return;
-        clean[k] = v;
-      });
-      var headers = { 'Content-Type': 'application/json' };
-      if (CONFIG.LEAD_API_BEARER && String(CONFIG.LEAD_API_BEARER).trim()) {
-        headers['Authorization'] = 'Bearer ' + String(CONFIG.LEAD_API_BEARER).trim();
-      }
-      fetch(apiUrl('/api/lead'), { method: 'POST', headers: headers, body: JSON.stringify(clean) })
-        .then(function (res) {
-          if (res.ok && !sheetLeadSent) {
-            sheetLeadSent = true;
-            saveSessionToSheet({ lead_sent: true });
-          }
-        })
-        .catch(function (err) {
-          console.warn('[lead sync]', err);
-        });
     }
 
     /**
@@ -705,6 +731,14 @@
       var enough = conditionCategoryCount() >= 2;
       wrap.hidden = !enough;
       wrap.setAttribute('aria-hidden', enough ? 'false' : 'true');
+      if (enough && !consultConditionsNotified) {
+        consultConditionsNotified = true;
+        try {
+          saveConsultToSheet(buildConsultSheetPayload({}));
+        } catch (e) {
+          console.log('[consult-sheet] conditions_met', e);
+        }
+      }
     }
 
     function processUserUtteranceForConditions(text) {
@@ -756,6 +790,7 @@
       }
       if (note.length > 500) note = note.slice(0, 500);
 
+      var visitorName = getStoredDisplayName() || '';
       return {
         budget_max: budgetMaxWan,
         preferred_area: areas,
@@ -765,7 +800,50 @@
         summary: summaryParts.join(' / ') || '',
         proposal_done: proposalDone,
         lead_company: '',
-        note: note
+        note: note,
+        name: visitorName,
+        display_name: visitorName
+      };
+    }
+
+    /**
+     * スプレッドシート「相談一覧」列向けオブジェクト（配列はそのまま。budget_max は円の数値）
+     */
+    function buildConsultSheetPayload(options) {
+      options = options || {};
+      var flagPatch = options.flagPatch || {};
+      var snap = loadSheetSnapshot();
+      var mergedSnap = Object.assign({}, snap, flagPatch);
+      var base = buildSheetSnapshotPayload(options);
+      var chatType =
+        mergedSnap.chat_type ||
+        (difyChatPurpose === 'consult' ? 'consult' : difyChatPurpose === 'property' ? 'room_search' : '');
+      var budgetYen = extractedConditions.budget;
+      if ((budgetYen == null || budgetYen <= 0) && ctx.rent) {
+        var fromRent = extractConditionsFromText(String(ctx.rent));
+        if (fromRent.budget != null) budgetYen = fromRent.budget;
+      }
+      var visitorName =
+        (mergedSnap.name != null && String(mergedSnap.name).trim() !== '' && String(mergedSnap.name).trim()) ||
+        getStoredDisplayName() ||
+        '';
+      return {
+        name: visitorName,
+        source: mergedSnap.source || 'lp',
+        chat_type: chatType,
+        budget_max: budgetYen != null && budgetYen > 0 ? budgetYen : '',
+        preferred_area: Array.isArray(base.preferred_area) ? base.preferred_area.slice() : [],
+        layout_preference: base.layout_preference || '',
+        features: Array.isArray(base.features) ? base.features.slice() : [],
+        lifestyle_tags: Array.isArray(base.lifestyle_tags) ? base.lifestyle_tags.slice() : [],
+        summary: base.summary || '',
+        line_return_clicked: !!mergedSnap.line_return_clicked,
+        line_consult_started: !!mergedSnap.line_consult_started,
+        proposal_done: !!base.proposal_done,
+        property_clicked: !!mergedSnap.property_clicked,
+        lead_sent: !!mergedSnap.lead_sent,
+        lead_company: mergedSnap.lead_company != null && mergedSnap.lead_company !== undefined ? String(mergedSnap.lead_company) : '',
+        note: base.note || ''
       };
     }
 
@@ -829,10 +907,17 @@
       var consentText = document.getElementById('leadProfileConsentText');
       var err = document.getElementById('leadProfileError');
       var nameInput = document.getElementById('leadProfileName');
-      var emailInput = document.getElementById('leadProfileEmail');
-      if (!modal || !form || !consent || !consentText || !onComplete) {
+      var nameExample = document.getElementById('leadProfileNameExample');
+      if (!modal || !form || !consent || !consentText || !nameInput || !onComplete) {
         onComplete && onComplete();
         return;
+      }
+
+      function updateNameExampleVisibility() {
+        if (!nameExample) return;
+        var has = (nameInput.value || '').length > 0;
+        nameExample.hidden = has;
+        nameExample.setAttribute('aria-hidden', has ? 'true' : 'false');
       }
 
       consentText.textContent = '';
@@ -845,17 +930,19 @@
         a.className = 'nr-lead-profile-policy-link';
         a.textContent = 'プライバシーポリシー';
         consentText.appendChild(a);
-        consentText.appendChild(document.createTextNode('に記載の取り扱いに同意します。'));
+        consentText.appendChild(document.createTextNode('に記載の内容に同意します。'));
       } else {
         consentText.textContent =
-          '連絡先の利用（相談対応・ご連絡）に同意します。プライバシーポリシーは運営サイトでご確認ください。';
+          'お名前の取り扱いに同意します。詳細は運営サイトのプライバシーポリシーをご確認ください。';
       }
 
       err.hidden = true;
       err.textContent = '';
       consent.checked = false;
-      nameInput.value = '';
-      emailInput.value = '';
+      nameInput.value = getStoredDisplayName() || '';
+      updateNameExampleVisibility();
+      nameInput.oninput = updateNameExampleVisibility;
+
       modal.removeAttribute('hidden');
       modal.setAttribute('aria-hidden', 'false');
       document.body.classList.add('nr-lead-profile-modal-open');
@@ -864,43 +951,29 @@
         modal.setAttribute('hidden', '');
         modal.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('nr-lead-profile-modal-open');
+        nameInput.oninput = null;
         try {
           sessionStorage.setItem(PROFILE_GATE_KEY, '1');
         } catch (e) {}
         onComplete();
       }
 
-      var skipBtn = document.getElementById('leadProfileSkip');
-      if (skipBtn) {
-        skipBtn.onclick = function () {
-          closeAndContinue();
-        };
-      }
-
       form.onsubmit = function (e) {
         e.preventDefault();
         err.hidden = true;
         var name = (nameInput.value || '').trim();
-        var email = (emailInput.value || '').trim();
+        if (!name) {
+          err.textContent = 'お名前を入力してください（ニックネームでも大丈夫です）。';
+          err.hidden = false;
+          return;
+        }
         if (!consent.checked) {
-          err.textContent = '同意にチェックを入れるか、「スキップして始める」を選んでください。';
+          err.textContent = '続けるには、同意にチェックをお願いします。';
           err.hidden = false;
           return;
         }
-        if (!name && !email) {
-          err.textContent = 'お名前またはメールのどちらかを入力するか、スキップしてください。';
-          err.hidden = false;
-          return;
-        }
-        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          err.textContent = 'メールアドレスの形式をご確認ください。';
-          err.hidden = false;
-          return;
-        }
-        var payload = {};
-        if (name) payload.name = name;
-        if (email) payload.email = email;
-        syncLeadToNotion(payload);
+        setStoredDisplayName(name);
+        saveSessionToSheet({ display_name: name, name: name });
         closeAndContinue();
       };
 
@@ -1127,6 +1200,11 @@
         if (sheetPropertyClickedSent) return;
         sheetPropertyClickedSent = true;
         saveSessionToSheet({ property_clicked: true });
+        try {
+          saveConsultToSheet(buildConsultSheetPayload({ flagPatch: { property_clicked: true } }));
+        } catch (e) {
+          console.log('[consult-sheet] property_click', e);
+        }
       });
 
       host.appendChild(box);
@@ -1212,7 +1290,6 @@
               chat_type: 'room_search'
             });
             difyChatPurpose = 'property';
-            syncLeadToNotion({});
             flowMode = 'find';
             findStep = 0;
             ctx = { lifestyle: '', rent: '', area: '' };
@@ -1246,7 +1323,6 @@
               chat_type: 'consult'
             });
             difyChatPurpose = 'consult';
-            syncLeadToNotion({});
             flowMode = 'consult';
             delay(CONFIG.USER_THINK_MS).then(function () {
               sayBotOnce(
@@ -1280,7 +1356,6 @@
       clearQuickHosts();
       appendUserBubble(label);
       ctx.lifestyle = label;
-      syncLeadToNotion({});
       delay(CONFIG.USER_THINK_MS).then(function () {
         sayBotOnce(
           'いいですね☺️　教えてくれてありがとうございます。\n' +
@@ -1303,7 +1378,6 @@
       clearQuickHosts();
       appendUserBubble(label);
       ctx.rent = label;
-      syncLeadToNotion({});
       delay(CONFIG.USER_THINK_MS).then(function () {
         sayBotOnce(
           'わかりました🍀　無理のないラインを、一緒に見ていきましょう。\n' +
@@ -1327,7 +1401,6 @@
       appendUserBubble(label);
       ctx.area = label;
       findStep = 3;
-      syncLeadToNotion({});
       delay(CONFIG.USER_THINK_MS).then(function () {
         sayBotOnce(
           'ありがとうございます☺️　だいぶ、あなたらしい条件が見えてきました。\n' +
@@ -1374,7 +1447,6 @@
     function onConsultPick(topicLabel) {
       clearQuickHosts();
       appendUserBubble(topicLabel);
-      syncLeadToNotion({ last_user_message: topicLabel });
       var body = CONSULT_TEXT[topicLabel] ||
         '気になること、ちゃんと受け止めます☺️\n一緒に、次の一歩を見つけていきましょう🍀';
       delay(CONFIG.USER_THINK_MS).then(function () {
@@ -1388,7 +1460,6 @@
                 ctx = { lifestyle: '相談', rent: '', area: '' };
                 renderPropertySuggest();
                 flowMode = 'idle';
-                syncLeadToNotion({});
               }
             );
           });
@@ -1457,8 +1528,6 @@
       clearComposerInput();
       removeEntryPanel();
       appendUserBubble(text);
-      syncLeadToNotion({ last_user_message: text.slice(0, 500) });
-
       if (CONFIG.USE_DIFY_CHAT && difyChatPurpose) {
         var streamBubble = null;
         inputLocked = true;
@@ -1546,9 +1615,12 @@
     loadPropertyList().then(function (list) {
       getOrCreateSessionId();
       PROPERTY_LIST = list;
-      syncLeadToNotion({});
       refreshStaticLineLinks();
       function beginConversation() {
+        if (elInput) elInput.disabled = false;
+        if (elSend) elSend.disabled = false;
+        var comp = document.querySelector('.composer');
+        if (comp) comp.classList.remove('nr-composer--gate-locked');
         showOpening();
         resizeTextarea();
       }
@@ -1558,6 +1630,10 @@
         gateDone = sessionStorage.getItem(PROFILE_GATE_KEY) === '1';
       } catch (e) {}
       if (showGate && !gateDone) {
+        if (elInput) elInput.disabled = true;
+        if (elSend) elSend.disabled = true;
+        var compGate = document.querySelector('.composer');
+        if (compGate) compGate.classList.add('nr-composer--gate-locked');
         openLeadProfileModal(beginConversation);
       } else {
         beginConversation();

@@ -41,32 +41,35 @@
     PROPERTIES_DATA_URL: 'data/properties.json',
 
     /**
-     * rental.html 表示直後の「任意プロフィール（名前・メール）」モーダルを出すか。
-     * false にすると従来どおりすぐ会話が始まります。
+     * rental.html 表示直後の「お名前（必須）」ゲートモーダルを出すか。
+     * false にすると同意モーダルを出さず、そのまま会話が始まります。
      */
     SHOW_LEAD_PROFILE_PROMPT: true,
 
     /**
-     * プロフィール送信時の同意文面に載せるプライバシーポリシーの URL（空ならリンクなしの文言のみ）。
-     * 公開時は自サイトのポリシーページに差し替えてください。
+     * モーダル同意文に載せるプライバシーポリシーの URL（空ならリンクなしの文言のみ）。
      */
     PRIVACY_POLICY_URL: '',
 
     /**
-     * false のとき rental は POST /api/lead を送りません（Notion 未設定のローカル検証用）。
+     * 互換用: rental は Notion /api/lead を呼びません（スプレッドシートのみで管理）。
      */
-    LEAD_SYNC_ENABLED: true,
+    LEAD_SYNC_ENABLED: false,
+
+    /** 未使用（旧 Notion API 用）。 */
+    LEAD_API_BEARER: '',
 
     /**
-     * Vercel で LEAD_API_SECRET を設定した場合のみ、ここに同じ値を入れて Authorization を付与。
-     * フロントに載るため秘匿性は高くありません。未設定なら空のまま。
+     * Google Apps Script Web アプリの URL（.../exec）。ここに直接貼るとブラウザから GAS に POST します。
+     * 空のままにした場合: 本番では POST /api/sheet に送り、Vercel の環境変数 GAS_SHEET_WEBHOOK_URL で GAS を指定（URL を Git に載せない）。
+     * file:// で開いているときはプロキシに届かないため送信しません。
      */
-    LEAD_API_BEARER: '',
+    GAS_SHEET_WEBHOOK_URL: '',
 
     /**
      * Vercel のオリジン（プロトコル＋ホスト、末尾スラッシュなし）。
      * 空のときは相対パス /api/...（本番と同じオリジン）。
-     * Live Server 等でローカル表示する場合はデプロイ先を指定すると /api/chat・/api/lead が動く。
+     * Live Server 等でローカル表示する場合はデプロイ先を指定すると /api/chat が動く。
      * 例: 'https://portfolio-pearl-one.vercel.app'
      */
     API_ORIGIN: '',
