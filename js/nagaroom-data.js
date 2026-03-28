@@ -53,6 +53,11 @@
     USE_DIFY_CHAT: true,
 
     /**
+     * Dify 返信を 1 文字ずつ出すときの待ち（ミリ秒）。小さいほど速い。
+     */
+    DIFY_CHAR_MS: 22,
+
+    /**
      * 物件一覧
      * filterRegion: nagasaki | isahaya | omura
      * rentMan: 家賃（万円・数値比較用）

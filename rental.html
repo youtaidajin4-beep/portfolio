@@ -184,7 +184,10 @@
       TYPING_MIN_MS: 560,
       TYPING_JITTER_MS: 420,
       USER_THINK_MS: 400,
-      FAST_RENDER_FOR_DIFY: true
+      DIFY_CHAR_MS: (function () {
+        var n = Number(NR.DIFY_CHAR_MS);
+        return !isNaN(n) && n >= 0 ? n : 22;
+      })()
     };
 
     function loadPropertyList() {
@@ -676,7 +679,8 @@
       return b;
     }
 
-    function typeIntoElement(el, fullText, onDone) {
+    function typeIntoElement(el, fullText, onDone, charMs) {
+      var ms = charMs != null && !isNaN(charMs) && charMs >= 0 ? charMs : CONFIG.CHAR_MS;
       var chars = Array.from(fullText);
       var i = 0;
       function tick() {
@@ -684,7 +688,7 @@
           el.textContent += chars[i];
           i++;
           scrollToBottom();
-          setTimeout(tick, CONFIG.CHAR_MS);
+          setTimeout(tick, ms);
         } else if (onDone) {
           onDone();
         }
@@ -740,17 +744,18 @@
       });
     }
 
-    // Dify応答用: 演出待ちを入れず、即時に吹き出し表示
-    function sayBotFast(text, onComplete) {
-      inputLocked = true;
-      setButtonsDisabled(true);
+    /**
+     * Dify 用: 事前に showTyping 済み想定。タイピング行を消してから 1 文字ずつ表示する。
+     */
+    function sayBotTypewriterAfterFetch(text, onComplete) {
       removeTyping();
       var bubbleEl = createEmptyBotBubble();
-      bubbleEl.textContent = text;
-      inputLocked = false;
-      setButtonsDisabled(false);
-      if (onComplete) onComplete();
-      scrollToBottom();
+      typeIntoElement(bubbleEl, text, function () {
+        inputLocked = false;
+        setButtonsDisabled(false);
+        if (onComplete) onComplete();
+        scrollToBottom();
+      }, CONFIG.DIFY_CHAR_MS);
     }
 
     function clearQuickHosts() {
@@ -1169,11 +1174,13 @@
       syncLeadToNotion({ last_user_message: text.slice(0, 500) });
 
       if (CONFIG.USE_DIFY_CHAT && difyChatPurpose) {
+        inputLocked = true;
+        setButtonsDisabled(true);
+        showTyping();
         fetchDifyChatReply(text, difyChatPurpose)
           .then(function (answer) {
             var body = answer && answer.trim() ? answer : '（返答が空でした）';
-            var render = CONFIG.FAST_RENDER_FOR_DIFY ? sayBotFast : sayBotOnce;
-            render(body, function () {
+            sayBotTypewriterAfterFetch(body, function () {
               if (flowMode === 'idle' && findStep === 0) {
                 delay(260).then(appendSoftLineFromFree);
               }
@@ -1182,8 +1189,7 @@
           .catch(function (err) {
             console.error(err);
             var reason = (err && err.message) ? ('\n（原因: ' + err.message + '）') : '';
-            var render = CONFIG.FAST_RENDER_FOR_DIFY ? sayBotFast : sayBotOnce;
-            render(
+            sayBotTypewriterAfterFetch(
               'ただいま会話に接続しにくい状況です。\n時間をおいて試すか、下のLINEからお問い合わせください。' + reason,
               function () {
                 if (flowMode === 'idle' && findStep === 0) {
