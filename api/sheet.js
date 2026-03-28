@@ -10,6 +10,12 @@
  *
  * nagaroom-data.js の GAS_SHEET_WEBHOOK_URL を空にして本 API 経由にすると、
  * GAS の URL を Git にコミットせずに済みます。
+ *
+ * --- GAS 側の推奨（行が空欄で消える問題の二重対策）---
+ * doPost で毎回 rowData をゼロから組み立て、JSON に無いキーを "" にしていると、
+ * 古いクライアントの部分 POST で列が消えます。LP 側は累積マージ済みの JSON を送りますが、
+ * GAS でも「既存行を読み、data に存在するキーだけ上書き」するマージ実装にすると安全です。
+ * 例: const cur = sheet.getRange(targetRow,1,1,numCols).getValues()[0]; と列インデックスでマージ。
  */
 
 function applyCors(req, res) {

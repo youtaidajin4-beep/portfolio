@@ -215,6 +215,28 @@
       }
     }
 
+    var SHEET_SNAPSHOT_KEY = 'nr_sheet_snapshot';
+
+    function loadSheetSnapshot() {
+      var sid = getOrCreateSessionId();
+      try {
+        var raw = localStorage.getItem(SHEET_SNAPSHOT_KEY);
+        if (!raw) return {};
+        var o = JSON.parse(raw);
+        if (!o || typeof o !== 'object') return {};
+        if (o.session_id !== sid) return {};
+        return o;
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function persistSheetSnapshot(merged) {
+      try {
+        localStorage.setItem(SHEET_SNAPSHOT_KEY, JSON.stringify(merged));
+      } catch (e) {}
+    }
+
     function buildSheetRowPatch(obj) {
       var o = {};
       if (!obj || typeof obj !== 'object') return o;
@@ -233,18 +255,22 @@
     }
 
     function saveSessionToSheet(data) {
+      var sid = getOrCreateSessionId();
+      var prev = loadSheetSnapshot();
+      var patch = buildSheetRowPatch(data || {});
+      var merged = Object.assign({}, prev, { session_id: sid, lead_id: getOrCreateLeadId() }, patch);
+      persistSheetSnapshot(merged);
+
       var direct = (CONFIG.GAS_SHEET_WEBHOOK_URL || '').trim();
       var url = direct;
       if (!url) {
         if (typeof window !== 'undefined' && window.location.protocol === 'file:') return;
         url = apiUrl('/api/sheet');
       }
-      var patch = buildSheetRowPatch(data || {});
-      var payload = Object.assign({ session_id: getOrCreateSessionId() }, patch);
       fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json;charset=utf-8' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(merged)
       })
         .then(function (res) {
           if (!res.ok) console.warn('[sheet]', res.status, res.statusText);
@@ -723,6 +749,13 @@
         conditionCategoryCount() >= 2 ||
         (budgetYen != null && budgetYen > 0 && areas.length > 0) ||
         (budgetYen != null && budgetYen > 0 && feat.length > 0 && areas.length > 0);
+      var lid = getOrCreateLeadId();
+      var note = 'lead:' + lid;
+      if (snippet) {
+        note = note + ' | ' + snippet.slice(0, 400);
+      }
+      if (note.length > 500) note = note.slice(0, 500);
+
       return {
         budget_max: budgetMaxWan,
         preferred_area: areas,
@@ -732,7 +765,7 @@
         summary: summaryParts.join(' / ') || '',
         proposal_done: proposalDone,
         lead_company: '',
-        note: snippet ? snippet.slice(0, 500) : ''
+        note: note
       };
     }
 
