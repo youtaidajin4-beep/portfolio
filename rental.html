@@ -527,7 +527,7 @@
      * ユーザー発言から抽出した条件（一覧URL等で再利用しやすい形）
      * budget: 月額想定（円・数値） / layout: 正規化した間取り文字列 / features: 英字スラッグの配列
      */
-    var extractedConditions = { budget: null, layout: '', features: [] };
+    var extractedConditions = { budget: null, layout: '', features: [], areas: [], lifestyleTags: [] };
 
     var FEATURE_RULES = [
       { test: /静か|閑静|静寂|騒音|落ち着いた/, slug: 'quiet' },
@@ -561,7 +561,36 @@
         var y = parseInt(m[1], 10);
         if (y >= 10000 && y <= 3000000) return y;
       }
+      m = s.match(/(\d{4,6})\s*円/);
+      if (m) {
+        var z = parseInt(m[1], 10);
+        if (z >= 10000 && z <= 3000000) return z;
+      }
       return null;
+    }
+
+    function extractAreasFromText(text) {
+      var t = String(text);
+      var found = [];
+      function push(a) {
+        if (a && found.indexOf(a) === -1) found.push(a);
+      }
+      if (/浦上/.test(t)) push('浦上');
+      if (/大村市|大村駅|玖島/.test(t)) push('大村市');
+      if (/諫早市|諫早駅|伊佐波/.test(t)) push('諫早市');
+      if (/(長崎市|銅座|浜町|宝町|松山町|桜町|茂里町|県庁坂|眼鏡橋)/.test(t) && !/諫早/.test(t)) {
+        push('長崎市');
+      }
+      return found;
+    }
+
+    function extractLifestyleTagsFromText(text) {
+      var t = String(text);
+      var tags = [];
+      if (/一人暮らし|一人で暮ら|単身|ひとりぐらし|ひとり暮らし/.test(t)) tags.push('一人暮らし');
+      if (/同棲|カップル|ふたり暮らし|二人暮らし/.test(t)) tags.push('同棲');
+      if (/ファミリー|家族と|子ども|こども/.test(t)) tags.push('ファミリー');
+      return tags;
     }
 
     function extractLayoutFromText(text) {
@@ -590,7 +619,9 @@
       return {
         budget: extractBudgetFromText(text),
         layout: extractLayoutFromText(text),
-        features: extractFeaturesFromText(text)
+        features: extractFeaturesFromText(text),
+        areas: extractAreasFromText(text),
+        lifestyleTags: extractLifestyleTagsFromText(text)
       };
     }
 
@@ -601,9 +632,19 @@
       if (patch.layout) {
         extractedConditions.layout = patch.layout;
       }
-      patch.features.forEach(function (slug) {
+      (patch.features || []).forEach(function (slug) {
         if (extractedConditions.features.indexOf(slug) === -1) {
           extractedConditions.features.push(slug);
+        }
+      });
+      (patch.areas || []).forEach(function (a) {
+        if (a && extractedConditions.areas.indexOf(a) === -1) {
+          extractedConditions.areas.push(a);
+        }
+      });
+      (patch.lifestyleTags || []).forEach(function (tag) {
+        if (tag && extractedConditions.lifestyleTags.indexOf(tag) === -1) {
+          extractedConditions.lifestyleTags.push(tag);
         }
       });
     }
@@ -613,6 +654,7 @@
       if (extractedConditions.budget != null && extractedConditions.budget > 0) n++;
       if (extractedConditions.layout) n++;
       if (extractedConditions.features.length > 0) n++;
+      if (extractedConditions.areas.length > 0) n++;
       return n;
     }
 
@@ -644,7 +686,8 @@
       updateConditionSearchButton();
     }
 
-    function buildProposalSheetPayload() {
+    function buildSheetSnapshotPayload(options) {
+      options = options || {};
       var budgetYen = extractedConditions.budget;
       if ((budgetYen == null || budgetYen <= 0) && ctx.rent) {
         var fromRent = extractConditionsFromText(String(ctx.rent));
@@ -652,19 +695,34 @@
       }
       var budgetMaxWan =
         budgetYen != null && budgetYen > 0 ? Math.round((budgetYen / 10000) * 10) / 10 : '';
-      var areas = [];
+      var areas = (extractedConditions.areas || []).slice();
       if (ctx.area && String(ctx.area).trim() && ctx.area.indexOf('まだ') === -1) {
-        areas.push(String(ctx.area).trim());
+        var ca = String(ctx.area).trim();
+        if (areas.indexOf(ca) === -1) areas.push(ca);
       }
-      var tags = [];
-      if (ctx.lifestyle && String(ctx.lifestyle).trim()) tags.push(String(ctx.lifestyle).trim());
+      var tags = (extractedConditions.lifestyleTags || []).slice();
+      if (ctx.lifestyle && String(ctx.lifestyle).trim()) {
+        var ls = String(ctx.lifestyle).trim();
+        if (tags.indexOf(ls) === -1) tags.push(ls);
+      }
       var feat = (extractedConditions.features || []).slice();
       var summaryParts = [];
       if (ctx.lifestyle) summaryParts.push('暮らし方: ' + ctx.lifestyle);
       if (ctx.rent) summaryParts.push('家賃感: ' + ctx.rent);
-      if (ctx.area) summaryParts.push('エリア: ' + ctx.area);
+      if (ctx.area) summaryParts.push('エリア(導線): ' + ctx.area);
+      if (areas.length) summaryParts.push('エリア(抽出): ' + areas.join(','));
       if (extractedConditions.layout) summaryParts.push('間取り抽出: ' + extractedConditions.layout);
       if (feat.length) summaryParts.push('こだわり: ' + feat.join(','));
+      var snippet = (options.lastUserMessage || '').trim();
+      if (snippet) {
+        summaryParts.push('直近メッセージ: ' + snippet.slice(0, 200));
+      }
+      var proposalDone =
+        !!options.forceProposalDone ||
+        sheetProposalSynced ||
+        conditionCategoryCount() >= 2 ||
+        (budgetYen != null && budgetYen > 0 && areas.length > 0) ||
+        (budgetYen != null && budgetYen > 0 && feat.length > 0 && areas.length > 0);
       return {
         budget_max: budgetMaxWan,
         preferred_area: areas,
@@ -672,10 +730,18 @@
         features: feat,
         lifestyle_tags: tags,
         summary: summaryParts.join(' / ') || '',
-        proposal_done: true,
+        proposal_done: proposalDone,
         lead_company: '',
-        note: ''
+        note: snippet ? snippet.slice(0, 500) : ''
       };
+    }
+
+    function buildProposalSheetPayload() {
+      return buildSheetSnapshotPayload({ forceProposalDone: true });
+    }
+
+    function emitSheetChatSnapshot(lastUserMessage) {
+      saveSessionToSheet(buildSheetSnapshotPayload({ lastUserMessage: lastUserMessage || '' }));
     }
 
     var elScroll = document.getElementById('chatScroll');
@@ -1377,6 +1443,7 @@
           }
         })
           .then(function (answer) {
+            emitSheetChatSnapshot(text);
             if (streamBubble) {
               streamBubble.classList.remove('bubble--bot--streaming');
               if (!streamBubble.textContent.trim()) {
@@ -1421,6 +1488,7 @@
 
       delay(CONFIG.USER_THINK_MS).then(function () {
         sayBotOnce(freeTextReply(text), function () {
+          emitSheetChatSnapshot(text);
           if (flowMode === 'idle' && findStep === 0) {
             delay(450).then(appendSoftLineFromFree);
           }
