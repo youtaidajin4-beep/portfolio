@@ -36,7 +36,7 @@
      */
     LINE_OA_URL_BASE:
       'https://line.me/R/oaMessage/' + encodeURIComponent('@' + LINE_BASIC_ID.replace(/^@/, '')),
-    /** 任意の事前入力文で URL を組み立てる（例: lineMessageUrl('相談 ' + leadId)） */
+    /** 任意の事前入力文で URL を組み立てる（通常は「相談」のみ） */
     lineMessageUrl: lineMessageUrl,
     PROPERTIES_DATA_URL: 'data/properties.json',
 
