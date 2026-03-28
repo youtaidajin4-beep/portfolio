@@ -188,8 +188,92 @@
       DIFY_CHAR_MS: (function () {
         var n = Number(NR.DIFY_CHAR_MS);
         return !isNaN(n) && n >= 0 ? n : 22;
-      })()
+      })(),
+      GAS_SHEET_WEBHOOK_URL:
+        typeof NR.GAS_SHEET_WEBHOOK_URL === 'string' ? NR.GAS_SHEET_WEBHOOK_URL.trim() : ''
     };
+
+    // --- GAS スプレッドシート連携（CONFIG の直後に置く）---
+    // (A) nagaroom-data.js の GAS_SHEET_WEBHOOK_URL に GAS の exec URL を直接書く
+    // (B) 同項目を空のまま → Vercel の環境変数 GAS_SHEET_WEBHOOK_URL を設定し、POST は /api/sheet 経由（URL を Git に載せない）
+    var _nrSheetSessionMem = null;
+    function getOrCreateSessionId() {
+      var k = 'nr_lp_session_id';
+      try {
+        var sid = localStorage.getItem(k);
+        if (sid) return sid;
+        sid =
+          typeof crypto !== 'undefined' && crypto.randomUUID
+            ? crypto.randomUUID()
+            : 'nr_sess_' + Date.now() + '_' + Math.random().toString(36).slice(2, 14);
+        localStorage.setItem(k, sid);
+        return sid;
+      } catch (e) {
+        if (_nrSheetSessionMem) return _nrSheetSessionMem;
+        _nrSheetSessionMem = 'nr_sess_mem_' + Date.now() + '_' + Math.random().toString(36).slice(2, 12);
+        return _nrSheetSessionMem;
+      }
+    }
+
+    function buildSheetRowPatch(obj) {
+      var o = {};
+      if (!obj || typeof obj !== 'object') return o;
+      var listKeys = { preferred_area: 1, features: 1, lifestyle_tags: 1 };
+      Object.keys(obj).forEach(function (key) {
+        var v = obj[key];
+        if (v === undefined) return;
+        if (listKeys[key]) {
+          if (Array.isArray(v)) o[key] = v.filter(function (x) { return x != null && String(x).trim() !== ''; }).join(',');
+          else if (v != null && String(v).trim() !== '') o[key] = String(v).trim();
+          return;
+        }
+        o[key] = v;
+      });
+      return o;
+    }
+
+    function saveSessionToSheet(data) {
+      var direct = (CONFIG.GAS_SHEET_WEBHOOK_URL || '').trim();
+      var url = direct;
+      if (!url) {
+        if (typeof window !== 'undefined' && window.location.protocol === 'file:') return;
+        url = apiUrl('/api/sheet');
+      }
+      var patch = buildSheetRowPatch(data || {});
+      var payload = Object.assign({ session_id: getOrCreateSessionId() }, patch);
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+        .then(function (res) {
+          if (!res.ok) console.warn('[sheet]', res.status, res.statusText);
+        })
+        .catch(function (err) {
+          console.warn('[sheet]', err);
+        });
+    }
+
+    var sheetProposalSynced = false;
+    var sheetLineReturnSent = false;
+    var sheetLineConsultSent = false;
+    var sheetPropertyClickedSent = false;
+    var sheetLeadSent = false;
+    var sheetStaticLineBound = false;
+
+    function bindSheetStaticLineListeners() {
+      if (sheetStaticLineBound) return;
+      sheetStaticLineBound = true;
+      ['heroLineLink', 'footerLineBtn'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('click', function () {
+          if (sheetLineReturnSent) return;
+          sheetLineReturnSent = true;
+          saveSessionToSheet({ line_return_clicked: true });
+        });
+      });
+    }
 
     function loadPropertyList() {
       return fetch(CONFIG.PROPERTIES_DATA_URL, { cache: 'no-store' })
@@ -297,9 +381,16 @@
       if (CONFIG.LEAD_API_BEARER && String(CONFIG.LEAD_API_BEARER).trim()) {
         headers['Authorization'] = 'Bearer ' + String(CONFIG.LEAD_API_BEARER).trim();
       }
-      fetch(apiUrl('/api/lead'), { method: 'POST', headers: headers, body: JSON.stringify(clean) }).catch(function (err) {
-        console.warn('[lead sync]', err);
-      });
+      fetch(apiUrl('/api/lead'), { method: 'POST', headers: headers, body: JSON.stringify(clean) })
+        .then(function (res) {
+          if (res.ok && !sheetLeadSent) {
+            sheetLeadSent = true;
+            saveSessionToSheet({ lead_sent: true });
+          }
+        })
+        .catch(function (err) {
+          console.warn('[lead sync]', err);
+        });
     }
 
     /**
@@ -426,9 +517,8 @@
       });
     }
 
-    var heroLine = document.getElementById('heroLineLink');
-    var footerLine = document.getElementById('footerLineBtn');
     refreshStaticLineLinks();
+    bindSheetStaticLineListeners();
 
     /** 会話の状態（物件フィルタの参考用・デモ） */
     var ctx = { lifestyle: '', rent: '', area: '' };
@@ -554,10 +644,59 @@
       updateConditionSearchButton();
     }
 
+    function buildProposalSheetPayload() {
+      var budgetYen = extractedConditions.budget;
+      if ((budgetYen == null || budgetYen <= 0) && ctx.rent) {
+        var fromRent = extractConditionsFromText(String(ctx.rent));
+        if (fromRent.budget != null) budgetYen = fromRent.budget;
+      }
+      var budgetMaxWan =
+        budgetYen != null && budgetYen > 0 ? Math.round((budgetYen / 10000) * 10) / 10 : '';
+      var areas = [];
+      if (ctx.area && String(ctx.area).trim() && ctx.area.indexOf('まだ') === -1) {
+        areas.push(String(ctx.area).trim());
+      }
+      var tags = [];
+      if (ctx.lifestyle && String(ctx.lifestyle).trim()) tags.push(String(ctx.lifestyle).trim());
+      var feat = (extractedConditions.features || []).slice();
+      var summaryParts = [];
+      if (ctx.lifestyle) summaryParts.push('暮らし方: ' + ctx.lifestyle);
+      if (ctx.rent) summaryParts.push('家賃感: ' + ctx.rent);
+      if (ctx.area) summaryParts.push('エリア: ' + ctx.area);
+      if (extractedConditions.layout) summaryParts.push('間取り抽出: ' + extractedConditions.layout);
+      if (feat.length) summaryParts.push('こだわり: ' + feat.join(','));
+      return {
+        budget_max: budgetMaxWan,
+        preferred_area: areas,
+        layout_preference: extractedConditions.layout || '',
+        features: feat,
+        lifestyle_tags: tags,
+        summary: summaryParts.join(' / ') || '',
+        proposal_done: true,
+        lead_company: '',
+        note: ''
+      };
+    }
+
     var elScroll = document.getElementById('chatScroll');
     var elLog = document.getElementById('chatLog');
     var elInput = document.getElementById('freeInput');
     var elSend = document.getElementById('sendBtn');
+
+    if (elLog) {
+      elLog.addEventListener(
+        'click',
+        function (e) {
+          var a = e.target.closest('a');
+          if (!a || !a.href) return;
+          if (String(a.href).indexOf('line.me') === -1) return;
+          if (sheetLineConsultSent) return;
+          sheetLineConsultSent = true;
+          saveSessionToSheet({ line_consult_started: true });
+        },
+        true
+      );
+    }
     var elConditionBtn = document.getElementById('conditionSearchBtn');
     if (elConditionBtn) {
       elConditionBtn.addEventListener('click', function () {
@@ -883,8 +1022,20 @@
         );
       });
 
+      host.addEventListener('click', function (e) {
+        var a = e.target.closest('a');
+        if (!a || !a.classList.contains('btn-ghost')) return;
+        if (sheetPropertyClickedSent) return;
+        sheetPropertyClickedSent = true;
+        saveSessionToSheet({ property_clicked: true });
+      });
+
       host.appendChild(box);
       elLog.appendChild(host);
+      if (!sheetProposalSynced) {
+        sheetProposalSynced = true;
+        saveSessionToSheet(buildProposalSheetPayload());
+      }
       scrollToBottom();
     }
 
@@ -956,6 +1107,11 @@
           function () {
             removeEntryPanel();
             appendUserBubble('お部屋を探す 🏠');
+            saveSessionToSheet({
+              started_at: new Date().toISOString(),
+              source: 'lp',
+              chat_type: 'room_search'
+            });
             difyChatPurpose = 'property';
             syncLeadToNotion({});
             flowMode = 'find';
@@ -985,6 +1141,11 @@
           function () {
             removeEntryPanel();
             appendUserBubble('まず相談したい 🍀');
+            saveSessionToSheet({
+              started_at: new Date().toISOString(),
+              source: 'lp',
+              chat_type: 'consult'
+            });
             difyChatPurpose = 'consult';
             syncLeadToNotion({});
             flowMode = 'consult';
@@ -1282,6 +1443,7 @@
     elInput.addEventListener('input', resizeTextarea);
 
     loadPropertyList().then(function (list) {
+      getOrCreateSessionId();
       PROPERTY_LIST = list;
       syncLeadToNotion({});
       refreshStaticLineLinks();
