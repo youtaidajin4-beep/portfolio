@@ -75,6 +75,46 @@
         </div>
       </section>
 
+      <div
+        id="chatSuggestCarouselHost"
+        class="nr-chat-suggest-host nodot"
+        hidden
+        aria-hidden="true"
+        aria-label="条件に合いそうなお部屋"
+      >
+        <p class="nr-chat-suggest-title">この条件で合いそうなお部屋</p>
+        <div
+          id="chatSuggestCarouselEmpty"
+          class="nr-chat-suggest-empty nr-property-empty-card"
+          hidden
+          aria-hidden="true"
+        >
+          <p class="nr-empty-state-line">今の条件だと少し絞り込みが強めかも。</p>
+          <p class="nr-empty-state-line">家賃や条件を少しゆるめると、いいお部屋が見つかりそうです。</p>
+          <button type="button" class="nr-empty-adjust-btn">条件を少し変える</button>
+        </div>
+        <div id="chatSuggestCarousel" class="nr-chat-suggest-track" role="list"></div>
+        <div
+          id="chatSuggestCarouselPager"
+          class="nr-chat-suggest-pager"
+          hidden
+          aria-hidden="true"
+          aria-live="polite"
+        >
+          <span id="chatSuggestCarouselPagerText" class="nr-chat-suggest-pager-text"></span>
+        </div>
+      </div>
+
+      <div id="nrContextualLineCta" class="nr-contextual-line-cta" hidden aria-hidden="true">
+        <a
+          id="nrContextualLineCtaLink"
+          class="nr-contextual-line-cta-btn"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+        ></a>
+      </div>
+
       <div id="chatConditionCta" class="chat-condition-cta" hidden aria-hidden="true">
         <button type="button" class="chat-condition-cta-btn" id="conditionSearchBtn">
           この条件でお部屋を見る
@@ -83,7 +123,11 @@
 
       <section id="gasListingSection" class="gas-listing-section nodot" hidden aria-hidden="true" aria-label="掲載物件一覧">
         <h2 class="gas-listing-heading">掲載物件</h2>
-        <p id="gasListingEmpty" class="gas-listing-empty" hidden>条件に合うお部屋が見つかりません</p>
+        <div id="gasListingEmpty" class="gas-listing-empty nr-property-empty-card" hidden aria-hidden="true">
+          <p class="nr-empty-state-line">今の条件だと少し絞り込みが強めかも。</p>
+          <p class="nr-empty-state-line">家賃や条件を少しゆるめると、いいお部屋が見つかりそうです。</p>
+          <button type="button" class="nr-empty-adjust-btn">条件を少し変える</button>
+        </div>
         <div id="gasListingGrid" class="listing-grid gas-listing-grid"></div>
       </section>
 
@@ -176,6 +220,10 @@
     var PROPERTY_LIST = [];
     /** 絞り込み後（描画用。applyPropertyFilters の結果と同等） */
     var FILTERED_PROPERTY_LIST = [];
+    /** 仕様上の `properties` と同義。PROPERTY_LIST 代入時に毎回同じ参照に更新 */
+    var properties = PROPERTY_LIST;
+    /** 仕様上の `filteredProperties` と同義。refreshFilteredListing で FILTERED_PROPERTY_LIST と同期 */
+    var filteredProperties = FILTERED_PROPERTY_LIST;
     /** GAS GET が成功し 1 件以上あるときだけ true（一覧セクション表示用。フォールバック時は false） */
     var gasListingShouldShow = false;
 
@@ -368,7 +416,7 @@
     function bindSheetStaticLineListeners() {
       if (sheetStaticLineBound) return;
       sheetStaticLineBound = true;
-      ['heroLineLink', 'footerLineBtn'].forEach(function (id) {
+      ['heroLineLink', 'footerLineBtn', 'nrContextualLineCtaLink'].forEach(function (id) {
         var el = document.getElementById(id);
         if (!el) return;
         el.addEventListener('click', function () {
@@ -419,6 +467,19 @@
       );
     }
 
+    /**
+     * short_reason 未設定時の仮生成（後で DB の reason 列に差し替え前提）
+     * 目安 20〜30 文字（maxLen 既定 26）
+     */
+    function deriveShortReason(text, maxLen) {
+      maxLen = maxLen != null ? maxLen : 26;
+      var s = String(text || '').replace(/\s+/g, ' ').trim();
+      if (!s) return '';
+      var arr = Array.from(s);
+      if (arr.length <= maxLen) return s;
+      return arr.slice(0, maxLen - 1).join('') + '…';
+    }
+
     /** GAS 1行 → 既存 property-card / renderPropertySuggest 用 */
     function normalizeGasProperty(raw, rowIndex) {
       raw = raw || {};
@@ -438,6 +499,8 @@
       var imgRaw = raw.image1 != null ? String(raw.image1).trim() : '';
       var image = imgRaw || GAS_PROPERTY_PLACEHOLDER_IMG;
       var comment = raw.story_comment != null ? String(raw.story_comment).trim() : '';
+      var srFromGas = raw.short_reason != null ? String(raw.short_reason).trim() : '';
+      var shortReason = srFromGas || deriveShortReason(comment, 26);
       var rentMan = rentManFromGasValue(rentVal);
       var rentYen = null;
       if (!isNaN(rentMan) && rentMan > 0) {
@@ -456,6 +519,7 @@
         filterRegion: 'nagasaki',
         features: [],
         comment: comment,
+        shortReason: shortReason,
         detailUrl: 'property.html?id=' + encodeURIComponent(id),
         gasPetOk: gasTruthy(raw.pet_ok),
         gasWashstand: gasTruthy(raw.independent_washstand),
@@ -470,6 +534,9 @@
       if (!p || typeof p !== 'object') return p;
       if (p.rentYen == null && p.rentMan != null && !isNaN(Number(p.rentMan))) {
         p.rentYen = Math.round(Number(p.rentMan) * 10000);
+      }
+      if (!p.shortReason && p.comment) {
+        p.shortReason = deriveShortReason(p.comment, 26);
       }
       return p;
     }
@@ -516,10 +583,18 @@
         });
     }
 
+    /** 仕様名: 物件一覧取得（実体は loadPropertyList と同一・二重 fetch しない） */
+    function fetchProperties() {
+      return loadPropertyList();
+    }
+
     /** アプリごとに conversation_id を分ける（物件検索と相談で Dify アプリが別のため） */
     var difyConvByPurpose = { property: null, consult: null };
     /** エントリーカード選択後のみ設定。未選択の自由入力はローカル応答 */
     var difyChatPurpose = null;
+    var nrLastUserUtteranceForLineCta = '';
+    var nrCarouselPagerPrevIdx = -1;
+    var nrCarouselPagerIndexChanges = 0;
 
     function randomLeadId() {
       if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -572,8 +647,10 @@
       var url = getLineUrlWithLead();
       var heroLine = document.getElementById('heroLineLink');
       var footerLine = document.getElementById('footerLineBtn');
+      var ctxLine = document.getElementById('nrContextualLineCtaLink');
       if (heroLine) heroLine.href = url;
       if (footerLine) footerLine.href = url;
+      if (ctxLine) ctxLine.href = url;
     }
 
     /**
@@ -856,8 +933,12 @@
       return t;
     }
 
-    function applyPropertyFilters(fullList) {
-      var ec = extractedConditions;
+    /**
+     * @param {Array} fullList 物件配列
+     * @param {object} [ecOverride] 省略時は extractedConditions（filterProperties から渡す用）
+     */
+    function applyPropertyFilters(fullList, ecOverride) {
+      var ec = ecOverride != null ? ecOverride : extractedConditions;
       var budget = ec.budget != null && ec.budget > 0 ? ec.budget : null;
       var layoutF = ec.layout ? normalizeLayoutForCompare(ec.layout) : '';
       var feats = ec.features || [];
@@ -881,6 +962,11 @@
         }
         return true;
       });
+    }
+
+    /** 仕様名: 条件オブジェクトで絞り込み（ec は budget / layout / features を想定） */
+    function filterProperties(conditions) {
+      return applyPropertyFilters(PROPERTY_LIST, conditions);
     }
 
     function hasUrlListingFilterParams() {
@@ -989,6 +1075,23 @@
       return n;
     }
 
+    /** チャット下カルーセル用: budget / layout / features のみカウント（2 以上で表示候補） */
+    function conditionCountBudgetLayoutFeatures() {
+      var n = 0;
+      if (extractedConditions.budget != null && extractedConditions.budget > 0) n++;
+      if (extractedConditions.layout && String(extractedConditions.layout).trim()) n++;
+      if (extractedConditions.features && extractedConditions.features.length > 0) n++;
+      return n;
+    }
+
+    function shouldShowChatSuggestCarousel() {
+      return (
+        difyChatPurpose === 'property' &&
+        PROPERTY_LIST.length > 0 &&
+        conditionCountBudgetLayoutFeatures() >= 2
+      );
+    }
+
     function buildConditionSearchUrl() {
       var params = new URLSearchParams();
       if (extractedConditions.budget != null) {
@@ -1019,6 +1122,53 @@
         }
       }
       refreshFilteredListing();
+    }
+
+    var NR_CONTEXTUAL_LINE_CTA_LABELS = {
+      conditions: 'この条件、LINEで相談してみる？',
+      viewed: '気になる物件、LINEでまとめて相談できるよ',
+      hesitate: 'どれがいいか迷ったら、LINEで一緒に整理できるよ'
+    };
+
+    function resetCarouselPagerChangeTracking() {
+      nrCarouselPagerPrevIdx = -1;
+      nrCarouselPagerIndexChanges = 0;
+    }
+
+    /**
+     * 物件検索モード時のみ。優先度: ②物件詳細を見た → ①条件が揃った → ③迷い・カードを何度か横に動かした
+     */
+    function pickContextualLineCtaVariant() {
+      if (difyChatPurpose !== 'property') return null;
+      try {
+        if (sessionStorage.getItem('nr_rental_property_detail_clicked') === '1') return 'viewed';
+      } catch (e) {}
+      var u = String(nrLastUserUtteranceForLineCta || '').trim();
+      if (
+        /迷[いうわっ]|どれが(いい)?|決め(ら)?れない|わからな|悩ん|どうしよう|選べな|比べたい|絞れな/.test(u)
+      ) {
+        return 'hesitate';
+      }
+      if (conditionCategoryCount() >= 2) return 'conditions';
+      if (nrCarouselPagerIndexChanges >= 2) return 'hesitate';
+      return null;
+    }
+
+    function refreshContextualLineCta() {
+      var wrap = document.getElementById('nrContextualLineCta');
+      var link = document.getElementById('nrContextualLineCtaLink');
+      if (!wrap || !link) return;
+      var variant = pickContextualLineCtaVariant();
+      if (!variant) {
+        wrap.hidden = true;
+        wrap.setAttribute('aria-hidden', 'true');
+        link.textContent = '';
+        return;
+      }
+      link.textContent = NR_CONTEXTUAL_LINE_CTA_LABELS[variant] || '';
+      link.href = getLineUrlWithLead();
+      wrap.hidden = false;
+      wrap.setAttribute('aria-hidden', 'false');
     }
 
     function processUserUtteranceForConditions(text) {
@@ -1161,6 +1311,44 @@
       });
     }
 
+    function scrollToChatComposer() {
+      var shell = document.querySelector('.chat-shell');
+      if (shell) {
+        shell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      var input = document.getElementById('freeInput');
+      if (input) {
+        setTimeout(function () {
+          try {
+            input.focus({ preventScroll: true });
+          } catch (e) {
+            try {
+              input.focus();
+            } catch (e2) {}
+          }
+        }, 450);
+      }
+    }
+
+    document.body.addEventListener(
+      'click',
+      function (e) {
+        var adjust = e.target.closest('.nr-empty-adjust-btn');
+        if (adjust) {
+          scrollToChatComposer();
+          return;
+        }
+        var propA = e.target.closest('a[href*="property.html"]');
+        if (propA && propA.getAttribute('href')) {
+          try {
+            sessionStorage.setItem('nr_rental_property_detail_clicked', '1');
+          } catch (err) {}
+          refreshContextualLineCta();
+        }
+      },
+      true
+    );
+
     var flowMode = 'idle';
     var findStep = 0;
     var inputLocked = false;
@@ -1176,6 +1364,165 @@
       var d = document.createElement('div');
       d.textContent = s;
       return d.innerHTML;
+    }
+
+    function truncateChatSuggestStory(text, maxChars) {
+      var arr = Array.from(String(text || ''));
+      if (arr.length <= maxChars) return String(text || '');
+      return arr.slice(0, maxChars).join('') + '…';
+    }
+
+    function hideChatSuggestCarouselPager() {
+      var pager = document.getElementById('chatSuggestCarouselPager');
+      if (!pager) return;
+      pager.hidden = true;
+      pager.setAttribute('aria-hidden', 'true');
+    }
+
+    function updateChatSuggestCarouselPager() {
+      var track = document.getElementById('chatSuggestCarousel');
+      var pager = document.getElementById('chatSuggestCarouselPager');
+      var textEl = document.getElementById('chatSuggestCarouselPagerText');
+      if (!track || !pager || !textEl) return;
+      var cards = track.querySelectorAll('.nr-chat-suggest-card');
+      if (!cards.length) {
+        hideChatSuggestCarouselPager();
+        nrCarouselPagerPrevIdx = -1;
+        return;
+      }
+      pager.hidden = false;
+      pager.setAttribute('aria-hidden', 'false');
+      var trackRect = track.getBoundingClientRect();
+      var centerX = trackRect.left + trackRect.width * 0.5;
+      var bestIdx = 0;
+      var bestDist = Infinity;
+      for (var i = 0; i < cards.length; i++) {
+        var r = cards[i].getBoundingClientRect();
+        var mid = r.left + r.width * 0.5;
+        var d = Math.abs(mid - centerX);
+        if (d < bestDist) {
+          bestDist = d;
+          bestIdx = i;
+        }
+      }
+      textEl.textContent = String(bestIdx + 1) + ' / ' + cards.length;
+      if (cards.length >= 2) {
+        if (nrCarouselPagerPrevIdx !== bestIdx) {
+          if (nrCarouselPagerPrevIdx >= 0) nrCarouselPagerIndexChanges++;
+          nrCarouselPagerPrevIdx = bestIdx;
+        }
+      } else {
+        nrCarouselPagerPrevIdx = bestIdx;
+      }
+      refreshContextualLineCta();
+    }
+
+    function bindChatSuggestCarouselPagerScroll(track) {
+      if (!track || track.dataset.nrPagerBound === '1') return;
+      track.dataset.nrPagerBound = '1';
+      var raf = null;
+      function schedule() {
+        if (raf != null) return;
+        raf = requestAnimationFrame(function () {
+          raf = null;
+          updateChatSuggestCarouselPager();
+        });
+      }
+      track.addEventListener('scroll', schedule, { passive: true });
+      window.addEventListener('resize', schedule);
+    }
+
+    /** チャット直下・横スライドの物件カード（条件 2 つ以上＋物件検索モード時） */
+    function renderPropertyCards() {
+      var host = document.getElementById('chatSuggestCarouselHost');
+      var track = document.getElementById('chatSuggestCarousel');
+      var emptyEl = document.getElementById('chatSuggestCarouselEmpty');
+      if (!host || !track) return;
+
+      if (!shouldShowChatSuggestCarousel()) {
+        resetCarouselPagerChangeTracking();
+        host.hidden = true;
+        host.setAttribute('aria-hidden', 'true');
+        track.innerHTML = '';
+        hideChatSuggestCarouselPager();
+        if (emptyEl) {
+          emptyEl.hidden = true;
+          emptyEl.setAttribute('aria-hidden', 'true');
+        }
+        return;
+      }
+
+      host.hidden = false;
+      host.setAttribute('aria-hidden', 'false');
+      track.innerHTML = '';
+      hideChatSuggestCarouselPager();
+      resetCarouselPagerChangeTracking();
+
+      var list = FILTERED_PROPERTY_LIST;
+      if (!list || !list.length) {
+        if (emptyEl) {
+          emptyEl.hidden = false;
+          emptyEl.setAttribute('aria-hidden', 'false');
+        }
+        return;
+      }
+
+      if (emptyEl) {
+        emptyEl.hidden = true;
+        emptyEl.setAttribute('aria-hidden', 'true');
+      }
+
+      list.forEach(function (p) {
+        var article = document.createElement('article');
+        article.className = 'nr-chat-suggest-card';
+        article.setAttribute('role', 'listitem');
+        var story = truncateChatSuggestStory(p.comment || '', 56);
+        article.innerHTML =
+          '<div class="nr-chat-suggest-card-img">' +
+          '<img src="' +
+          escapeHtml(p.image) +
+          '" alt="" loading="lazy" width="320" height="200">' +
+          '</div>' +
+          '<div class="nr-chat-suggest-card-body">' +
+          '<h3 class="nr-chat-suggest-card-name">' +
+          escapeHtml(p.name) +
+          '</h3>' +
+          '<p class="nr-chat-suggest-card-rent">' +
+          escapeHtml(p.rent || '—') +
+          '</p>' +
+          '<p class="nr-chat-suggest-card-meta">' +
+          '<span>' +
+          escapeHtml(p.layout || '—') +
+          '</span>' +
+          '<span class="nr-chat-suggest-card-meta-sep" aria-hidden="true">·</span>' +
+          '<span>' +
+          escapeHtml(p.area || '—') +
+          '</span>' +
+          '</p>' +
+          (story
+            ? '<p class="nr-chat-suggest-card-story">' + escapeHtml(story) + '</p>'
+            : '') +
+          (p.shortReason
+            ? '<p class="nr-chat-suggest-card-reason">' +
+              '<span class="nr-chat-suggest-card-reason-label">この物件が合う理由</span>' +
+              '<span class="nr-chat-suggest-card-reason-text">' +
+              escapeHtml(p.shortReason) +
+              '</span></p>'
+            : '') +
+          '<a class="nr-chat-suggest-card-detail" href="property.html?id=' +
+          encodeURIComponent(p.id) +
+          '">詳細を見る</a>' +
+          '</div>';
+        var img = article.querySelector('img');
+        if (img) img.alt = (p.name || '物件') + 'のイメージ';
+        track.appendChild(article);
+      });
+
+      bindChatSuggestCarouselPagerScroll(track);
+      updateChatSuggestCarouselPager();
+      requestAnimationFrame(function () {
+        updateChatSuggestCarouselPager();
+      });
     }
 
     /**
@@ -1222,6 +1569,13 @@
             '<span class="property-tag">' + escapeHtml(p.rent) + '</span>' +
             '<span class="property-tag">' + escapeHtml(p.layout) + '</span></p>' +
             '<p class="property-card-comment">' + escapeHtml(p.comment) + '</p>' +
+            (p.shortReason
+              ? '<p class="property-card-match-reason">' +
+                '<span class="property-card-match-reason-label">この物件が合う理由</span>' +
+                '<span class="property-card-match-reason-text">' +
+                escapeHtml(p.shortReason) +
+                '</span></p>'
+              : '') +
           '</div>';
         grid.appendChild(a);
       });
@@ -1229,7 +1583,11 @@
 
     refreshFilteredListing = function () {
       FILTERED_PROPERTY_LIST = applyPropertyFilters(PROPERTY_LIST);
+      filteredProperties = FILTERED_PROPERTY_LIST;
+      properties = PROPERTY_LIST;
       renderGasListingSection(FILTERED_PROPERTY_LIST);
+      renderPropertyCards();
+      refreshContextualLineCta();
     };
 
     var PROFILE_GATE_KEY = 'nr_profile_gate_done';
@@ -1324,9 +1682,11 @@
       b.textContent = text;
       row.appendChild(b);
       elLog.appendChild(row);
+      nrLastUserUtteranceForLineCta = String(text || '');
       processUserUtteranceForConditions(text);
       reinforceConditionsAfterUserMessage(text);
       scrollToBottom();
+      refreshContextualLineCta();
     }
 
     function createEmptyBotBubble(rowExtraClass) {
@@ -1489,6 +1849,13 @@
             '<span class="property-tag">' + escapeHtml(p.rent) + '</span>' +
             '<span class="property-tag">' + escapeHtml(p.layout) + '</span></p>' +
             '<p class="property-card-comment">' + escapeHtml(p.comment) + '</p>' +
+            (p.shortReason
+              ? '<p class="property-card-match-reason">' +
+                '<span class="property-card-match-reason-label">この物件が合う理由</span>' +
+                '<span class="property-card-match-reason-text">' +
+                escapeHtml(p.shortReason) +
+                '</span></p>'
+              : '') +
             '<div class="property-card-actions">' +
               '<a class="btn-ghost" href="' + escapeHtml(p.detailUrl) + '">詳細を見る</a>' +
               '<a class="btn-fill" href="' + escapeHtml(getLineUrlWithLead()) + '" target="_blank" rel="noopener noreferrer">この物件について相談する</a>' +
@@ -1956,6 +2323,7 @@
     loadPropertyList().then(function (list) {
       getOrCreateSessionId();
       PROPERTY_LIST = (list || []).map(enrichPropertyForFilter);
+      properties = PROPERTY_LIST;
       updateConditionSearchButton();
       refreshStaticLineLinks();
       function beginConversation() {

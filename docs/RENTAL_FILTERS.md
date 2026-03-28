@@ -27,6 +27,33 @@ rental.html?budget=60000&layout=1K&features=pet,washstand
 
 「この条件でお部屋を見る」ボタンを押すと、上記形式の URL に遷移します。
 
+## チャット直下の横スライド（この条件で合いそうなお部屋）
+
+`chat-shell`（会話＋入力欄）のすぐ下に、条件に合わせて物件カードが横スクロールで出る帯があります。
+
+### 表示される条件
+
+- **物件検索チャット**に入っているとき（`difyChatPurpose === 'property'`）
+- **`budget` / `layout` / `features` のうち 2 つ以上**が `extractedConditions` に入っている（エリア抽出の数は含めません）
+- **`PROPERTY_LIST` に 1 件以上**ある
+
+### 中身
+
+- 表示する物件は、ページ下部の一覧と同じ **`applyPropertyFilters`** の結果です。
+- カードから **「詳細を見る」** で `property.html?id=…` に遷移します。
+- 該当 0 件のときは **「条件に合うお部屋がまだ見つかっていません」** とだけ出ます。
+
+### 仕様でいう `userConditions`
+
+コード上は **`extractedConditions`** がそれに相当します。`budget` は **円**（例: `60000` = 6万円以下）。
+
+### 関連する関数（`rental.html` 内）
+
+- `fetchProperties()` … 実体は `loadPropertyList()` と同じ（二重 fetch しません）
+- `filterProperties(conditions)` … `applyPropertyFilters(PROPERTY_LIST, conditions)`
+- `renderPropertyCards()` … 横スライド帯の描画
+- `properties` / `filteredProperties` … それぞれ `PROPERTY_LIST` / `FILTERED_PROPERTY_LIST` と同期した別名
+
 ## features スラッグとスプレッドシート（GAS）列
 
 会話から拾ったスラッグは、物件オブジェクトの次の真偽フィールドと対応します（**両方 true とみなす値**に対応: `true`, `1`, `"TRUE"`, `"はい"` など）。

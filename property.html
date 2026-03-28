@@ -16,6 +16,7 @@
     GAS の一覧 JSON を読む URL は、rental と同じ場所に1か所だけ書きます。
     → js/nagaroom-data.js を開き、GAS_PROPERTIES_GET_URL に Web アプリの doGet URL（.../exec）を貼る。
     rental の一覧・この詳細ページの両方が同じ URL を参照します（ここでは URL を書かない）。
+    「この物件が合う人」はタイトル直下に JS で差し込みます。GAS に short_reason があれば優先、なければ story_comment の先頭〜2文を仮表示します（本文のストーリー欄とは別）。
   -->
   <header class="nr-header">
     <div class="nr-header-inner">
@@ -129,6 +130,50 @@
       );
     }
 
+    /** story_comment から最大2文を取り出す（short_reason 未設定時の仮表示用） */
+    function extractAudienceLinesFromStory(story) {
+      story = String(story || '').replace(/\s+/g, ' ').trim();
+      if (!story) return [];
+      var parts = story.split(/([。！？!?])/);
+      var sentences = [];
+      for (var i = 0; i < parts.length; i += 2) {
+        var seg = (parts[i] || '').trim();
+        var punct = parts[i + 1] || '';
+        var sent = (seg + punct).trim();
+        if (sent) sentences.push(sent);
+        if (sentences.length >= 2) break;
+      }
+      if (!sentences.length) {
+        if (story.length <= 90) return [story];
+        return [story.slice(0, 88) + '…'];
+      }
+      return sentences;
+    }
+
+    /** タイトル直下用。「この物件が合う人」（story_comment 本体とは別枠） */
+    function buildAudienceMatchBlock(row) {
+      row = row || {};
+      var lines = [];
+      var explicit = row.short_reason != null ? String(row.short_reason).trim() : '';
+      if (explicit) {
+        lines = [explicit];
+      } else {
+        lines = extractAudienceLinesFromStory(row.story_comment);
+      }
+      if (!lines.length) return '';
+      var inner = lines
+        .map(function (s) {
+          return '<p class="property-detail-audience-line">' + escapeHtml(s) + '</p>';
+        })
+        .join('');
+      return (
+        '<div class="property-detail-audience">' +
+        '<p class="property-detail-audience-kicker">この物件が合う人</p>' +
+        inner +
+        '</div>'
+      );
+    }
+
     function renderState(html) {
       var mount = document.getElementById('propertyDetailMount');
       if (!mount) return;
@@ -203,12 +248,14 @@
 
       var story = row.story_comment != null ? String(row.story_comment).trim() : '';
       var station = row.station_info != null ? String(row.station_info).trim() : '';
+      var audienceBlock = buildAudienceMatchBlock(row);
 
       var body =
         '<article class="property-card property-detail-article">' +
         gallery +
         '<div class="property-card-body">' +
         '<h1 class="property-card-name property-detail-h1">' + escapeHtml(title) + '</h1>' +
+        audienceBlock +
         '<p class="property-card-meta">' +
         '<span class="property-tag">' + escapeHtml(formatRent(row.rent)) + '</span>' +
         '<span class="property-tag">' + escapeHtml(row.layout != null && String(row.layout).trim() ? String(row.layout).trim() : '—') + '</span>' +
