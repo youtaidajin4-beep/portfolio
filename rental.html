@@ -308,10 +308,11 @@
     }
 
     /**
-     * /api/chat が text/event-stream を返す場合に読み取り、最終回答文字列を組み立てる
-     * （見た目は従来どおり「1回の応答」として表示するため、Promise は完了時に1回だけ resolve）
+     * /api/chat が text/event-stream のとき、delta ごとに onAccumulated(これまでの全文) を呼び、完了時に全文で resolve
      */
-    function parseDifySseResponse(res, purpose) {
+    function parseDifySseResponse(res, purpose, hooks) {
+      var onAccumulated =
+        hooks && typeof hooks.onAccumulated === 'function' ? hooks.onAccumulated : null;
       if (!res.body || typeof res.body.getReader !== 'function') {
         return res.text().then(function () {
           throw new Error('Streaming is not supported in this browser');
@@ -355,7 +356,10 @@
                 }
                 var ext = extractDifySsePayload(obj);
                 if (ext.conversationId) convId = ext.conversationId;
-                if (ext.delta) fullAnswer += ext.delta;
+                if (ext.delta) {
+                  fullAnswer += ext.delta;
+                  if (onAccumulated) onAccumulated(fullAnswer);
+                }
               }
               pump();
             })
@@ -365,7 +369,7 @@
       });
     }
 
-    function fetchDifyChatReply(userMessage, purpose) {
+    function fetchDifyChatReply(userMessage, purpose, streamHooks) {
       var convId =
         purpose && difyConvByPurpose.hasOwnProperty(purpose) ? difyConvByPurpose[purpose] : null;
       return fetch(apiUrl('/api/chat'), {
@@ -393,7 +397,7 @@
         }
 
         if (ct.indexOf('text/event-stream') !== -1) {
-          return parseDifySseResponse(res, purpose);
+          return parseDifySseResponse(res, purpose, streamHooks || null);
         }
 
         return res.text().then(function (text) {
@@ -668,9 +672,9 @@
       scrollToBottom();
     }
 
-    function createEmptyBotBubble() {
+    function createEmptyBotBubble(rowExtraClass) {
       var row = document.createElement('div');
-      row.className = 'bubble-row bubble-row--bot';
+      row.className = 'bubble-row bubble-row--bot' + (rowExtraClass ? ' ' + rowExtraClass : '');
       var b = document.createElement('div');
       b.className = 'bubble bubble--bot';
       row.appendChild(b);
@@ -1162,32 +1166,74 @@
       );
     }
 
+    function clearComposerInput() {
+      elInput.value = '';
+      elInput.style.height = 'auto';
+      var minH = 48;
+      elInput.style.height = minH + 'px';
+      requestAnimationFrame(function () {
+        elInput.value = '';
+        elInput.style.height = 'auto';
+        elInput.style.height = minH + 'px';
+      });
+    }
+
     function onFreeSend() {
       if (inputLocked) return;
       var text = (elInput.value || '').trim();
       if (!text) return;
 
-      elInput.value = '';
-      resizeTextarea();
+      clearComposerInput();
       removeEntryPanel();
       appendUserBubble(text);
       syncLeadToNotion({ last_user_message: text.slice(0, 500) });
 
       if (CONFIG.USE_DIFY_CHAT && difyChatPurpose) {
+        var streamBubble = null;
         inputLocked = true;
         setButtonsDisabled(true);
         showTyping();
-        fetchDifyChatReply(text, difyChatPurpose)
+        fetchDifyChatReply(text, difyChatPurpose, {
+          onAccumulated: function (full) {
+            if (!streamBubble) {
+              removeTyping();
+              streamBubble = createEmptyBotBubble('bubble-row--bot-in');
+              streamBubble.classList.add('bubble--bot--streaming');
+            }
+            streamBubble.textContent = full;
+            scrollToBottom();
+          }
+        })
           .then(function (answer) {
-            var body = answer && answer.trim() ? answer : '（返答が空でした）';
-            sayBotTypewriterAfterFetch(body, function () {
+            if (streamBubble) {
+              streamBubble.classList.remove('bubble--bot--streaming');
+              if (!streamBubble.textContent.trim()) {
+                streamBubble.textContent =
+                  answer && String(answer).trim() ? String(answer).trim() : '（返答が空でした）';
+              }
+              inputLocked = false;
+              setButtonsDisabled(false);
+              scrollToBottom();
               if (flowMode === 'idle' && findStep === 0) {
                 delay(260).then(appendSoftLineFromFree);
               }
-            });
+            } else {
+              removeTyping();
+              var body = answer && answer.trim() ? answer : '（返答が空でした）';
+              sayBotTypewriterAfterFetch(body, function () {
+                if (flowMode === 'idle' && findStep === 0) {
+                  delay(260).then(appendSoftLineFromFree);
+                }
+              });
+            }
           })
           .catch(function (err) {
             console.error(err);
+            removeTyping();
+            if (streamBubble && streamBubble.parentElement) {
+              streamBubble.parentElement.remove();
+              streamBubble = null;
+            }
             var reason = (err && err.message) ? ('\n（原因: ' + err.message + '）') : '';
             sayBotTypewriterAfterFetch(
               'ただいま会話に接続しにくい状況です。\n時間をおいて試すか、下のLINEからお問い合わせください。' + reason,
