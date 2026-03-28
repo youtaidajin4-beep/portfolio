@@ -102,13 +102,12 @@
             <p class="line-guide-head">ご利用の流れ</p>
             <p class="line-guide-main">
               ボタンを押すとLINEの入力欄に<br>
-              「<span class="line-guide-accent">相談</span>」というメッセージが<br>
+              「<span class="line-guide-accent">相談</span>」と<strong>あなた専用のお客様コード</strong>が<br>
               <strong>自動で入ります</strong>
             </p>
             <p class="line-guide-strong">
-              そのまま「<span class="line-guide-accent">相談</span>」の文字を<br>
-              <strong class="line-guide-highlight line-guide-keep">一度だけ送信</strong>していただくと<br>
-              <strong class="line-guide-highlight line-guide-keep">専用のご案内</strong>がスタートします
+              その内容を<strong class="line-guide-highlight line-guide-keep">消さずに一度だけ送信</strong>していただくと、<br>
+              スタッフ側で会話内容と紐付けて<strong class="line-guide-highlight line-guide-keep">スムーズにご案内</strong>できます
             </p>
           </div>
         </div>
@@ -122,6 +121,47 @@
     <a href="listings.html">一覧で見る</a>
   </footer>
 
+  <div
+    id="leadProfileModal"
+    class="nr-lead-profile-modal"
+    hidden
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="leadProfileTitle"
+    aria-hidden="true"
+  >
+    <div class="nr-lead-profile-backdrop" aria-hidden="true"></div>
+    <div class="nr-lead-profile-panel">
+      <h2 id="leadProfileTitle" class="nr-lead-profile-title">差し支えなければ（任意）</h2>
+      <p class="nr-lead-profile-desc">
+        お名前とメールをいただくと、担当がスムーズにご案内できます。<br>
+        あとからでも大丈夫です。LINE のお客様コードでも同じように紐付けられます。
+      </p>
+      <p class="nr-lead-profile-purpose">
+        いただいた情報は、お部屋探しの<strong>相談対応・ご連絡</strong>のために利用し、当社のプライバシーポリシーに従って管理します。
+      </p>
+      <form id="leadProfileForm" class="nr-lead-profile-form" novalidate>
+        <label class="nr-lead-profile-label">
+          <span class="nr-lead-profile-label-text">お名前（ニックネーム可）</span>
+          <input type="text" id="leadProfileName" name="name" class="nr-lead-profile-input" maxlength="80" autocomplete="name" />
+        </label>
+        <label class="nr-lead-profile-label">
+          <span class="nr-lead-profile-label-text">メールアドレス</span>
+          <input type="email" id="leadProfileEmail" name="email" class="nr-lead-profile-input" maxlength="120" autocomplete="email" />
+        </label>
+        <label class="nr-lead-profile-consent" id="leadProfileConsentLabel">
+          <input type="checkbox" id="leadProfileConsent" />
+          <span id="leadProfileConsentText" class="nr-lead-profile-consent-text"></span>
+        </label>
+        <p class="nr-lead-profile-hint" id="leadProfileError" role="alert" hidden></p>
+        <div class="nr-lead-profile-actions">
+          <button type="button" class="nr-lead-profile-skip" id="leadProfileSkip">スキップして始める</button>
+          <button type="submit" class="nr-lead-profile-submit" id="leadProfileSubmit">入力して始める</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="js/nagaroom-data.js"></script>
   <script>
   (function () {
@@ -132,8 +172,14 @@
 
     var CONFIG = {
       LINE_URL: NR.LINE_URL,
+      LINE_OA_URL_BASE: NR.LINE_OA_URL_BASE || '',
       PROPERTIES_DATA_URL: NR.PROPERTIES_DATA_URL || 'data/properties.json',
       USE_DIFY_CHAT: NR.USE_DIFY_CHAT === true,
+      LEAD_SYNC_ENABLED: NR.LEAD_SYNC_ENABLED !== false,
+      LEAD_API_BEARER: typeof NR.LEAD_API_BEARER === 'string' ? NR.LEAD_API_BEARER : '',
+      SHOW_LEAD_PROFILE_PROMPT: NR.SHOW_LEAD_PROFILE_PROMPT !== false,
+      PRIVACY_POLICY_URL: typeof NR.PRIVACY_POLICY_URL === 'string' ? NR.PRIVACY_POLICY_URL.trim() : '',
+      API_ORIGIN: typeof NR.API_ORIGIN === 'string' ? NR.API_ORIGIN.replace(/\/+$/, '').trim() : '',
       CHAR_MS: 34,
       TYPING_MIN_MS: 560,
       TYPING_JITTER_MS: 420,
@@ -156,21 +202,90 @@
         });
     }
 
-    /** Dify 会話 ID（USE_DIFY_CHAT=true の時のみ使用） */
-    var difyConversationId = null;
+    /** アプリごとに conversation_id を分ける（物件検索と相談で Dify アプリが別のため） */
+    var difyConvByPurpose = { property: null, consult: null };
+    /** エントリーカード選択後のみ設定。未選択の自由入力はローカル応答 */
+    var difyChatPurpose = null;
 
-    function getOrCreateDifyUserId() {
-      var k = 'nr_dify_user_id';
+    function randomLeadId() {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return 'nr_' + crypto.randomUUID();
+      }
+      return 'nr_' + Date.now() + '_' + Math.random().toString(36).slice(2, 14);
+    }
+
+    function getOrCreateLeadId() {
+      var k = 'nr_lead_id';
       try {
         var id = localStorage.getItem(k);
         if (!id) {
-          id = 'lp_' + Date.now() + '_' + Math.random().toString(36).slice(2, 12);
+          id = randomLeadId();
           localStorage.setItem(k, id);
         }
         return id;
       } catch (e) {
-        return 'lp_anonymous_user';
+        return 'nr_anon_' + Date.now();
       }
+    }
+
+    function getOrCreateDifyUserId() {
+      return getOrCreateLeadId();
+    }
+
+    function apiUrl(path) {
+      var base = CONFIG.API_ORIGIN;
+      if (!base) return path;
+      return base + path;
+    }
+
+    function getLineUrlWithLead() {
+      var base = (CONFIG.LINE_OA_URL_BASE || CONFIG.LINE_URL.split('?')[0] || '').replace(/\/+$/, '');
+      var lead = getOrCreateLeadId();
+      return base + '?' + encodeURIComponent('相談 ' + lead);
+    }
+
+    function refreshStaticLineLinks() {
+      var url = getLineUrlWithLead();
+      var heroLine = document.getElementById('heroLineLink');
+      var footerLine = document.getElementById('footerLineBtn');
+      if (heroLine) heroLine.href = url;
+      if (footerLine) footerLine.href = url;
+    }
+
+    function syncLeadToNotion(overrides) {
+      if (CONFIG.LEAD_SYNC_ENABLED === false) return;
+      var lead_id = getOrCreateLeadId();
+      var payload = {
+        lead_id: lead_id,
+        chat_purpose: difyChatPurpose || '',
+        intent_tags: (extractedConditions.features || []).join(','),
+        context_json: JSON.stringify({
+          lifestyle: ctx.lifestyle,
+          rent: ctx.rent,
+          area: ctx.area,
+          flowMode: flowMode,
+          findStep: findStep
+        })
+      };
+      if (overrides && typeof overrides === 'object') {
+        Object.keys(overrides).forEach(function (k) {
+          payload[k] = overrides[k];
+        });
+      }
+      var clean = {};
+      Object.keys(payload).forEach(function (k) {
+        var v = payload[k];
+        if (v === undefined || v === null) return;
+        if (typeof v === 'string' && v === '' && k !== 'lead_id') return;
+        clean[k] = v;
+      });
+      var headers = { 'Content-Type': 'application/json' };
+      if (CONFIG.LEAD_API_BEARER && String(CONFIG.LEAD_API_BEARER).trim()) {
+        headers['Authorization'] = 'Bearer ' + String(CONFIG.LEAD_API_BEARER).trim();
+      }
+      fetch(apiUrl('/api/lead'), { method: 'POST', headers: headers, body: JSON.stringify(clean) }).catch(function (err) {
+        console.warn('[lead sync]', err);
+      });
     }
 
     /**
@@ -193,7 +308,7 @@
      * /api/chat が text/event-stream を返す場合に読み取り、最終回答文字列を組み立てる
      * （見た目は従来どおり「1回の応答」として表示するため、Promise は完了時に1回だけ resolve）
      */
-    function parseDifySseResponse(res) {
+    function parseDifySseResponse(res, purpose) {
       if (!res.body || typeof res.body.getReader !== 'function') {
         return res.text().then(function () {
           throw new Error('Streaming is not supported in this browser');
@@ -211,7 +326,9 @@
             .read()
             .then(function (result) {
               if (result.done) {
-                if (convId) difyConversationId = convId;
+                if (convId && purpose && difyConvByPurpose.hasOwnProperty(purpose)) {
+                  difyConvByPurpose[purpose] = convId;
+                }
                 resolve(fullAnswer);
                 return;
               }
@@ -245,14 +362,17 @@
       });
     }
 
-    function fetchDifyChatReply(userMessage) {
-      return fetch('/api/chat', {
+    function fetchDifyChatReply(userMessage, purpose) {
+      var convId =
+        purpose && difyConvByPurpose.hasOwnProperty(purpose) ? difyConvByPurpose[purpose] : null;
+      return fetch(apiUrl('/api/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userMessage: userMessage,
-          conversationId: difyConversationId,
-          userId: getOrCreateDifyUserId()
+          conversationId: convId,
+          userId: getOrCreateDifyUserId(),
+          chatPurpose: purpose
         })
       }).then(function (res) {
         var ct = res.headers.get('content-type') || '';
@@ -270,7 +390,7 @@
         }
 
         if (ct.indexOf('text/event-stream') !== -1) {
-          return parseDifySseResponse(res);
+          return parseDifySseResponse(res, purpose);
         }
 
         return res.text().then(function (text) {
@@ -280,8 +400,8 @@
           } catch (e) {
             throw new Error(text ? text.slice(0, 300) : 'Invalid response');
           }
-          if (data.conversationId) {
-            difyConversationId = data.conversationId;
+          if (data.conversationId && purpose && difyConvByPurpose.hasOwnProperty(purpose)) {
+            difyConvByPurpose[purpose] = data.conversationId;
           }
           return data.answer != null ? String(data.answer) : '';
         });
@@ -290,8 +410,7 @@
 
     var heroLine = document.getElementById('heroLineLink');
     var footerLine = document.getElementById('footerLineBtn');
-    if (heroLine) heroLine.href = CONFIG.LINE_URL;
-    if (footerLine) footerLine.href = CONFIG.LINE_URL;
+    refreshStaticLineLinks();
 
     /** 会話の状態（物件フィルタの参考用・デモ） */
     var ctx = { lifestyle: '', rent: '', area: '' };
@@ -443,6 +562,95 @@
       var d = document.createElement('div');
       d.textContent = s;
       return d.innerHTML;
+    }
+
+    var PROFILE_GATE_KEY = 'nr_profile_gate_done';
+
+    function openLeadProfileModal(onComplete) {
+      var modal = document.getElementById('leadProfileModal');
+      var form = document.getElementById('leadProfileForm');
+      var consent = document.getElementById('leadProfileConsent');
+      var consentText = document.getElementById('leadProfileConsentText');
+      var err = document.getElementById('leadProfileError');
+      var nameInput = document.getElementById('leadProfileName');
+      var emailInput = document.getElementById('leadProfileEmail');
+      if (!modal || !form || !consent || !consentText || !onComplete) {
+        onComplete && onComplete();
+        return;
+      }
+
+      consentText.textContent = '';
+      var policyUrl = CONFIG.PRIVACY_POLICY_URL;
+      if (policyUrl) {
+        var a = document.createElement('a');
+        a.href = policyUrl;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = 'nr-lead-profile-policy-link';
+        a.textContent = 'プライバシーポリシー';
+        consentText.appendChild(a);
+        consentText.appendChild(document.createTextNode('に記載の取り扱いに同意します。'));
+      } else {
+        consentText.textContent =
+          '連絡先の利用（相談対応・ご連絡）に同意します。プライバシーポリシーは運営サイトでご確認ください。';
+      }
+
+      err.hidden = true;
+      err.textContent = '';
+      consent.checked = false;
+      nameInput.value = '';
+      emailInput.value = '';
+      modal.removeAttribute('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('nr-lead-profile-modal-open');
+
+      function closeAndContinue() {
+        modal.setAttribute('hidden', '');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('nr-lead-profile-modal-open');
+        try {
+          sessionStorage.setItem(PROFILE_GATE_KEY, '1');
+        } catch (e) {}
+        onComplete();
+      }
+
+      var skipBtn = document.getElementById('leadProfileSkip');
+      if (skipBtn) {
+        skipBtn.onclick = function () {
+          closeAndContinue();
+        };
+      }
+
+      form.onsubmit = function (e) {
+        e.preventDefault();
+        err.hidden = true;
+        var name = (nameInput.value || '').trim();
+        var email = (emailInput.value || '').trim();
+        if (!consent.checked) {
+          err.textContent = '同意にチェックを入れるか、「スキップして始める」を選んでください。';
+          err.hidden = false;
+          return;
+        }
+        if (!name && !email) {
+          err.textContent = 'お名前またはメールのどちらかを入力するか、スキップしてください。';
+          err.hidden = false;
+          return;
+        }
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          err.textContent = 'メールアドレスの形式をご確認ください。';
+          err.hidden = false;
+          return;
+        }
+        var payload = {};
+        if (name) payload.name = name;
+        if (email) payload.email = email;
+        syncLeadToNotion(payload);
+        closeAndContinue();
+      };
+
+      setTimeout(function () {
+        nameInput.focus();
+      }, 80);
     }
 
     function appendUserBubble(text) {
@@ -616,7 +824,7 @@
             '<p class="property-card-comment">' + escapeHtml(p.comment) + '</p>' +
             '<div class="property-card-actions">' +
               '<a class="btn-ghost" href="' + escapeHtml(p.detailUrl) + '">詳細を見る</a>' +
-              '<a class="btn-fill" href="' + CONFIG.LINE_URL + '" target="_blank" rel="noopener noreferrer">この物件について相談する</a>' +
+              '<a class="btn-fill" href="' + escapeHtml(getLineUrlWithLead()) + '" target="_blank" rel="noopener noreferrer">この物件について相談する</a>' +
             '</div>' +
           '</div>';
         box.appendChild(card);
@@ -630,7 +838,7 @@
           '<button type="button" data-action="more">他にも見てみる</button>' +
           '<a href="listings.html">掲載物件を一覧で見比べる</a>' +
           '<button type="button" data-action="adjust">条件を少し変えて探す</button>' +
-          '<a href="' + CONFIG.LINE_URL + '" target="_blank" rel="noopener noreferrer">相談しながら紹介してもらう</a>' +
+          '<a href="' + escapeHtml(getLineUrlWithLead()) + '" target="_blank" rel="noopener noreferrer">相談しながら紹介してもらう</a>' +
         '</div>';
       box.appendChild(foot);
 
@@ -688,7 +896,7 @@
       block.className = 'cta-block';
       block.innerHTML =
         '<p>写真や細かい条件も送りやすいので、続きはこちらからどうぞ。</p>' +
-        '<a class="btn-fill" href="' + CONFIG.LINE_URL + '" target="_blank" rel="noopener noreferrer">メッセージで相談を続ける</a>';
+        '<a class="btn-fill" href="' + escapeHtml(getLineUrlWithLead()) + '" target="_blank" rel="noopener noreferrer">メッセージで相談を続ける</a>';
       host.appendChild(block);
       elLog.appendChild(host);
       scrollToBottom();
@@ -728,6 +936,8 @@
           function () {
             removeEntryPanel();
             appendUserBubble('お部屋を探す 🏠');
+            difyChatPurpose = 'property';
+            syncLeadToNotion({});
             flowMode = 'find';
             findStep = 0;
             ctx = { lifestyle: '', rent: '', area: '' };
@@ -755,6 +965,8 @@
           function () {
             removeEntryPanel();
             appendUserBubble('まず相談したい 🍀');
+            difyChatPurpose = 'consult';
+            syncLeadToNotion({});
             flowMode = 'consult';
             delay(CONFIG.USER_THINK_MS).then(function () {
               sayBotOnce(
@@ -788,6 +1000,7 @@
       clearQuickHosts();
       appendUserBubble(label);
       ctx.lifestyle = label;
+      syncLeadToNotion({});
       delay(CONFIG.USER_THINK_MS).then(function () {
         sayBotOnce(
           'いいですね☺️　教えてくれてありがとうございます。\n' +
@@ -810,6 +1023,7 @@
       clearQuickHosts();
       appendUserBubble(label);
       ctx.rent = label;
+      syncLeadToNotion({});
       delay(CONFIG.USER_THINK_MS).then(function () {
         sayBotOnce(
           'わかりました🍀　無理のないラインを、一緒に見ていきましょう。\n' +
@@ -833,6 +1047,7 @@
       appendUserBubble(label);
       ctx.area = label;
       findStep = 3;
+      syncLeadToNotion({});
       delay(CONFIG.USER_THINK_MS).then(function () {
         sayBotOnce(
           'ありがとうございます☺️　だいぶ、あなたらしい条件が見えてきました。\n' +
@@ -879,6 +1094,7 @@
     function onConsultPick(topicLabel) {
       clearQuickHosts();
       appendUserBubble(topicLabel);
+      syncLeadToNotion({ last_user_message: topicLabel });
       var body = CONSULT_TEXT[topicLabel] ||
         '気になること、ちゃんと受け止めます☺️\n一緒に、次の一歩を見つけていきましょう🍀';
       delay(CONFIG.USER_THINK_MS).then(function () {
@@ -892,6 +1108,7 @@
                 ctx = { lifestyle: '相談', rent: '', area: '' };
                 renderPropertySuggest();
                 flowMode = 'idle';
+                syncLeadToNotion({});
               }
             );
           });
@@ -949,9 +1166,10 @@
       resizeTextarea();
       removeEntryPanel();
       appendUserBubble(text);
+      syncLeadToNotion({ last_user_message: text.slice(0, 500) });
 
-      if (CONFIG.USE_DIFY_CHAT) {
-        fetchDifyChatReply(text)
+      if (CONFIG.USE_DIFY_CHAT && difyChatPurpose) {
+        fetchDifyChatReply(text, difyChatPurpose)
           .then(function (answer) {
             var body = answer && answer.trim() ? answer : '（返答が空でした）';
             var render = CONFIG.FAST_RENDER_FOR_DIFY ? sayBotFast : sayBotOnce;
@@ -1002,8 +1220,22 @@
 
     loadPropertyList().then(function (list) {
       PROPERTY_LIST = list;
-      showOpening();
-      resizeTextarea();
+      syncLeadToNotion({});
+      refreshStaticLineLinks();
+      function beginConversation() {
+        showOpening();
+        resizeTextarea();
+      }
+      var showGate = CONFIG.SHOW_LEAD_PROFILE_PROMPT !== false;
+      var gateDone = false;
+      try {
+        gateDone = sessionStorage.getItem(PROFILE_GATE_KEY) === '1';
+      } catch (e) {}
+      if (showGate && !gateDone) {
+        openLeadProfileModal(beginConversation);
+      } else {
+        beginConversation();
+      }
     });
   })();
   </script>

@@ -6,8 +6,9 @@
  * 返ってきた text/event-stream をそのままクライアントへ転送します。
  *
  * 環境変数（Vercel）:
- *   DIFY_API_KEY / DIFY_PROPERTY_API_KEY
- *   DIFY_API_URL / DIFY_PROPERTY_API_URL（chat-messages のフルURL推奨）
+ *   相談アプリ（chatPurpose: consult）: DIFY_API_URL / DIFY_API_KEY
+ *   物件検索アプリ（chatPurpose: property）: DIFY_PROPERTY_API_URL / DIFY_PROPERTY_API_KEY
+ *   chatPurpose なし（後方互換）: DIFY_API_* を優先し、無ければ DIFY_PROPERTY_*
  *
  * 切り分け（HTTP 405）:
  *   - DevTools Network で /api/chat の Request Method が POST か確認（GET だと 405）。
@@ -95,29 +96,6 @@ module.exports = async function handler(req, res) {
 
   applyCors(req, res);
 
-  var difyUrlEnv = getFirstDefinedEnv(['DIFY_API_URL', 'DIFY_PROPERTY_API_URL']);
-  var apiKeyEnv = getFirstDefinedEnv(['DIFY_API_KEY', 'DIFY_PROPERTY_API_KEY']);
-
-  var difyUrl = normalizeDifyUrl(difyUrlEnv.value);
-  var apiKey = apiKeyEnv.value;
-
-  if (!difyUrl || !apiKey) {
-    var missing = {
-      DIFY_API_URL: !difyUrl,
-      DIFY_API_KEY: !apiKey,
-    };
-    var resolvedFrom = {
-      urlEnv: difyUrlEnv.key,
-      keyEnv: apiKeyEnv.key,
-    };
-    console.error('[api/chat] Missing env vars (values hidden):', { missing: missing, resolvedFrom: resolvedFrom });
-    return res.status(500).json({
-      error: 'Server configuration error: set DIFY_API_URL and DIFY_API_KEY in Vercel environment variables.',
-      missing: missing,
-      resolvedFrom: resolvedFrom,
-    });
-  }
-
   var body;
   try {
     body = await readJsonBody(req);
@@ -128,9 +106,55 @@ module.exports = async function handler(req, res) {
   var userMessage = body.userMessage;
   var conversationId = body.conversationId;
   var userId = body.userId || 'lp_anonymous_user';
+  var chatPurpose = body.chatPurpose;
 
   if (userMessage == null || String(userMessage).trim() === '') {
     return res.status(400).json({ error: 'userMessage is required' });
+  }
+
+  var difyUrlEnv;
+  var apiKeyEnv;
+  if (chatPurpose === 'property') {
+    difyUrlEnv = getFirstDefinedEnv(['DIFY_PROPERTY_API_URL']);
+    apiKeyEnv = getFirstDefinedEnv(['DIFY_PROPERTY_API_KEY']);
+  } else if (chatPurpose === 'consult') {
+    difyUrlEnv = getFirstDefinedEnv(['DIFY_API_URL']);
+    apiKeyEnv = getFirstDefinedEnv(['DIFY_API_KEY']);
+  } else {
+    difyUrlEnv = getFirstDefinedEnv(['DIFY_API_URL', 'DIFY_PROPERTY_API_URL']);
+    apiKeyEnv = getFirstDefinedEnv(['DIFY_API_KEY', 'DIFY_PROPERTY_API_KEY']);
+  }
+
+  var difyUrl = normalizeDifyUrl(difyUrlEnv.value);
+  var apiKey = apiKeyEnv.value;
+
+  if (!difyUrl || !apiKey) {
+    var missing;
+    var errMsg;
+    if (chatPurpose === 'property') {
+      missing = { DIFY_PROPERTY_API_URL: !difyUrl, DIFY_PROPERTY_API_KEY: !apiKey };
+      errMsg =
+        'Server configuration error: for property flow (chatPurpose=property), set DIFY_PROPERTY_API_URL and DIFY_PROPERTY_API_KEY.';
+    } else if (chatPurpose === 'consult') {
+      missing = { DIFY_API_URL: !difyUrl, DIFY_API_KEY: !apiKey };
+      errMsg =
+        'Server configuration error: for consult flow (chatPurpose=consult), set DIFY_API_URL and DIFY_API_KEY.';
+    } else {
+      missing = { DIFY_API_URL: !difyUrl, DIFY_API_KEY: !apiKey };
+      errMsg =
+        'Server configuration error: set DIFY_API_URL and DIFY_API_KEY (or DIFY_PROPERTY_*) in Vercel environment variables.';
+    }
+    var resolvedFrom = {
+      urlEnv: difyUrlEnv.key,
+      keyEnv: apiKeyEnv.key,
+      chatPurpose: chatPurpose == null ? null : String(chatPurpose),
+    };
+    console.error('[api/chat] Missing env vars (values hidden):', { missing: missing, resolvedFrom: resolvedFrom });
+    return res.status(500).json({
+      error: errMsg,
+      missing: missing,
+      resolvedFrom: resolvedFrom,
+    });
   }
 
   var payload = {
