@@ -24,9 +24,13 @@
       --mist: rgba(184, 214, 235, 0.14);
       --mist-strong: rgba(140, 180, 210, 0.22);
     }
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 4.5rem;
+    }
     body {
       margin: 0;
+      min-height: 100%;
       font-family: "Noto Sans JP", sans-serif;
       font-size: 16px;
       line-height: 1.75;
@@ -1182,18 +1186,15 @@
     }
 
     /* —— Dify サービス紹介チャット（埋め込み） —— */
-    /* スクロールしても常に画面右下に固定（LP と独立してビューポート基準） */
-    #dify-chatbot-bubble {
-      position: fixed !important;
-      inset: auto 1.25rem 1.25rem auto !important;
-      z-index: 2147483645 !important;
-      margin: 0 !important;
-      pointer-events: none;
-    }
-    #dify-chatbot-bubble * {
-      pointer-events: auto;
-    }
+    /*
+      udify embed はルートを #dify-chatbot-bubble-button に置く（旧 #dify-chatbot-bubble は未使用）。
+      position: relative で fixed を上書きすると画面外に飛ぶので、fixed を維持し変数で余白だけ調整する。
+    */
     #dify-chatbot-bubble-button {
+      position: fixed !important;
+      --dify-chatbot-bubble-button-right: calc(1.25rem + env(safe-area-inset-right, 0px));
+      --dify-chatbot-bubble-button-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+      z-index: 2147483647 !important;
       background: linear-gradient(155deg, #1e2a42 0%, #0d1526 45%, #121a2c 100%) !important;
       border: 2px solid rgba(201, 169, 98, 0.9) !important;
       box-shadow:
@@ -1227,11 +1228,21 @@
     @media (prefers-reduced-motion: reduce) {
       #dify-chatbot-bubble-button { animation: none !important; }
     }
-    /* ウィンドウはルートが fixed なので、内部の絶対配置に追従して開閉する */
+    /*
+      embed はプリロード iframe を body 直下に置き position:absolute にする。
+      そのため包含ブロックが文書全体になり、スクロール位置によってパネルがヒーロー付近に出る。
+      fixed でビューポート基準にし、右下ボタンの直上に載せる（LP スクロール時も常に同じ画面位置）。
+    */
     #dify-chatbot-bubble-window {
+      position: fixed !important;
+      right: calc(1.25rem + env(safe-area-inset-right, 0px)) !important;
+      bottom: calc(1.25rem + 48px + 0.65rem + env(safe-area-inset-bottom, 0px)) !important;
+      left: auto !important;
+      top: auto !important;
+      z-index: 2147483646 !important;
       width: min(24rem, calc(100vw - 1.5rem)) !important;
       height: min(40rem, calc(100vh - 5rem)) !important;
-      max-height: min(40rem, calc(100vh - 7rem)) !important;
+      max-height: min(40rem, calc(100dvh - 7rem)) !important;
       border-radius: 1rem !important;
       border: 1px solid rgba(201, 169, 98, 0.35) !important;
       box-shadow: 0 28px 80px rgba(0, 0, 0, 0.55) !important;
@@ -1831,12 +1842,13 @@
   <script>
     (function () {
       var DIFY_TOKEN = 'AnAuoBxIhyE6PJJ6';
-      var DIFY_EMBED_CACHE_BUST = '20260329-newbot';
+      var DIFY_EMBED_CACHE_BUST = '20260329-chat-fixed';
 
       try {
         var i;
         var toDrop = [];
-        var keyRe = /dify|udify|chatbot|embed|7k6lrRG6adicH9qD|AnAuoBxIhyE6PJJ6/i;
+        /* 「embed」単体は広すぎるので除外（他スクリプトのキーを消さない） */
+        var keyRe = /dify|udify|chatbot|7k6lrRG6adicH9qD|AnAuoBxIhyE6PJJ6/i;
         for (i = 0; i < localStorage.length; i++) {
           var lk = localStorage.key(i);
           if (lk && keyRe.test(lk)) toDrop.push(lk);
@@ -1857,54 +1869,77 @@
         userVariables: {}
       };
 
+      function lpPinDifyToViewport() {
+        var btn = document.getElementById('dify-chatbot-bubble-button');
+        if (!btn) return;
+        btn.style.setProperty(
+          '--dify-chatbot-bubble-button-right',
+          'calc(1.25rem + env(safe-area-inset-right, 0px))'
+        );
+        btn.style.setProperty(
+          '--dify-chatbot-bubble-button-bottom',
+          'calc(1.25rem + env(safe-area-inset-bottom, 0px))'
+        );
+      }
+
+      /* embed の resetIframePosition が inline で top/bottom を書き換えるので !important と併用 */
+      function lpPinDifyChatIframe() {
+        var el = document.getElementById('dify-chatbot-bubble-window');
+        if (!el) return;
+        el.style.setProperty('position', 'fixed', 'important');
+        el.style.setProperty('right', 'calc(1.25rem + env(safe-area-inset-right, 0px))', 'important');
+        el.style.setProperty(
+          'bottom',
+          'calc(1.25rem + 48px + 0.65rem + env(safe-area-inset-bottom, 0px))',
+          'important'
+        );
+        el.style.setProperty('left', 'auto', 'important');
+        el.style.setProperty('top', 'auto', 'important');
+      }
+
+      document.addEventListener(
+        'click',
+        function (ev) {
+          var t = ev.target;
+          if (!t || !t.closest) return;
+          if (!t.closest('#dify-chatbot-bubble-button')) return;
+          [0, 50, 200, 500].forEach(function (ms) {
+            setTimeout(lpPinDifyChatIframe, ms);
+          });
+        },
+        true
+      );
+
       var s = document.createElement('script');
       s.src = 'https://udify.app/embed.min.js?v=' + encodeURIComponent(DIFY_EMBED_CACHE_BUST);
-      s.id = DIFY_TOKEN;
+      /* トークンを id に使わない（#トークン でページ末尾の script へジャンプするのを防ぐ） */
+      s.id = 'lp-dify-embed-loader';
       s.defer = true;
+      s.onload = function () {
+        [0, 400, 1200, 2800].forEach(function (ms) {
+          setTimeout(function () {
+            lpPinDifyToViewport();
+            lpPinDifyChatIframe();
+          }, ms);
+        });
+      };
       document.body.appendChild(s);
-    })();
-  </script>
-  <script>
-    (function () {
-      function findDifyRoot() {
-        var el = document.getElementById('dify-chatbot-bubble');
-        if (el) return el;
-        var btn = document.getElementById('dify-chatbot-bubble-button');
-        if (!btn) return null;
-        var p = btn;
-        for (var i = 0; i < 12 && p && p !== document.body; i++) {
-          if (p.id === 'dify-chatbot-bubble') return p;
-          p = p.parentElement;
-        }
-        return btn.parentElement || null;
-      }
-      function pinDifyChatbot() {
-        var root = findDifyRoot();
-        if (!root) return;
-        root.style.setProperty('position', 'fixed', 'important');
-        root.style.setProperty('right', '1.25rem', 'important');
-        root.style.setProperty('bottom', '1.25rem', 'important');
-        root.style.setProperty('left', 'auto', 'important');
-        root.style.setProperty('top', 'auto', 'important');
-        root.style.setProperty('z-index', '2147483645', 'important');
-        root.style.setProperty('margin', '0', 'important');
-      }
-      var t;
-      function schedulePin() {
-        clearTimeout(t);
-        t = setTimeout(pinDifyChatbot, 0);
-      }
-      var mo = new MutationObserver(schedulePin);
-      mo.observe(document.documentElement, { childList: true, subtree: true });
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', pinDifyChatbot);
-      } else {
-        pinDifyChatbot();
-      }
-      window.addEventListener('load', pinDifyChatbot);
-      [500, 1500, 3000].forEach(function (ms) {
-        setTimeout(pinDifyChatbot, ms);
+
+      window.addEventListener('load', function lpDifyLoadOnce() {
+        window.removeEventListener('load', lpDifyLoadOnce);
+        setTimeout(function () {
+          lpPinDifyToViewport();
+          lpPinDifyChatIframe();
+        }, 0);
       });
+
+      window.addEventListener(
+        'resize',
+        function () {
+          lpPinDifyChatIframe();
+        },
+        { passive: true }
+      );
     })();
   </script>
   <div class="lp-dify-hint" role="note" aria-live="polite">
