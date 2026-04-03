@@ -1180,6 +1180,114 @@
       text-decoration: underline;
       text-underline-offset: 0.2em;
     }
+
+    /* —— Dify サービス紹介チャット（埋め込み） —— */
+    /* スクロールしても常に画面右下に固定（LP と独立してビューポート基準） */
+    #dify-chatbot-bubble {
+      position: fixed !important;
+      inset: auto 1.25rem 1.25rem auto !important;
+      z-index: 2147483645 !important;
+      margin: 0 !important;
+      pointer-events: none;
+    }
+    #dify-chatbot-bubble * {
+      pointer-events: auto;
+    }
+    #dify-chatbot-bubble-button {
+      background: linear-gradient(155deg, #1e2a42 0%, #0d1526 45%, #121a2c 100%) !important;
+      border: 2px solid rgba(201, 169, 98, 0.9) !important;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 12px 40px rgba(0, 0, 0, 0.5),
+        0 0 0 0 rgba(201, 169, 98, 0.45) !important;
+      animation: lpDifyGlow 2.5s ease-in-out infinite !important;
+      transition: transform 0.2s var(--ease-out), box-shadow 0.2s !important;
+    }
+    #dify-chatbot-bubble-button:hover {
+      transform: scale(1.06) !important;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 16px 48px rgba(0, 0, 0, 0.55),
+        0 0 28px rgba(201, 169, 98, 0.55) !important;
+    }
+    @keyframes lpDifyGlow {
+      0%, 100% {
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.06),
+          0 12px 40px rgba(0, 0, 0, 0.5),
+          0 0 20px rgba(201, 169, 98, 0.35) !important;
+      }
+      50% {
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.1),
+          0 14px 44px rgba(0, 0, 0, 0.55),
+          0 0 36px rgba(201, 169, 98, 0.55) !important;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #dify-chatbot-bubble-button { animation: none !important; }
+    }
+    /* ウィンドウはルートが fixed なので、内部の絶対配置に追従して開閉する */
+    #dify-chatbot-bubble-window {
+      width: min(24rem, calc(100vw - 1.5rem)) !important;
+      height: min(40rem, calc(100vh - 5rem)) !important;
+      max-height: min(40rem, calc(100vh - 7rem)) !important;
+      border-radius: 1rem !important;
+      border: 1px solid rgba(201, 169, 98, 0.35) !important;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.55) !important;
+      overflow: hidden !important;
+    }
+    .lp-dify-hint {
+      position: fixed;
+      z-index: 2147483640;
+      right: 1rem;
+      bottom: 88px;
+      max-width: 15.5rem;
+      padding: 0.75rem 0.95rem;
+      background: linear-gradient(135deg, rgba(13, 21, 38, 0.97) 0%, rgba(21, 29, 46, 0.98) 100%);
+      border: 1px solid rgba(201, 169, 98, 0.55);
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      pointer-events: none;
+      animation: lpDifyHintFloat 3s ease-in-out infinite;
+    }
+    @media (min-width: 900px) {
+      .lp-dify-hint { right: 1.5rem; bottom: 96px; }
+    }
+    @keyframes lpDifyHintFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .lp-dify-hint { animation: none; }
+    }
+    .lp-dify-hint__k {
+      font-family: var(--font-en);
+      font-size: 0.5625rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(184, 214, 235, 0.95);
+      margin: 0 0 0.35rem;
+    }
+    .lp-dify-hint__t {
+      margin: 0;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: rgba(250, 250, 250, 0.92);
+    }
+    .lp-dify-hint__t strong {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .lp-dify-hint__arr {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.6875rem;
+      color: rgba(250, 250, 250, 0.45);
+      letter-spacing: 0.06em;
+    }
   </style>
 </head>
 <body>
@@ -1715,5 +1823,94 @@
       }
     })();
   </script>
+  <!--
+    Dify / UDify でチャットアプリを更新したら:
+    1) 埋め込みコードを再発行し、下の token が最新か確認する（古いトークンのままだと旧アプリに繋がる）
+    2) スクリプト内 DIFY_EMBED_CACHE_BUST の値を変えて保存（embed.min.js のブラウザキャッシュを避ける）
+  -->
+  <script>
+    (function () {
+      var DIFY_TOKEN = 'AnAuoBxIhyE6PJJ6';
+      var DIFY_EMBED_CACHE_BUST = '20260329-newbot';
+
+      try {
+        var i;
+        var toDrop = [];
+        var keyRe = /dify|udify|chatbot|embed|7k6lrRG6adicH9qD|AnAuoBxIhyE6PJJ6/i;
+        for (i = 0; i < localStorage.length; i++) {
+          var lk = localStorage.key(i);
+          if (lk && keyRe.test(lk)) toDrop.push(lk);
+        }
+        toDrop.forEach(function (k) { localStorage.removeItem(k); });
+        toDrop = [];
+        for (i = 0; i < sessionStorage.length; i++) {
+          var sk = sessionStorage.key(i);
+          if (sk && keyRe.test(sk)) toDrop.push(sk);
+        }
+        toDrop.forEach(function (k) { sessionStorage.removeItem(k); });
+      } catch (e) {}
+
+      window.difyChatbotConfig = {
+        token: DIFY_TOKEN,
+        inputs: {},
+        systemVariables: {},
+        userVariables: {}
+      };
+
+      var s = document.createElement('script');
+      s.src = 'https://udify.app/embed.min.js?v=' + encodeURIComponent(DIFY_EMBED_CACHE_BUST);
+      s.id = DIFY_TOKEN;
+      s.defer = true;
+      document.body.appendChild(s);
+    })();
+  </script>
+  <script>
+    (function () {
+      function findDifyRoot() {
+        var el = document.getElementById('dify-chatbot-bubble');
+        if (el) return el;
+        var btn = document.getElementById('dify-chatbot-bubble-button');
+        if (!btn) return null;
+        var p = btn;
+        for (var i = 0; i < 12 && p && p !== document.body; i++) {
+          if (p.id === 'dify-chatbot-bubble') return p;
+          p = p.parentElement;
+        }
+        return btn.parentElement || null;
+      }
+      function pinDifyChatbot() {
+        var root = findDifyRoot();
+        if (!root) return;
+        root.style.setProperty('position', 'fixed', 'important');
+        root.style.setProperty('right', '1.25rem', 'important');
+        root.style.setProperty('bottom', '1.25rem', 'important');
+        root.style.setProperty('left', 'auto', 'important');
+        root.style.setProperty('top', 'auto', 'important');
+        root.style.setProperty('z-index', '2147483645', 'important');
+        root.style.setProperty('margin', '0', 'important');
+      }
+      var t;
+      function schedulePin() {
+        clearTimeout(t);
+        t = setTimeout(pinDifyChatbot, 0);
+      }
+      var mo = new MutationObserver(schedulePin);
+      mo.observe(document.documentElement, { childList: true, subtree: true });
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', pinDifyChatbot);
+      } else {
+        pinDifyChatbot();
+      }
+      window.addEventListener('load', pinDifyChatbot);
+      [500, 1500, 3000].forEach(function (ms) {
+        setTimeout(pinDifyChatbot, ms);
+      });
+    })();
+  </script>
+  <div class="lp-dify-hint" role="note" aria-live="polite">
+    <p class="lp-dify-hint__k">Support Chat</p>
+    <p class="lp-dify-hint__t">サービス紹介・ご質問は<br><strong>右下のチャット</strong>でどうぞ</p>
+    <span class="lp-dify-hint__arr">↓ タップして試せます</span>
+  </div>
 </body>
 </html>
