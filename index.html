@@ -3,1608 +3,1336 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="長崎エリア特化のSNS型住まいメディア。Instagram×LINEで若者に届く物件掲載で、見込み客を不動産会社へ送客します。">
-  <title>NAGA ROOM | 長崎の住まいメディア</title>
+  <meta name="description" content="NAGA ROOM — 長崎エリアの不動産会社向け賃貸集客。チャットボット検索型体験・SNS・LP・LINE。4〜6月無料掲載。">
+  <title>NAGA ROOM | For Real Estate Partners</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
+    :root {
+      --black: #0d1526;
+      --black-soft: #151d2e;
+      --white: #fafafa;
+      --gray: #9a9a9a;
+      --line: rgba(255,255,255,0.08);
+      --line-dark: rgba(0,0,0,0.08);
+      --accent: #c9a962;
+      --max: 1200px;
+      --font-en: "Syne", system-ui, sans-serif;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    }
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      font-family: "Noto Sans JP", sans-serif;
       font-size: 16px;
-      line-height: 1.7;
-      color: #1a1a1a;
-      background: #fff;
+      line-height: 1.75;
+      color: #e8e8e8;
+      background: var(--black);
+      -webkit-font-smoothing: antialiased;
     }
-    a { color: inherit; text-decoration: none; }
     img { max-width: 100%; height: auto; display: block; }
-    ul { margin: 0; padding: 0; list-style: none; }
+    a { color: inherit; text-decoration: none; }
 
-    :root {
-      --cyan: #67e8f9;
-      --cyan-soft: rgba(103, 232, 249, 0.12);
-      --cyan-border: rgba(103, 232, 249, 0.4);
-      --bg: #fff;
-      --bg-card: #f8fafb;
-      --border: rgba(0,0,0,0.08);
-      --text: #1a1a1a;
-      --text-muted: #555;
-      --text-dim: #777;
-      --container: 1280px;
-      --radius: 1.75rem;
-      --header-h: 76px;
+    /* —— Reveal —— */
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(48px);
+      transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
     }
-    @media (min-width: 768px) {
-      :root { --header-h: 88px; }
+    [data-reveal].is-inview {
+      opacity: 1;
+      transform: none;
     }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-up { animation: fadeUp 0.8s ease-out both; }
-
-    /* Header */
-    .header {
-      position: sticky;
+    /* —— Header —— */
+    .lp-header {
+      position: fixed;
       top: 0;
-      z-index: 100;
-      height: var(--header-h);
-      border-bottom: 1px solid var(--border);
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(12px);
-    }
-    .header-inner {
-      max-width: var(--container);
-      margin: 0 auto;
-      padding: 0 1.5rem;
-      height: 100%;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 1rem 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      transition: background 0.35s ease, backdrop-filter 0.35s ease;
     }
-    .logo-wrap {
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-      padding: 0.6rem 1.25rem 0.6rem 1rem;
-      border-left: 4px solid var(--cyan);
-      margin-left: -0.25rem;
+    .lp-header.is-solid {
+      background: rgba(13, 21, 38, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
     }
-    .logo-wrap img {
-      height: 52px;
-      width: auto;
+    .lp-logo {
+      font-family: var(--font-en);
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: 0.06em;
+      color: var(--white);
+    }
+    .lp-logo small {
       display: block;
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 0.5625rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      color: var(--gray);
+      margin-top: 0.15rem;
     }
-    @media (min-width: 768px) {
-      .logo-wrap img { height: 68px; }
-      .logo-wrap { padding: 0.75rem 1.5rem 0.75rem 1.25rem; gap: 1rem; border-left-width: 4px; }
+    .lp-header__cta {
+      font-family: var(--font-en);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.65rem 1.15rem;
+      border: 1px solid rgba(255,255,255,0.35);
+      color: var(--white);
+      transition: background 0.25s, color 0.25s, border-color 0.25s;
     }
-    .logo-sub {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      margin: 0;
-      letter-spacing: 0.02em;
-    }
-    @media (min-width: 768px) {
-      .logo-sub { font-size: 0.75rem; }
-    }
-    .nav-check { display: none; }
-    .nav-toggle {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 6px;
-      width: 44px;
-      height: 44px;
-      padding: 10px;
-      background: none;
-      border: none;
-      cursor: pointer;
-    }
-    .nav-toggle span {
-      display: block;
-      width: 22px;
-      height: 2px;
-      background: #1a1a1a;
-      transition: transform .2s, opacity .2s;
-    }
-    .nav-check:checked ~ .nav-toggle span:nth-child(1) {
-      transform: translateY(8px) rotate(45deg);
-    }
-    .nav-check:checked ~ .nav-toggle span:nth-child(2) { opacity: 0; }
-    .nav-check:checked ~ .nav-toggle span:nth-child(3) {
-      transform: translateY(-8px) rotate(-45deg);
-    }
-    .nav {
-      position: fixed;
-      top: var(--header-h);
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: #fff;
-      padding: 2rem 1.5rem;
-      overflow-y: auto;
-      transform: translateX(100%);
-      transition: transform .25s ease;
-    }
-    .nav-check:checked ~ .nav { transform: translateX(0); }
-    .nav-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-    .nav-list a {
-      display: block;
-      padding: 0.875rem 0;
-      font-size: 1rem;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-list a:hover { color: var(--cyan); }
-
-    .header-cta {
-      display: none;
-    }
-    @media (min-width: 768px) {
-      .nav-toggle { display: none; }
-      .nav {
-        position: static;
-        transform: none;
-        padding: 0;
-        background: transparent;
-        overflow: visible;
-      }
-      .nav-list {
-        flex-direction: row;
-        gap: 1.5rem;
-        align-items: center;
-      }
-      .nav-list a { padding: 0.5rem 0; border: none; font-size: 0.9rem; }
-      .header-cta {
-        display: inline-block;
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #0a0a0a;
-        background: var(--cyan);
-        border-radius: 0.5rem;
-        transition: transform .15s, box-shadow .2s;
-      }
-      .header-cta:hover {
-        transform: scale(1.02);
-        box-shadow: 0 2px 12px rgba(103,232,249,0.35);
-      }
-      .header-cta:focus-visible {
-        outline: 2px solid var(--cyan);
-        outline-offset: 2px;
-      }
+    .lp-header__cta:hover {
+      background: var(--white);
+      color: var(--black);
+      border-color: var(--white);
     }
 
-    .container {
-      max-width: var(--container);
-      margin: 0 auto;
-      padding: 0 1.5rem;
-    }
-
-    /* Hero */
-    .hero {
+    /* —— Hero —— */
+    .lp-hero {
       position: relative;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: flex-end;
+      padding: 8rem 1.5rem 4rem;
       overflow: hidden;
-      border-bottom: 1px solid var(--border);
-      scroll-margin-top: 0;
     }
-    .hero-bg {
+    .lp-hero__bg {
       position: absolute;
       inset: 0;
-      background:
-        radial-gradient(circle at top right, rgba(103,232,249,0.2), transparent 40%),
-        radial-gradient(circle at bottom left, rgba(0,0,0,0.02), transparent 35%);
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.08);
+      animation: heroKen 22s ease-in-out infinite alternate;
+    }
+    @keyframes heroKen {
+      from { transform: scale(1.06); }
+      to { transform: scale(1.12); }
+    }
+    .lp-hero__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, rgba(13,21,38,0.92) 0%, rgba(13,21,38,0.55) 45%, rgba(13,21,38,0.35) 100%);
+    }
+    .lp-hero__grain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.04;
       pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
-    .hero-inner {
+    .lp-hero__inner {
       position: relative;
-      max-width: var(--container);
+      z-index: 2;
+      max-width: var(--max);
       margin: 0 auto;
-      padding: 4rem 1.5rem 5rem;
+      width: 100%;
     }
-    @media (min-width: 768px) {
-      .hero-inner {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 3rem;
-        align-items: center;
-        padding: 6rem 1.5rem 8rem;
-      }
-    }
-    .hero-tag {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.35em;
-      color: var(--cyan);
-      margin-bottom: 1rem;
-    }
-    .hero h1 {
-      font-size: 2rem;
+    .lp-hero__en {
+      font-family: var(--font-en);
+      font-size: clamp(0.8125rem, 2.5vw, 1rem);
       font-weight: 600;
-      line-height: 1.35;
-      margin: 0;
-      color: var(--text);
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 1.25rem;
     }
-    .hero h1 .accent { color: var(--cyan); }
-    @media (min-width: 768px) {
-      .hero h1 { font-size: 3.5rem; }
+    .lp-hero__title {
+      font-size: clamp(1.85rem, 5.5vw, 3.25rem);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      margin: 0 0 1.5rem;
+      max-width: 16em;
     }
-    .hero-lead {
-      margin-top: 1.5rem;
-      max-width: 32ch;
-      font-size: 1rem;
-      line-height: 1.8;
-      color: var(--text-muted);
+    .lp-hero__lead {
+      font-size: clamp(0.9375rem, 1.8vw, 1.0625rem);
+      color: rgba(250,250,250,0.72);
+      max-width: 36rem;
+      margin: 0 0 2.25rem;
+      line-height: 1.85;
     }
-    .hero-cta-wrap {
-      margin-top: 2.5rem;
+    .lp-hero__cta {
       display: flex;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 0.85rem;
     }
-    .btn-primary {
-      display: inline-block;
-      padding: 1rem 1.5rem;
-      background: var(--cyan);
-      color: #0a0a0a;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 1rem;
-      transition: transform .15s, box-shadow .2s;
-    }
-    .btn-primary:hover {
-      transform: scale(1.02);
-      box-shadow: 0 0 30px rgba(103,232,249,0.35);
-    }
-    .btn-primary:focus-visible {
-      outline: 2px solid var(--cyan);
-      outline-offset: 2px;
-    }
-    .btn-outline {
-      display: inline-block;
-      padding: 1rem 1.5rem;
-      border: 1px solid rgba(0,0,0,0.15);
-      color: var(--text);
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 1rem;
-      transition: border-color .2s, color .2s;
-    }
-    .btn-outline:hover {
-      border-color: var(--cyan);
-      color: var(--cyan);
-    }
-    .btn-outline:focus-visible {
-      outline: 2px solid var(--cyan);
-      outline-offset: 2px;
-    }
-    .hero-badge {
-      display: inline-block;
-      margin-top: 1rem;
-      padding: 0.35rem 0.75rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text);
-      background: var(--cyan-soft);
-      border: 1px solid var(--cyan-border);
-      border-radius: 9999px;
-    }
-    .hero-flow-card {
-      margin-top: 2rem;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 1.5rem;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.08);
-    }
-    @media (min-width: 768px) { .hero-flow-card { margin-top: 0; } }
-    .hero-flow-card-inner {
-      border-radius: 1.5rem;
-      border: 1px solid var(--cyan-border);
-      background: var(--bg-card);
-      padding: 1.25rem;
-    }
-    .hero-flow-card p:first-child {
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      margin: 0 0 1rem;
-    }
-    .flow-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    .flow-step-row {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0.75rem 1rem;
-      border-radius: 1rem;
-      border: 1px solid var(--border);
-    }
-    .flow-step-num {
-      flex-shrink: 0;
-      width: 2.5rem;
-      height: 2.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: var(--cyan);
-      color: #0a0a0a;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    .flow-step-row span { font-size: 0.9rem; color: var(--text-muted); }
-
-    /* Section common */
-    .sec {
-      padding: 5rem 0;
-      scroll-margin-top: var(--header-h);
-    }
-    .sec-alt {
-      background: #f8fafb;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .sec-tag {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.3em;
-      color: var(--cyan);
-      margin-bottom: 0.75rem;
-    }
-    .sec-title {
-      font-size: 1.75rem;
-      font-weight: 600;
-      color: var(--text);
-      margin: 0 0 1rem;
-    }
-    @media (min-width: 768px) { .sec-title { font-size: 2.25rem; } }
-    .sec-lead {
-      font-size: 1rem;
-      color: var(--text-muted);
-      margin: 0 0 2rem;
-      max-width: 40ch;
-    }
-
-    /* Services */
-    .services-grid {
-      display: grid;
-      gap: 1.5rem;
-    }
-    @media (min-width: 768px) {
-      .services-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (min-width: 1024px) {
-      .services-grid { grid-template-columns: repeat(4, 1fr); }
-    }
-    .service-card {
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 1.5rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    }
-    .service-card .icon { font-size: 2rem; margin-bottom: 1rem; }
-    .service-card h3 {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--text);
-      margin: 0 0 0.75rem;
-    }
-    .service-card p {
-      font-size: 0.9rem;
-      line-height: 1.7;
-      color: var(--text-muted);
-      margin: 0;
-    }
-
-    /* Stats */
-    .stats-grid {
-      display: grid;
-      gap: 1.5rem;
-    }
-    @media (min-width: 768px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (min-width: 1024px) {
-      .stats-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    .stat-card {
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 2rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    }
-    .stat-value {
-      font-size: 1.75rem;
-      font-weight: 600;
-      color: var(--cyan);
-    }
-    @media (min-width: 768px) { .stat-value { font-size: 2rem; } }
-    .stat-label {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-top: 0.5rem;
-    }
-
-    /* Cases */
-    .cases-grid {
-      display: grid;
-      gap: 1.5rem;
-    }
-    @media (min-width: 768px) {
-      .cases-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    .case-card {
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 1.75rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    }
-    .case-card .cat {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      border: 1px solid var(--cyan-border);
-      font-size: 0.75rem;
-      color: var(--cyan);
-      margin-bottom: 1.25rem;
-    }
-    .case-card p {
-      font-size: 0.9rem;
-      line-height: 1.75;
-      color: var(--text-muted);
-      margin: 0 0 0.75rem;
-    }
-    .case-card p strong { color: var(--text); }
-
-    /* Works */
-    .works-grid {
-      display: grid;
-      gap: 1.5rem;
-    }
-    @media (min-width: 768px) {
-      .works-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    .work-card {
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: #fff;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    }
-    .work-card-thumb {
-      height: 12rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, var(--cyan-soft), rgba(0,0,0,0.02));
-      text-align: center;
-      padding: 1rem;
-    }
-    .work-card-thumb p { margin: 0; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--cyan); }
-    .work-card-thumb h4 { margin: 0.5rem 0 0; font-size: 1.1rem; font-weight: 600; color: var(--text); }
-    .work-card-link {
-      display: inline-block;
-      margin-top: 0.75rem;
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--cyan);
-      border: 1px solid var(--cyan-border);
-      border-radius: 0.5rem;
-      transition: background .2s, color .2s;
-    }
-    .work-card-link:hover {
-      background: var(--cyan-soft);
-      color: #0e7490;
-    }
-    .work-card-demo-links {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.35rem;
-      margin-top: 0.5rem;
-    }
-    .work-card-demo-links .work-card-link {
-      margin-top: 0;
-    }
-    .work-card-thumb--instagram {
-      padding: 1.5rem !important;
-    }
-    .work-instagram-link {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.75rem;
-      color: var(--text);
-    }
-    .work-instagram-link img {
-      width: 120px;
-      height: 120px;
-      object-fit: contain;
-      border-radius: 0.5rem;
-    }
-    .work-instagram-id {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--cyan);
-    }
-    .work-instagram-link:hover .work-instagram-id { text-decoration: underline; }
-    .work-card-body { padding: 1.25rem; }
-    .work-card-body .cat { font-size: 0.8rem; color: var(--cyan); }
-    .work-card-body .desc { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.65; }
-
-    /* Testimonials */
-    .testimonials-grid {
-      display: grid;
-      gap: 1.5rem;
-    }
-    @media (min-width: 768px) {
-      .testimonials-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    .testimonial-card {
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 1.75rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    }
-    .testimonial-card blockquote {
-      font-size: 1rem;
-      line-height: 1.8;
-      color: var(--text);
-      margin: 0;
-    }
-    .testimonial-card footer {
-      margin-top: 1.25rem;
-      font-size: 0.9rem;
-      color: var(--cyan);
-    }
-
-    /* Flow */
-    .flow-lead {
-      font-size: 1rem;
-      color: var(--text-muted);
-      text-align: center;
-      margin: 0 auto 2rem;
-      max-width: 36ch;
-      line-height: 1.8;
-    }
-    .flow-grid {
-      display: grid;
-      gap: 1.25rem;
-    }
-    @media (min-width: 768px) {
-      .flow-grid { grid-template-columns: repeat(5, 1fr); gap: 1rem; }
-    }
-    .flow-card {
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 1.5rem 1.25rem;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      transition: box-shadow .2s, border-color .2s;
-    }
-    .flow-card:hover {
-      border-color: var(--cyan-border);
-      box-shadow: 0 8px 28px rgba(103, 232, 249, 0.1);
-    }
-    .flow-card-num {
-      width: 2.75rem;
-      height: 2.75rem;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: var(--cyan);
-      color: #0a0a0a;
-      font-weight: 700;
-      font-size: 1rem;
-    }
-    .flow-card .flow-step-title {
-      margin: 0.75rem 0 0.35rem;
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .flow-card .flow-step-desc {
-      margin: 0;
-      font-size: 0.8rem;
-      line-height: 1.5;
-      color: var(--text-muted);
-    }
-
-    /* FAQ */
-    .faq-list { display: flex; flex-direction: column; gap: 0.75rem; }
-    .faq-item {
-      border-radius: 1.5rem;
-      border: 1px solid var(--border);
-      background: #fff;
-      overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-    }
-    .faq-item summary {
-      padding: 1.25rem 1.5rem;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-      list-style: none;
-    }
-    .faq-item summary:focus-visible {
-      outline: 2px solid var(--cyan);
-      outline-offset: 2px;
-    }
-    .faq-item summary::-webkit-details-marker { display: none; }
-    .faq-item summary::after { content: "+"; float: right; }
-    .faq-item[open] summary::after { content: "−"; }
-    .faq-item p {
-      padding: 0 1.5rem 1.25rem;
-      margin: 0;
-      font-size: 0.9rem;
-      line-height: 1.75;
-      color: var(--text-muted);
-    }
-
-    /* Profile + Positioning */
-    .profile-grid {
-      display: grid;
-      gap: 2rem;
-    }
-    @media (min-width: 768px) {
-      .profile-grid { grid-template-columns: 1.2fr 0.8fr; align-items: start; }
-    }
-    .profile-text {
-      font-size: 1rem;
-      line-height: 1.85;
-      color: var(--text-muted);
-    }
-    .profile-cards {
-      margin-top: 1.5rem;
-      display: grid;
-      gap: 1rem;
-    }
-    @media (min-width: 480px) { .profile-cards { grid-template-columns: repeat(2, 1fr); } }
-    .profile-mini-card {
-      border-radius: 1rem;
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 1.25rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-    }
-    .profile-mini-card .label { font-size: 0.8rem; color: var(--cyan); }
-    .profile-mini-card .body { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.6; }
-    .positioning-card {
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 2rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    }
-    .positioning-card h4 {
-      font-size: 1.35rem;
-      font-weight: 600;
-      color: var(--text);
-      margin: 0 0 1.5rem;
-    }
-    .positioning-row {
-      border-radius: 1rem;
-      border: 1px solid var(--border);
-      padding: 1rem 1.25rem;
-      margin-bottom: 0.75rem;
-    }
-    .positioning-row.highlight {
-      border-color: var(--cyan-border);
-      background: var(--cyan-soft);
-    }
-    .positioning-row .small { font-size: 0.8rem; color: var(--text-dim); }
-    .positioning-row .main { font-size: 1.1rem; font-weight: 500; color: var(--text); margin-top: 0.25rem; }
-
-    /* Contact */
-    .contact-grid {
-      display: grid;
-      gap: 2rem;
-    }
-    @media (min-width: 768px) {
-      .contact-grid { grid-template-columns: 1.2fr 0.8fr; }
-    }
-    .contact-form-wrap {
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 2rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    }
-    .form-grid {
-      display: grid;
-      gap: 1.25rem;
-    }
-    @media (min-width: 768px) {
-      .form-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    .form-group label {
-      display: block;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 0.35rem;
-    }
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.875rem 1rem;
-      font-size: 1rem;
-      font-family: inherit;
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      background: #fff;
-      color: var(--text);
-      outline: none;
-      transition: border-color .2s;
-    }
-    .form-group input:focus,
-    .form-group textarea:focus { border-color: var(--cyan); }
-    .form-group input:focus-visible,
-    .form-group textarea:focus-visible { outline: none; }
-    .form-submit:focus-visible {
-      outline: 2px solid var(--text);
-      outline-offset: 2px;
-    }
-    .form-group textarea { min-height: 140px; resize: vertical; }
-    .form-submit {
-      width: 100%;
-      margin-top: 1.5rem;
-      padding: 1rem 1.5rem;
-      font-size: 1rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 1rem;
-      background: var(--cyan);
-      color: #0a0a0a;
-      cursor: pointer;
-      transition: transform .15s;
-    }
-    .form-submit:hover { transform: scale(1.01); }
-    .contact-sidebar {
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: #f8fafb;
-      padding: 2rem;
-    }
-    .contact-sidebar .tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--cyan); }
-    .contact-sidebar .company { margin-top: 0.75rem; font-size: 0.95rem; color: var(--text-muted); }
-    .contact-sidebar .info-block { margin-top: 1.5rem; }
-    .contact-sidebar .info-block .label { font-size: 0.8rem; color: var(--text-dim); }
-    .contact-sidebar .info-block .value { font-size: 1rem; color: var(--text); margin-top: 0.25rem; }
-    .contact-monitor-note {
-      margin-top: 1.5rem;
-      padding: 1.25rem;
-      border-radius: 1rem;
-      border: 1px solid var(--cyan-border);
-      background: var(--cyan-soft);
-      font-size: 0.9rem;
-      line-height: 1.7;
-      color: #0e7490;
-    }
-    .contact-cta-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-    }
-    @media (min-width: 768px) {
-      .contact-cta-wrap { flex-direction: row; flex-wrap: wrap; }
-    }
-    .btn-line {
+    .lp-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      padding: 0.875rem 1.25rem;
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #fff;
-      background: #06c755;
-      border-radius: 0.5rem;
-      border: none;
-      cursor: pointer;
-      transition: opacity .2s, transform .15s;
-    }
-    .btn-line:hover { opacity: 0.95; transform: scale(1.01); }
-    .btn-line:focus-visible {
-      outline: 2px solid #06c755;
-      outline-offset: 2px;
-    }
-    .btn-line::before {
-      content: "LINE";
-      font-size: 0.75rem;
+      font-family: var(--font-en);
+      font-size: 0.6875rem;
       font-weight: 700;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 1rem 1.6rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.25s, color 0.25s, border-color 0.25s;
+    }
+    .lp-btn:active { transform: scale(0.98); }
+    .lp-btn--light {
+      background: var(--white);
+      color: var(--black);
+      border-color: var(--white);
+    }
+    .lp-btn--light:hover { background: #e8e8e8; border-color: #e8e8e8; }
+    .lp-btn--outline {
+      background: transparent;
+      color: var(--white);
+      border-color: rgba(255,255,255,0.4);
+    }
+    .lp-btn--outline:hover {
+      border-color: var(--white);
+      background: rgba(255,255,255,0.06);
+    }
+    .lp-hero__scroll {
+      position: absolute;
+      bottom: 2rem;
+      right: 1.5rem;
+      font-family: var(--font-en);
+      font-size: 0.625rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+      writing-mode: vertical-rl;
+      display: none;
+    }
+    @media (min-width: 900px) {
+      .lp-hero__scroll { display: block; }
     }
 
-    /* Pricing */
-    .pricing-monitor-box {
-      max-width: 32rem;
-      margin: 0 auto 1.5rem;
-      padding: 1.25rem;
-      border: 1px solid var(--cyan-border);
-      border-radius: 1rem;
-      background: var(--cyan-soft);
-      text-align: center;
-    }
-    .pricing-monitor-box .period { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
-    .pricing-monitor-box .note { font-size: 0.8rem; color: var(--text-dim); margin: 0; }
-    .pricing-lead-note {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      margin-top: 0.5rem;
-    }
-    .pricing-grid {
+    /* —— Stats strip —— */
+    .lp-stats {
       display: grid;
-      gap: 1.25rem;
-      margin-top: 1.5rem;
+      grid-template-columns: 1fr;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
     }
     @media (min-width: 768px) {
-      .pricing-grid { grid-template-columns: 1fr 1.12fr 1fr; align-items: stretch; }
+      .lp-stats { grid-template-columns: repeat(3, 1fr); }
     }
-    .pricing-card {
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 1.5rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-      display: flex;
-      flex-direction: column;
+    .lp-stats__cell {
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--line);
     }
-    .pricing-card .plan-name {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text);
-      margin: 0 0 0.25rem;
+    @media (min-width: 768px) {
+      .lp-stats__cell { border-bottom: none; border-right: 1px solid var(--line); }
+      .lp-stats__cell:last-child { border-right: none; }
     }
-    .pricing-card .plan-badge {
-      display: inline-block;
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: #fff;
-      background: var(--cyan);
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.25rem;
-      margin-bottom: 0.75rem;
-    }
-    .pricing-card .price-area {
-      margin-bottom: 1rem;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .pricing-card .price-regular-row {
+    .lp-stats__num {
+      font-family: var(--font-en);
+      font-size: clamp(2.5rem, 6vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1;
+      color: var(--white);
       margin-bottom: 0.5rem;
     }
-    .pricing-card .price-label { font-size: 0.7rem; color: var(--text-dim); margin-bottom: 0.15rem; }
-    .pricing-card .price-regular {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-decoration: line-through;
-    }
-    .pricing-card .price-regular .unit { font-size: 0.85rem; font-weight: 500; }
-    .pricing-card .price-monitor-row {
-      margin-top: 0.5rem;
-      padding-top: 0.5rem;
-      border-top: 1px dashed var(--border);
-    }
-    .pricing-card .price-monitor-badge {
-      display: inline-block;
-      font-size: 0.65rem;
-      font-weight: 600;
-      color: #0e7490;
-      background: var(--cyan-soft);
-      padding: 0.2rem 0.45rem;
-      border-radius: 0.2rem;
-      margin-bottom: 0.25rem;
-    }
-    .pricing-card .price-monitor {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .pricing-card .price-monitor .unit { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); }
-    .pricing-card .plan-contents {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin: 0 0 0.75rem;
-      padding-left: 1rem;
-      line-height: 1.6;
-    }
-    .pricing-card .plan-contents li { margin-bottom: 0.2rem; }
-    .pricing-card.pricing-pro {
-      border: 2px solid var(--cyan-border);
-      background: var(--cyan-soft);
-      box-shadow: 0 4px 20px rgba(103, 232, 249, 0.12);
-    }
-    @media (min-width: 768px) {
-      .pricing-card.pricing-pro { transform: scale(1.03); }
-    }
-    .pricing-upgrade-note {
-      text-align: center;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-top: 1.5rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
+    .lp-stats__label {
+      font-size: 0.8125rem;
+      color: var(--gray);
+      line-height: 1.55;
     }
 
-    /* Benefits (replacing testimonials) */
-    .benefits-grid {
+    /* —— Section shell —— */
+    .lp-sec {
+      padding: clamp(4.5rem, 12vw, 8rem) 1.5rem;
+      position: relative;
+    }
+    .lp-sec--light {
+      background: var(--white);
+      color: #1a1a1a;
+    }
+    .lp-sec--dark {
+      background: var(--black-soft);
+      color: var(--white);
+    }
+    .lp-sec--black {
+      background: var(--black);
+      color: var(--white);
+    }
+    .lp-sec__inner { max-width: var(--max); margin: 0 auto; }
+
+    .lp-sec__head {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.25rem 2rem;
+      align-items: start;
+      margin-bottom: clamp(2.5rem, 6vw, 3.5rem);
+    }
+    @media (max-width: 640px) {
+      .lp-sec__head { grid-template-columns: 1fr; }
+    }
+    .lp-sec__num {
+      font-family: var(--font-en);
+      font-size: clamp(3.5rem, 12vw, 6rem);
+      font-weight: 800;
+      line-height: 0.85;
+      color: rgba(0,0,0,0.06);
+    }
+    .lp-sec--dark .lp-sec__num,
+    .lp-sec--black .lp-sec__num { color: rgba(255,255,255,0.06); }
+    .lp-sec__meta {
+      padding-top: 0.5rem;
+    }
+    .lp-sec__en {
+      font-family: var(--font-en);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 0.65rem;
+    }
+    .lp-sec--light .lp-sec__en { color: #8a7340; }
+    .lp-sec__h {
+      font-size: clamp(1.5rem, 3.5vw, 2rem);
+      font-weight: 700;
+      line-height: 1.35;
+      margin: 0 0 0.75rem;
+      letter-spacing: 0.02em;
+    }
+    .lp-sec__lead {
+      font-size: 0.9375rem;
+      line-height: 1.85;
+      margin: 0;
+      max-width: 40rem;
+    }
+    .lp-sec--light .lp-sec__lead { color: #4a4a4a; }
+    .lp-sec--dark .lp-sec__lead,
+    .lp-sec--black .lp-sec__lead { color: rgba(250,250,250,0.65); }
+
+    /* —— Problems —— */
+    .lp-prob-grid {
+      display: grid;
+      gap: 1px;
+      background: var(--line-dark);
+      border: 1px solid var(--line-dark);
+    }
+    @media (min-width: 768px) {
+      .lp-prob-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .lp-prob {
+      background: var(--white);
+      padding: 1.75rem 1.5rem;
+      transition: box-shadow 0.35s ease;
+    }
+    .lp-prob:hover { box-shadow: 0 20px 50px rgba(0,0,0,0.06); }
+    .lp-prob h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0 0 0.65rem;
+      padding-left: 1rem;
+      border-left: 3px solid var(--accent);
+    }
+    .lp-prob p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: #555;
+      line-height: 1.75;
+    }
+    .lp-prob-foot {
+      margin-top: 2rem;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      text-align: center;
+      color: #333;
+    }
+    .lp-prob-hero {
+      height: min(32vw, 200px);
+      border-radius: 8px;
+      margin-bottom: 1.75rem;
+      background-size: cover;
+      background-position: center 42%;
+      border: 1px solid var(--line-dark);
+    }
+
+    /* —— Mechanism cards + photo —— */
+    .lp-mech-grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+    @media (min-width: 900px) {
+      .lp-mech-grid { grid-template-columns: repeat(5, 1fr); }
+    }
+    .lp-mech {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+      overflow: hidden;
+      transition: transform 0.35s var(--ease-out), border-color 0.35s;
+    }
+    .lp-mech:hover {
+      transform: translateY(-6px);
+      border-color: rgba(201, 169, 98, 0.35);
+    }
+    .lp-mech__img {
+      aspect-ratio: 4/3;
+      background-size: cover;
+      background-position: center;
+    }
+    .lp-mech__body { padding: 1.15rem 1rem 1.35rem; }
+    .lp-mech__step {
+      font-family: var(--font-en);
+      font-size: 0.625rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 0.35rem;
+    }
+    .lp-mech__title {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      margin: 0 0 0.4rem;
+      line-height: 1.45;
+    }
+    .lp-mech__desc {
+      margin: 0;
+      font-size: 0.75rem;
+      color: var(--gray);
+      line-height: 1.6;
+    }
+    .lp-mech-banner {
+      margin-top: 2.5rem;
+      padding: 2rem 1.5rem;
+      border: 1px solid rgba(201, 169, 98, 0.35);
+      background: linear-gradient(135deg, rgba(201, 169, 98, 0.08) 0%, transparent 60%);
+      text-align: center;
+    }
+    .lp-mech-banner__en {
+      font-family: var(--font-en);
+      font-size: 0.625rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .lp-mech-banner h3 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin: 0 0 0.65rem;
+    }
+    .lp-mech-banner p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: rgba(250,250,250,0.7);
+      max-width: 36rem;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.75;
+    }
+
+    /* —— Chat section (split + EN) —— */
+    .lp-chat {
+      display: grid;
+      gap: 0;
+    }
+    @media (min-width: 960px) {
+      .lp-chat { grid-template-columns: 1fr 1fr; min-height: 520px; }
+    }
+    .lp-chat__visual {
+      position: relative;
+      min-height: 280px;
+      background-size: cover;
+      background-position: center;
+    }
+    .lp-chat__visual::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 50%, rgba(13,21,38,0.68) 100%);
+    }
+    .lp-chat__content {
+      padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--black);
+      border-top: 1px solid var(--line);
+    }
+    @media (min-width: 960px) {
+      .lp-chat__content { border-top: none; border-left: 1px solid var(--line); }
+    }
+    .lp-chat__mega {
+      font-family: var(--font-en);
+      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: rgba(255,255,255,0.12);
+      margin: 0 0 1rem;
+    }
+    .lp-chat__h {
+      font-size: clamp(1.35rem, 3vw, 1.75rem);
+      font-weight: 700;
+      margin: 0 0 1rem;
+    }
+    .lp-chat__lead {
+      font-size: 0.9375rem;
+      color: rgba(250,250,250,0.68);
+      line-height: 1.85;
+      margin: 0 0 1.5rem;
+      max-width: 28rem;
+    }
+    .lp-chat-ui {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      max-width: 380px;
+      background: var(--black-soft);
+    }
+    .lp-chat-ui__bar {
+      padding: 0.65rem 1rem;
+      font-size: 0.6875rem;
+      color: var(--gray);
+      border-bottom: 1px solid var(--line);
+    }
+    .lp-chat-ui__body { padding: 1rem; }
+    .lp-chat-b {
+      font-size: 0.75rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+      max-width: 92%;
+      background: rgba(255,255,255,0.06);
+      color: rgba(250,250,250,0.88);
+    }
+    .lp-chat-b--user {
+      margin-left: auto;
+      background: rgba(201, 169, 98, 0.2);
+      border: 1px solid rgba(201, 169, 98, 0.25);
+    }
+    .lp-compare {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      margin-top: 1.5rem;
+    }
+    .lp-compare th,
+    .lp-compare td {
+      padding: 0.75rem 0;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    .lp-compare th {
+      width: 38%;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .lp-compare td { color: var(--gray); }
+
+    /* —— Feature grid photos —— */
+    .lp-feat-grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+    @media (min-width: 640px) {
+      .lp-feat-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1000px) {
+      .lp-feat-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .lp-feat {
+      position: relative;
+      overflow: hidden;
+      background: var(--black-soft);
+      border: 1px solid var(--line);
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .lp-feat__bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.7s var(--ease-out);
+    }
+    .lp-feat:hover .lp-feat__bg { transform: scale(1.06); }
+    .lp-feat__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 38%, rgba(13,21,38,0.78) 100%);
+    }
+    .lp-feat__body {
+      position: relative;
+      z-index: 2;
+      padding: 1.5rem 1.25rem;
+    }
+    .lp-feat__en {
+      font-family: var(--font-en);
+      font-size: 0.5625rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.35rem;
+    }
+    .lp-feat h3 {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      margin: 0 0 0.4rem;
+    }
+    .lp-feat p {
+      margin: 0;
+      font-size: 0.8125rem;
+      color: rgba(250,250,250,0.65);
+      line-height: 1.6;
+    }
+
+    /* —— Pricing —— */
+    .lp-price-banner {
+      padding: 2rem 1.75rem;
+      background: var(--black);
+      color: var(--white);
+      border: 1px solid var(--line);
+      margin-bottom: 2rem;
+    }
+    .lp-price-banner__en {
+      font-family: var(--font-en);
+      font-size: 0.625rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .lp-price-banner h3 {
+      font-size: clamp(1.15rem, 2.5vw, 1.45rem);
+      font-weight: 700;
+      margin: 0 0 0.65rem;
+      line-height: 1.45;
+    }
+    .lp-price-banner p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: rgba(250,250,250,0.7);
+      line-height: 1.75;
+      max-width: 42rem;
+    }
+    .lp-plans {
+      display: grid;
+      gap: 1.25rem;
+    }
+    @media (min-width: 768px) {
+      .lp-plans { grid-template-columns: repeat(3, 1fr); align-items: stretch; }
+    }
+    .lp-plan {
+      border: 1px solid var(--line-dark);
+      padding: 1.75rem 1.35rem;
+      background: var(--white);
+      position: relative;
+    }
+    .lp-plan--hit {
+      border-color: rgba(201, 169, 98, 0.55);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08);
+    }
+    .lp-plan__badge {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-en);
+      font-size: 0.5625rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: var(--black);
+      color: var(--white);
+      padding: 0.35rem 0.75rem;
+    }
+    .lp-plan h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0 0 0.35rem;
+    }
+    .lp-plan__price {
+      font-size: 1.0625rem;
+      font-weight: 700;
+      margin: 0 0 1rem;
+    }
+    .lp-plan__price small {
+      display: block;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: #888;
+      margin-top: 0.25rem;
+    }
+    .lp-plan ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .lp-plan li {
+      font-size: 0.8125rem;
+      color: #555;
+      padding: 0.45rem 0;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      line-height: 1.5;
+    }
+    .lp-plan li:first-child { border-top: none; padding-top: 0; }
+    .lp-price-note {
+      margin-top: 1.75rem;
+      font-size: 0.75rem;
+      color: #888;
+      line-height: 1.65;
+    }
+
+    /* —— Photo option full bleed —— */
+    .lp-photo-split {
+      display: grid;
+    }
+    @media (min-width: 900px) {
+      .lp-photo-split { grid-template-columns: 1.1fr 0.9fr; min-height: 480px; }
+    }
+    .lp-photo-split__img {
+      min-height: 280px;
+      background-size: cover;
+      background-position: center;
+    }
+    .lp-photo-split__body {
+      padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--black-soft);
+      border-top: 1px solid var(--line);
+    }
+    @media (min-width: 900px) {
+      .lp-photo-split__body { border-top: none; border-left: 1px solid var(--line); }
+    }
+    .lp-photo-split__en {
+      font-family: var(--font-en);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      color: rgba(255,255,255,0.1);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .lp-photo-split h3 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+    .lp-photo-split__price {
+      font-family: var(--font-en);
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--white);
+      margin: 0 0 1rem;
+    }
+    .lp-photo-split__price span {
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--gray);
+    }
+    .lp-photo-split ul {
+      margin: 0 0 1rem;
+      padding: 0;
+      list-style: none;
+    }
+    .lp-photo-split li {
+      font-size: 0.875rem;
+      color: rgba(250,250,250,0.7);
+      padding: 0.35rem 0;
+      padding-left: 1.1rem;
+      position: relative;
+    }
+    .lp-photo-split li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.85em;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .lp-photo-split__note {
+      font-size: 0.875rem;
+      color: rgba(250,250,250,0.72);
+      line-height: 1.75;
+      margin: 0;
+    }
+
+    /* —— Flow —— */
+    .lp-flow {
       display: grid;
       gap: 1.5rem;
     }
     @media (min-width: 768px) {
-      .benefits-grid { grid-template-columns: repeat(3, 1fr); }
+      .lp-flow { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
     }
-    .benefit-card {
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 1.5rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    .lp-flow__step {
+      text-align: left;
+      padding-top: 1.5rem;
+      border-top: 2px solid var(--black);
     }
-    .benefit-card h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin: 0 0 0.5rem;
+    .lp-sec--dark .lp-flow__step { border-top-color: rgba(255,255,255,0.25); }
+    .lp-flow__num {
+      font-family: var(--font-en);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.75rem;
     }
-    .benefit-card p {
-      font-size: 0.9rem;
-      line-height: 1.65;
-      color: var(--text-muted);
+    .lp-sec--light .lp-flow__num { color: #8a7340; }
+    .lp-flow__step h4 {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      margin: 0 0 0.4rem;
+    }
+    .lp-flow__step p {
       margin: 0;
+      font-size: 0.8125rem;
+      color: #666;
+      line-height: 1.65;
     }
-    .benefit-card .label {
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      color: var(--text-dim);
-      margin-bottom: 0.5rem;
-    }
+    .lp-sec--dark .lp-flow__step p { color: var(--gray); }
 
-    /* Footer */
-    .footer {
-      padding: 2rem 1.5rem;
-      border-top: 1px solid var(--border);
+    /* —— Contact —— */
+    .lp-contact {
+      padding: clamp(4rem, 10vw, 6rem) 1.5rem;
+      background: var(--black);
+      border-top: 1px solid var(--line);
+    }
+    .lp-contact__inner {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    .lp-contact__en {
+      font-family: var(--font-en);
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 800;
       text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-dim);
+      color: rgba(255,255,255,0.9);
+      margin: 0 0 0.35rem;
+      letter-spacing: -0.02em;
+    }
+    .lp-contact__sub {
+      text-align: center;
+      font-size: 0.9375rem;
+      color: var(--gray);
+      margin: 0 0 2rem;
+      line-height: 1.7;
+    }
+    .lp-form {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+      padding: 2rem 1.5rem;
+    }
+    .lp-form__field { margin-bottom: 1.1rem; }
+    .lp-form__field label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(250,250,250,0.55);
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.04em;
+    }
+    .lp-form__field input,
+    .lp-form__field textarea {
+      width: 100%;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: rgba(13, 21, 38, 0.45);
+      color: var(--white);
+    }
+    .lp-form__field input:focus,
+    .lp-form__field textarea:focus {
+      outline: none;
+      border-color: rgba(201, 169, 98, 0.5);
+    }
+    .lp-form__field textarea { min-height: 120px; resize: vertical; }
+    .lp-form__submit {
+      width: 100%;
+      margin-top: 0.5rem;
+      font-family: var(--font-en);
+      font-size: 0.6875rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 1.05rem;
+      background: var(--white);
+      color: var(--black);
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .lp-form__submit:hover { opacity: 0.92; }
+    .lp-form__submit:active { transform: scale(0.99); }
+    .lp-form__err {
+      display: none;
+      color: #f87171;
+      font-size: 0.8125rem;
+      text-align: center;
+      margin-top: 0.75rem;
+    }
+    .lp-form.is-error .lp-form__err { display: block; }
+    .lp-form__hint {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: var(--gray);
+      text-align: center;
+      line-height: 1.6;
+    }
+    .lp-form__hint code { font-size: 0.7rem; }
+
+    .lp-footer {
+      padding: 2rem 1.5rem 2.5rem;
+      text-align: center;
+      font-size: 0.6875rem;
+      color: var(--gray);
+      border-top: 1px solid var(--line);
+      background: var(--black);
+    }
+    .lp-footer a {
+      color: rgba(250,250,250,0.55);
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
     }
   </style>
 </head>
 <body>
-  <header class="header">
-    <div class="header-inner container">
-      <a href="#" class="logo-wrap">
-        <img src="assets/logo.png" alt="NAGA ROOM" width="120" height="36">
-        <p class="logo-sub">長崎の住まいメディア</p>
-      </a>
-      <input type="checkbox" id="nav-check" class="nav-check" aria-hidden="true">
-      <label for="nav-check" class="nav-toggle" aria-label="メニュー">
-        <span></span>
-        <span></span>
-        <span></span>
-      </label>
-      <nav class="nav">
-        <ul class="nav-list">
-          <li><a href="#goal">目標と現状</a></li>
-          <li><a href="#services">サービス</a></li>
-          <li><a href="#pricing">料金</a></li>
-          <li><a href="#flow">導入の流れ</a></li>
-          <li><a href="#cases">活用イメージ</a></li>
-          <li><a href="#works">制作実績</a></li>
-          <li><a href="bestroom.html">限定記事</a></li>
-          <li><a href="#contact">お問い合わせ</a></li>
-        </ul>
-      </nav>
-      <a href="#contact" class="header-cta">相談する</a>
-    </div>
+  <header class="lp-header" id="lp-header">
+    <a href="#" class="lp-logo" aria-label="NAGA ROOM">NAGA ROOM<small>FOR REAL ESTATE</small></a>
+    <a href="#contact" class="lp-header__cta" data-scroll="contact">Contact</a>
   </header>
 
-  <main>
-    <section class="hero">
-      <div class="hero-bg" aria-hidden="true"></div>
-      <div class="hero-inner container">
-        <div class="fade-up">
-          <h1>
-            長崎の若い世代に届く<br>
-            <span class="accent">「長崎版SUUMO × Instagram × AI」</span>
-          </h1>
-          <p class="hero-lead">
-            Instagramで惹きつけて、LINEで条件を取り、AIで提案して、貴社へ送客。<br>
-            <strong>“ユーザー（見込み客）を集めて不動産会社に流す”</strong>、長崎特化の体験型不動産メディアです。
-          </p>
-          <span class="hero-badge">モニター価格で試せます</span>
-          <div class="hero-cta-wrap">
-            <a href="#contact" class="btn-primary">掲載相談をする</a>
-            <a href="#services" class="btn-outline">サービスを見る</a>
-          </div>
-        </div>
-        <div class="hero-flow-card fade-up">
-          <div class="hero-flow-card-inner">
-            <p>集客導線</p>
-            <div class="flow-steps">
-              <div class="flow-step-row">
-                <span class="flow-step-num">1</span>
-                <span>Instagramで認知</span>
-              </div>
-              <div class="flow-step-row">
-                <span class="flow-step-num">2</span>
-                <span>プロフィールからLINE登録</span>
-              </div>
-              <div class="flow-step-row">
-                <span class="flow-step-num">3</span>
-                <span>チャットボットで条件取得</span>
-              </div>
-              <div class="flow-step-row">
-                <span class="flow-step-num">4</span>
-                <span>LPで提案型の物件紹介</span>
-              </div>
-              <div class="flow-step-row">
-                <span class="flow-step-num">5</span>
-                <span>不動産会社へ送客</span>
-              </div>
-            </div>
-          </div>
-        </div>
+  <section class="lp-hero">
+    <div class="lp-hero__bg" style="background-image:url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1920&q=85'); background-position:center 55%;" role="img" aria-label="モダンな賃貸リビングのイメージ"></div>
+    <div class="lp-hero__overlay"></div>
+    <div class="lp-hero__grain"></div>
+    <div class="lp-hero__inner">
+      <p class="lp-hero__en" data-reveal>Nagasaki × Rental Media</p>
+      <h1 class="lp-hero__title" data-reveal>不動産会社の賃貸集客を、<br>対話体験で次の層へ。</h1>
+      <p class="lp-hero__lead" data-reveal>SNS・LP・LINE とチャットボット検索型の体験をつなぎ、若年層が入りやすい導線で物件に出会ってもらう。長崎エリアに特化した掲載基盤です。</p>
+      <div class="lp-hero__cta" data-reveal>
+        <a href="#contact" class="lp-btn lp-btn--light" data-scroll="contact">掲載相談を申し込む</a>
+        <a href="#mechanism" class="lp-btn lp-btn--outline" data-scroll="mechanism">サービスを見る</a>
       </div>
-    </section>
-
-    <section id="goal" class="sec sec-alt">
-      <div class="container">
-        <p class="sec-tag">Goal</p>
-        <h2 class="sec-title">若年層と自然につながる状態</h2>
-        <p class="sec-lead">長崎で家探しする若い世代と接点を持ち、LINEで相談が生まれる状態</p>
-        <div class="stats-grid">
-          <div class="stat-card fade-up">
-            <div class="stat-value">1,000人</div>
-            <p class="stat-label">LINE登録</p>
-          </div>
-          <div class="stat-card fade-up">
-            <div class="stat-value">1,500件</div>
-            <p class="stat-label">LP掲載物件数</p>
-          </div>
-          <div class="stat-card fade-up">
-            <div class="stat-value">10,000人</div>
-            <p class="stat-label">Instagramフォロワー</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="current" class="sec">
-      <div class="container">
-        <p class="sec-tag">Current</p>
-        <h2 class="sec-title">導線が未整備で機会を逃している</h2>
-        <p class="sec-lead">LINE登録0人、LP掲載0件、SNS経由問い合わせ0〜5件で導線が未接続</p>
-        <div class="stats-grid">
-          <div class="stat-card fade-up">
-            <div class="stat-value">0人</div>
-            <p class="stat-label">LINE登録</p>
-          </div>
-          <div class="stat-card fade-up">
-            <div class="stat-value">0件</div>
-            <p class="stat-label">LP掲載物件数</p>
-          </div>
-          <div class="stat-card fade-up">
-            <div class="stat-value">2,600人</div>
-            <p class="stat-label">Instagramフォロワー</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="sec">
-      <div class="container">
-        <p class="sec-tag">Business Model</p>
-        <h2 class="sec-title">集客〜送客までの仕組み</h2>
-        <p class="sec-lead">
-          物件の“掲載枠”を売るのではなく、<strong>見込み客データを資産化</strong>し、送客の質を上げていくモデルです。
-        </p>
-        <div class="stats-grid">
-          <div class="stat-card fade-up">
-            <div class="stat-value">Instagram</div>
-            <p class="stat-label">おしゃれ物件・街情報で認知を獲得</p>
-          </div>
-          <div class="stat-card fade-up">
-            <div class="stat-value">LINE</div>
-            <p class="stat-label">登録でリード獲得（相談の入口）</p>
-          </div>
-          <div class="stat-card fade-up">
-            <div class="stat-value">AI診断</div>
-            <p class="stat-label">希望条件ヒアリング→物件提案</p>
-          </div>
-        </div>
-        <div class="cases-grid" style="margin-top: 1.25rem;">
-          <article class="case-card fade-up">
-            <span class="cat">送客</span>
-            <p>条件に合うユーザーを、加盟（掲載）不動産会社へ送客します。</p>
-          </article>
-          <article class="case-card fade-up">
-            <span class="cat">データ</span>
-            <p>家賃・エリア・引越し時期・間取りなど、<strong>不動産会社が一番欲しい見込み客データ</strong>が蓄積します。</p>
-          </article>
-          <article class="case-card fade-up">
-            <span class="cat">改善</span>
-            <p>データが溜まるほど提案精度が上がり、送客の質・単価も上がっていきます。</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="services" class="sec">
-      <div class="container">
-        <p class="sec-tag">Services</p>
-        <h2 class="sec-title">NAGA ROOMができること</h2>
-        <p class="sec-lead">
-          中小の不動産会社でも導入しやすいように、SNS集客からLINE導線、チャットボット、LPまで一連の流れで支援します。
-        </p>
-        <div class="services-grid">
-          <article class="service-card fade-up">
-            <div class="icon">📱</div>
-            <h3>Instagram集客支援</h3>
-            <p>長崎エリアに特化したSNS運用で、住まい探し世代との接点をつくり、認知から問い合わせまでを設計します。</p>
-          </article>
-          <article class="service-card fade-up">
-            <div class="icon">💬</div>
-            <h3>LINE導線設計</h3>
-            <p>公式LINEを使って見込み客を獲得し、物件提案や教育導線まで一貫して設計します。</p>
-          </article>
-          <article class="service-card fade-up">
-            <div class="icon">🤖</div>
-            <h3>チャットボット構築</h3>
-            <p>希望エリア・家賃・間取り・条件を取得し、ユーザーごとに最適な物件提案へつなげる診断型ボットを構築します。</p>
-          </article>
-          <article class="service-card fade-up">
-            <div class="icon">🏠</div>
-            <h3>LP・掲載設計</h3>
-            <p>検索型ではなく提案型の物件LPを制作し、SNSから流入したユーザーを問い合わせへつなげます。</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="pricing" class="sec sec-alt">
-      <div class="container">
-        <p class="sec-tag">Price</p>
-        <h2 class="sec-title">料金（掲載 × SNS × 送客）</h2>
-        <p class="sec-lead">まずは「LP掲載」から。必要に応じて「SNS掲載」「優先送客」「広告」を組み合わせて単価を上げられます。</p>
-        <div class="pricing-monitor-box fade-up">
-          <p class="period">モニター枠（任意）：最初の3ヶ月</p>
-          <p class="note">枠が埋まり次第終了。詳細はお問い合わせください。</p>
-        </div>
-        <h3 class="sec-title" style="font-size:1.2rem; margin-top:0.5rem;">料金プラン</h3>
-        <p class="sec-lead">物件単位の掲載をベースに、SNS露出・送客優先度を追加できます。</p>
-        <p class="pricing-lead-note">※LP制作費（撮影/原稿整備含む）は内容により調整。既存素材がある場合は軽くできます。</p>
-        <div class="pricing-grid">
-          <div class="pricing-card fade-up">
-            <h3 class="plan-name">LP掲載</h3>
-            <div class="price-area">
-              <div class="price-regular-row">
-                <p class="price-label">通常価格</p>
-                <p class="price-regular">月 15,000<span class="unit">円</span></p>
-              </div>
-              <div class="price-monitor-row">
-                <span class="price-monitor-badge">モニター期間中</span>
-                <p class="price-monitor">月 5,000<span class="unit">円</span></p>
-              </div>
-            </div>
-            <ul class="plan-contents">
-              <li>物件LP掲載</li>
-              <li>写真掲載</li>
-              <li>基本情報掲載</li>
-              <li>問い合わせ導線（LINE/フォーム）</li>
-            </ul>
-          </div>
-          <div class="pricing-card pricing-pro fade-up">
-            <span class="plan-badge">おすすめ</span>
-            <h3 class="plan-name">SNS掲載（任意）</h3>
-            <div class="price-area">
-              <div class="price-regular-row">
-                <p class="price-label">通常価格</p>
-                <p class="price-regular">月 ＋30,000<span class="unit">円</span></p>
-              </div>
-              <div class="price-monitor-row">
-                <span class="price-monitor-badge">モニター期間中</span>
-                <p class="price-monitor">月 ＋10,000<span class="unit">円</span></p>
-              </div>
-            </div>
-            <ul class="plan-contents">
-              <li>物件LP掲載</li>
-              <li>AIキャッチコピー</li>
-              <li>Instagram投稿 1回</li>
-              <li>ストーリー掲載（応相談）</li>
-              <li>LINEでの紹介導線</li>
-            </ul>
-          </div>
-          <div class="pricing-card fade-up">
-            <h3 class="plan-name">優先送客 / 広告</h3>
-            <div class="price-area">
-              <div class="price-regular-row">
-                <p class="price-label">通常価格</p>
-                <p class="price-regular">別途お見積り</p>
-              </div>
-              <div class="price-monitor-row">
-                <span class="price-monitor-badge">モニター期間中</span>
-                <p class="price-monitor">応相談</p>
-              </div>
-            </div>
-            <ul class="plan-contents">
-              <li>優先紹介（エリア/条件別）</li>
-              <li>特集枠（街・沿線・ライフスタイル）</li>
-              <li>広告配信（任意）</li>
-              <li>送客レポート（任意）</li>
-            </ul>
-          </div>
-        </div>
-        <p class="pricing-upgrade-note fade-up">※基本は「LP掲載（15,000円/物件）」＋「SNS掲載（30,000円/任意）」の組み合わせで設計します。掲載数が増えるほど相乗効果が出ます。</p>
-      </div>
-    </section>
-
-    <section class="sec">
-      <div class="container">
-        <p class="sec-tag">Target</p>
-        <h2 class="sec-title">市場規模と売上イメージ</h2>
-        <p class="sec-lead">長崎の賃貸物件は数千〜1万件規模。仮に500物件掲載できた場合の試算です。</p>
-        <div class="stats-grid">
-          <div class="stat-card fade-up">
-            <div class="stat-value">500件</div>
-            <p class="stat-label">掲載物件数（例）</p>
-          </div>
-          <div class="stat-card fade-up">
-            <div class="stat-value">750万/月</div>
-            <p class="stat-label">LP掲載のみ（15,000×500）</p>
-          </div>
-          <div class="stat-card fade-up">
-            <div class="stat-value">〜1000万/月</div>
-            <p class="stat-label">SNS掲載・優先送客・広告を組合せ</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="cases" class="sec">
-      <div class="container">
-        <p class="sec-tag">For</p>
-        <h2 class="sec-title">こんな会社におすすめ</h2>
-        <p class="sec-lead">若年層向けの集客を強化したい、SNSを活用したいという方にご検討いただいています。</p>
-        <div class="cases-grid">
-          <article class="case-card fade-up">
-            <span class="cat">賃貸仲介</span>
-            <p>20代向けの集客を増やしたい、ポータル以外の導線を持ちたい場合に。InstagramからLINEへつなぎ、見込み客を獲得する流れを一緒に設計します。</p>
-          </article>
-          <article class="case-card fade-up">
-            <span class="cat">売買・マンション</span>
-            <p>若年層に物件の良さを伝えたい場合に。物件LPとSNS投稿を組み合わせて、問い合わせにつながる導線をご提案します。</p>
-          </article>
-          <article class="case-card fade-up">
-            <span class="cat">地域密着型</span>
-            <p>街の紹介や住まいのTipsでファンをつくり、比較検討前の層との接点を増やしたい場合に。相談につなげる導線を整えます。</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="works" class="sec sec-alt">
-      <div class="container">
-        <p class="sec-tag">Works</p>
-        <h2 class="sec-title">制作実績</h2>
-        <div class="works-grid">
-          <article class="work-card fade-up">
-            <div class="work-card-thumb">
-              <div>
-                <p>Demo</p>
-                <h4>NAGA ROOM サービスLP</h4>
-                <div class="work-card-demo-links">
-                  <a href="rental.html" class="work-card-link">会話で探す</a>
-                  <a href="listings.html" class="work-card-link">一覧で見る</a>
-                </div>
-              </div>
-            </div>
-            <div class="work-card-body">
-              <p class="cat">LP制作</p>
-              <p class="desc">会話から始まる住まい探し（チャット体験）と、掲載物件の一覧ページを分離。どちらからもLINE相談へ自然につながる構成です。</p>
-            </div>
-          </article>
-          <article class="work-card fade-up">
-            <div class="work-card-thumb work-card-thumb--instagram">
-              <a href="https://www.instagram.com/nagaroom_official/" target="_blank" rel="noopener noreferrer" class="work-instagram-link">
-                <img src="assets/instagram-qr.png" alt="NAGA ROOM Instagram QRコード" width="160" height="160">
-                <span class="work-instagram-id">@nagaroom_official</span>
-              </a>
-            </div>
-            <div class="work-card-body">
-              <p class="cat">Instagram運用</p>
-              <p class="desc">若年層に刺さるビジュアルと物語風コピーを組み合わせた投稿テンプレート。公式アカウントはこちらから。</p>
-            </div>
-          </article>
-          <article class="work-card fade-up">
-            <div class="work-card-thumb">
-              <div>
-                <p>Demo</p>
-                <h4>LINE診断導線</h4>
-              </div>
-            </div>
-            <div class="work-card-body">
-              <p class="cat">チャットボット設計</p>
-              <p class="desc">希望条件を自然に取得し、不動産会社への送客までつなげる診断導線。</p>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="sec sec-alt">
-      <div class="container">
-        <p class="sec-tag">Merit</p>
-        <h2 class="sec-title">NAGA ROOMを使うメリット</h2>
-        <div class="benefits-grid">
-          <article class="benefit-card fade-up">
-            <p class="label">若年層</p>
-            <h3>若い世代に届く</h3>
-            <p>Instagramを日常的に見る20代〜30代に、住まい情報を届けられます。ポータル検索だけでは触れにくい層へのリーチが可能です。</p>
-          </article>
-          <article class="benefit-card fade-up">
-            <p class="label">制作</p>
-            <h3>投稿制作まで任せられる</h3>
-            <p>掲載用の投稿デザイン・コピーまで一括で対応。自社でSNS運用のノウハウがなくても、メディアとして発信を始められます。</p>
-          </article>
-          <article class="benefit-card fade-up">
-            <p class="label">導線</p>
-            <h3>LINE導線までまとめて整う</h3>
-            <p>InstagramからLINE登録、チャットボットでの条件ヒアリングまで一連の流れを設計。見込み客を無理なく獲得する仕組みをつくれます。</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="flow" class="sec sec-alt">
-      <div class="container">
-        <p class="sec-tag">Flow</p>
-        <h2 class="sec-title">導入の流れ</h2>
-        <p class="flow-lead">ご契約から運用開始まで一貫してサポート。貴社に合った設計で、無理なく始められます。</p>
-        <div class="flow-grid">
-          <div class="flow-card fade-up">
-            <div class="flow-card-num">1</div>
-            <p class="flow-step-title">ヒアリング</p>
-            <p class="flow-step-desc">課題・目標をお聞きします</p>
-          </div>
-          <div class="flow-card fade-up">
-            <div class="flow-card-num">2</div>
-            <p class="flow-step-title">戦略設計</p>
-            <p class="flow-step-desc">最適な導線を提案</p>
-          </div>
-          <div class="flow-card fade-up">
-            <div class="flow-card-num">3</div>
-            <p class="flow-step-title">SNS・LINE・LP制作</p>
-            <p class="flow-step-desc">掲載に必要なものを一式制作</p>
-          </div>
-          <div class="flow-card fade-up">
-            <div class="flow-card-num">4</div>
-            <p class="flow-step-title">公開・運用開始</p>
-            <p class="flow-step-desc">物件掲載スタート</p>
-          </div>
-          <div class="flow-card fade-up">
-            <div class="flow-card-num">5</div>
-            <p class="flow-step-title">改善提案</p>
-            <p class="flow-step-desc">効果を見ながら継続サポート</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="sec">
-      <div class="container" style="max-width: 48rem;">
-        <p class="sec-tag">FAQ</p>
-        <h2 class="sec-title">よくある質問</h2>
-        <div class="faq-list">
-          <details class="faq-item fade-up">
-            <summary>どんな不動産会社に向いていますか？</summary>
-            <p>若年層へのアプローチを強化したい会社、SNS集客を始めたい会社、ポータル以外の集客導線を作りたい会社に向いています。</p>
-          </details>
-          <details class="faq-item fade-up">
-            <summary>Instagram運用だけの相談もできますか？</summary>
-            <p>可能です。投稿設計、導線整理、プロフィール改善、LINE誘導まで含めてご提案できます。</p>
-          </details>
-          <details class="faq-item fade-up">
-            <summary>チャットボットやLINEはまだ未導入でも大丈夫ですか？</summary>
-            <p>問題ありません。導入前提で設計し、必要に応じて段階的に整備できるようにご提案します。</p>
-          </details>
-        </div>
-      </div>
-    </section>
-
-    <section class="sec sec-alt">
-      <div class="container">
-        <div class="profile-grid">
-          <div class="fade-up">
-            <p class="sec-tag">Profile</p>
-            <h2 class="sec-title">プロフィール</h2>
-            <p class="profile-text">
-              NAGA ROOMは、長崎で住まいを探す若い世代に向けて、見つけやすく、相談しやすく、行動しやすい導線をつくるための住まいメディアです。大通エージェンシーが培ってきた広告の知見を土台に、新聞折込とは異なるSNS起点の新しい集客モデルを設計しています。
-            </p>
-            <div class="profile-cards">
-              <div class="profile-mini-card">
-                <p class="label">スキル</p>
-                <p class="body">SNS設計 / LINE導線設計 / チャットボット設計 / LP制作 / 不動産広告設計</p>
-              </div>
-              <div class="profile-mini-card">
-                <p class="label">想い</p>
-                <p class="body">長崎で家探しをする人にとって、もっと自然で、もっと楽しい住まい探し体験をつくること。</p>
-              </div>
-            </div>
-          </div>
-          <div class="positioning-card fade-up">
-            <p class="sec-tag">Positioning</p>
-            <h4>検索型ではなく、提案型へ。</h4>
-            <div class="positioning-row">
-              <p class="small">一般的な不動産ポータル</p>
-              <p class="main">検索型</p>
-            </div>
-            <div class="positioning-row highlight">
-              <p class="small">NAGA ROOM</p>
-              <p class="main">SNSで惹きつける提案型</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="contact" class="sec">
-      <div class="container">
-        <p class="sec-tag">Contact</p>
-        <h2 class="sec-title">お問い合わせ</h2>
-        <p class="sec-lead">
-          長崎で若い世代向けの不動産集客を強化したい方へ。SNS運用、LINE導線、チャットボット、LP掲載までまとめてご相談いただけます。
-        </p>
-        <div class="contact-cta-wrap fade-up">
-          <a href="https://line.me/R/oaMessage/%40081nnswr/?%E7%9B%B8%E8%AB%87"
-             class="btn-line"
-             aria-label="LINEで相談"
-             target="_blank"
-             rel="noopener noreferrer">
-            LINEで気軽に相談
-          </a>
-        </div>
-        <div class="contact-grid">
-          <div class="contact-form-wrap fade-up">
-            <form class="contact-form" action="#" method="post">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label for="company">会社名</label>
-                  <input type="text" id="company" name="company" placeholder="株式会社〇〇">
-                </div>
-                <div class="form-group">
-                  <label for="name">ご担当者名</label>
-                  <input type="text" id="name" name="name" placeholder="山田 太郎">
-                </div>
-              </div>
-              <div class="form-grid">
-                <div class="form-group">
-                  <label for="email">メールアドレス</label>
-                  <input type="email" id="email" name="email" placeholder="example@nagaroom.jp" required>
-                </div>
-                <div class="form-group">
-                  <label for="tel">電話番号</label>
-                  <input type="tel" id="tel" name="tel" placeholder="095-000-0000">
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="message">ご相談内容</label>
-                <textarea id="message" name="message" placeholder="Instagram掲載、LINE導線、LP制作などご相談内容をご記入ください。" required></textarea>
-              </div>
-              <button type="submit" class="form-submit">送信する</button>
-            </form>
-          </div>
-          <div class="contact-sidebar fade-up">
-            <p class="tag">Info</p>
-            <p class="company">大通エージェンシー / NAGA ROOM</p>
-            <div class="info-block">
-              <p class="label">メール</p>
-              <p class="value">contact@nagaroom.jp</p>
-            </div>
-            <div class="info-block">
-              <p class="label">Instagram</p>
-              <p class="value">@nagaroom_official</p>
-            </div>
-            <div class="info-block">
-              <p class="label">LINE</p>
-              <p class="value">公式LINEでご相談受付中</p>
-            </div>
-            <div class="contact-monitor-note">
-              <strong>料金プラン</strong><br>
-              Basic 5,000円／月〜。LP制作費の別途・込みなど、ご希望に合わせてご案内します。
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="container">
-      <p>© 2026 大通エージェンシー / NAGA ROOM</p>
     </div>
+    <span class="lp-hero__scroll">Scroll</span>
+  </section>
+
+  <div class="lp-stats">
+    <div class="lp-stats__cell" data-reveal>
+      <div class="lp-stats__num">FREE</div>
+      <p class="lp-stats__label">4月〜6月は物件掲載無料<br>初期費用なしで参加いただけます</p>
+    </div>
+    <div class="lp-stats__cell" data-reveal>
+      <div class="lp-stats__num">4</div>
+      <p class="lp-stats__label">長崎・諫早・大村・佐世保<br>エリア特化の設計</p>
+    </div>
+    <div class="lp-stats__cell" data-reveal>
+      <div class="lp-stats__num">5</div>
+      <p class="lp-stats__label">SNS → LP → チャット → LINE → 反響<br>見つけてもらう導線を一体で</p>
+    </div>
+  </div>
+
+  <section class="lp-sec lp-sec--light" id="issues">
+    <div class="lp-sec__inner">
+      <div class="lp-sec__head" data-reveal>
+        <span class="lp-sec__num" aria-hidden="true">01</span>
+        <div class="lp-sec__meta">
+          <p class="lp-sec__en">Problems</p>
+          <h2 class="lp-sec__h">こんなお悩みはありませんか？</h2>
+          <p class="lp-sec__lead">ポータル掲載は欠かせません。一方で、一覧のなかでは魅力が伝わりきらない。若年層には検索フォームより会話やSNSのほうが入りやすい——そんな距離感に、チャットを核にした接点で応えます。</p>
+        </div>
+      </div>
+      <div class="lp-prob-hero" data-reveal style="background-image:url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80');" role="img" aria-label=""></div>
+      <div class="lp-prob-grid" data-reveal>
+        <div class="lp-prob">
+          <h4>条件検索だけでは届きにくい</h4>
+          <p>まだ言葉にできない希望に、項目入力だけでは刺さりにくい場面があります。</p>
+        </div>
+        <div class="lp-prob">
+          <h4>写真・見せ方で損している</h4>
+          <p>内見前の印象で差がつく時代。素材の質が反響に直結しやすいです。</p>
+        </div>
+        <div class="lp-prob">
+          <h4>若年層にリーチしづらい</h4>
+          <p>SNSやメッセージアプリに時間を使う層へ、ポータルだけでは足りないことも。</p>
+        </div>
+        <div class="lp-prob">
+          <h4>掲載で終わってしまう</h4>
+          <p>「探される」の手前から、接客の入り口まで設計したい。</p>
+        </div>
+      </div>
+      <p class="lp-prob-foot" data-reveal>これらの課題に、<strong>チャットボット検索型体験 × 長崎特化の導線</strong>で向き合います。</p>
+    </div>
+  </section>
+
+  <section class="lp-sec lp-sec--dark" id="mechanism">
+    <div class="lp-sec__inner">
+      <div class="lp-sec__head" data-reveal>
+        <span class="lp-sec__num">02</span>
+        <div class="lp-sec__meta">
+          <p class="lp-sec__en">Flow</p>
+          <h2 class="lp-sec__h">NAGA ROOM の仕組み</h2>
+          <p class="lp-sec__lead">単なる掲載ではなく、<strong>見つけてもらうまでの導線</strong>をひと続きで。チャットボット検索型の体験が中心にあります。</p>
+        </div>
+      </div>
+      <div class="lp-mech-grid" data-reveal>
+        <article class="lp-mech">
+          <div class="lp-mech__img" style="background-image:url('https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&q=80'); background-position:center 40%;"></div>
+          <div class="lp-mech__body">
+            <p class="lp-mech__step">STEP 01</p>
+            <h3 class="lp-mech__title">SNS</h3>
+            <p class="lp-mech__desc">興味のきっかけをつくり、LPへ誘導。</p>
+          </div>
+        </article>
+        <article class="lp-mech">
+          <div class="lp-mech__img" style="background-image:url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'); background-position:center 45%;"></div>
+          <div class="lp-mech__body">
+            <p class="lp-mech__step">STEP 02</p>
+            <h3 class="lp-mech__title">LP</h3>
+            <p class="lp-mech__desc">物件の空気感を丁寧に見せる。</p>
+          </div>
+        </article>
+        <article class="lp-mech">
+          <div class="lp-mech__img" style="background-image:url('https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?w=600&q=80'); background-position:center 42%;"></div>
+          <div class="lp-mech__body">
+            <p class="lp-mech__step">STEP 03</p>
+            <h3 class="lp-mech__title">チャットボット検索</h3>
+            <p class="lp-mech__desc">会話で希望を整理し物件へ。</p>
+          </div>
+        </article>
+        <article class="lp-mech">
+          <div class="lp-mech__img" style="background-image:url('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&q=80'); background-position:center 45%;"></div>
+          <div class="lp-mech__body">
+            <p class="lp-mech__step">STEP 04</p>
+            <h3 class="lp-mech__title">LINE</h3>
+            <p class="lp-mech__desc">相談・深掘り、貴社への接点へ。</p>
+          </div>
+        </article>
+        <article class="lp-mech">
+          <div class="lp-mech__img" style="background-image:url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80'); background-position:center 40%;"></div>
+          <div class="lp-mech__body">
+            <p class="lp-mech__step">STEP 05</p>
+            <h3 class="lp-mech__title">反響</h3>
+            <p class="lp-mech__desc">対話のなかで見えた物件として。</p>
+          </div>
+        </article>
+      </div>
+      <div class="lp-mech-banner" data-reveal>
+        <p class="lp-mech-banner__en">Core</p>
+        <h3>チャットボット検索型体験が、差別化の芯</h3>
+        <p>キーワードを並べるのではなく、会話を通じて希望に近づく。掲載が「待ち」だけでなく、接客の入り口として働きやすくなります。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="lp-sec lp-sec--black" id="chat-experience">
+    <div class="lp-chat">
+      <div class="lp-chat__visual" style="background-image:url('https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80'); background-position:center 35%;" role="img" aria-label="スマホでメッセージをやりとりするイメージ"></div>
+      <div class="lp-chat__content">
+        <p class="lp-chat__mega" data-reveal>Chat Search</p>
+        <h2 class="lp-chat__h" data-reveal>チャットボット検索型体験</h2>
+        <p class="lp-chat__lead" data-reveal>NAGA ROOM の最大の特徴です。条件の羅列ではなく、<strong>対話のなかで物件に出会う</strong>。若年層にとって検索より入りやすく、LINE や LP との相性も良い設計です。</p>
+        <div class="lp-chat-ui" data-reveal>
+          <div class="lp-chat-ui__bar">Conversation preview</div>
+          <div class="lp-chat-ui__body">
+            <div class="lp-chat-b">落ち着いた雰囲気で、駅から近いと嬉しいです。</div>
+            <div class="lp-chat-b lp-chat-b--user">家賃は5万円前後で考えています</div>
+            <div class="lp-chat-b">ありがとうございます。近い条件のお部屋をご提案しますね。</div>
+          </div>
+        </div>
+        <table class="lp-compare" data-reveal>
+          <tbody>
+            <tr><th>一般的な条件検索</th><td>項目入力 → 一覧。言語化しづらい希望は伝わりにくい。</td></tr>
+            <tr><th>チャットボット検索型</th><td>会話で整理 → 合いそうな物件へ。雰囲気や暮らし方にも寄り添える。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="lp-sec lp-sec--dark">
+    <div class="lp-sec__inner">
+      <div class="lp-sec__head" data-reveal>
+        <span class="lp-sec__num">03</span>
+        <div class="lp-sec__meta">
+          <p class="lp-sec__en">Strengths</p>
+          <h2 class="lp-sec__h">提供できる価値</h2>
+          <p class="lp-sec__lead">長崎エリアに寄せた設計と、若年層に寄り添う見せ方。チャット体験を軸に、SNS・LINE・LP が連なります。</p>
+        </div>
+      </div>
+      <div class="lp-feat-grid">
+        <article class="lp-feat" data-reveal>
+          <div class="lp-feat__bg" style="background-image:url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80'); background-position:center 35%;"></div>
+          <div class="lp-feat__overlay"></div>
+          <div class="lp-feat__body">
+            <p class="lp-feat__en">Youth</p>
+            <h3>若年層へのアプローチ</h3>
+            <p>検索より会話やSNSに馴染みやすい導線で、最初の一歩を軽くします。</p>
+          </div>
+        </article>
+        <article class="lp-feat" data-reveal>
+          <div class="lp-feat__bg" style="background-image:url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80'); background-position:center 60%;"></div>
+          <div class="lp-feat__overlay"></div>
+          <div class="lp-feat__body">
+            <p class="lp-feat__en">Local</p>
+            <h3>長崎エリア特化</h3>
+            <p>長崎市・諫早市・大村市・佐世保市を想定した展開です。</p>
+          </div>
+        </article>
+        <article class="lp-feat" data-reveal>
+          <div class="lp-feat__bg" style="background-image:url('https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80'); background-position:center 45%;"></div>
+          <div class="lp-feat__overlay"></div>
+          <div class="lp-feat__body">
+            <p class="lp-feat__en">Landing</p>
+            <h3>LP で魅力を伝える</h3>
+            <p>物件ごとに暮らしのイメージを丁寧に見せられます。</p>
+          </div>
+        </article>
+        <article class="lp-feat" data-reveal>
+          <div class="lp-feat__bg" style="background-image:url('https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80'); background-position:center 50%;"></div>
+          <div class="lp-feat__overlay"></div>
+          <div class="lp-feat__body">
+            <p class="lp-feat__en">Social</p>
+            <h3>SNS と相性の良い素材</h3>
+            <p>Instagram 等での発信と連動しやすい見せ方を意識しています。</p>
+          </div>
+        </article>
+        <article class="lp-feat" data-reveal>
+          <div class="lp-feat__bg" style="background-image:url('https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?w=800&q=80'); background-position:center 40%;"></div>
+          <div class="lp-feat__overlay"></div>
+          <div class="lp-feat__body">
+            <p class="lp-feat__en">Line</p>
+            <h3>LINE 導線</h3>
+            <p>相談への橋渡し。若い世代との接点をつくりやすくします。</p>
+          </div>
+        </article>
+        <article class="lp-feat" data-reveal>
+          <div class="lp-feat__bg" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80'); background-position:center 45%;"></div>
+          <div class="lp-feat__overlay"></div>
+          <div class="lp-feat__body">
+            <p class="lp-feat__en">Visual</p>
+            <h3>写真・空気感</h3>
+            <p>視覚で差がつく掲載。撮影オプションでさらに引き上げ可能です。</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="lp-sec lp-sec--light" id="pricing">
+    <div class="lp-sec__inner">
+      <div class="lp-sec__head" data-reveal>
+        <span class="lp-sec__num">04</span>
+        <div class="lp-sec__meta">
+          <p class="lp-sec__en">Plans</p>
+          <h2 class="lp-sec__h">料金プラン</h2>
+          <p class="lp-sec__lead">掲載の入り方に合わせて選べる三段階。スタンダードが主力プランです。</p>
+        </div>
+      </div>
+      <div class="lp-price-banner" data-reveal>
+        <p class="lp-price-banner__en">Campaign</p>
+        <h3>4月〜6月は、無料で物件掲載いただけます</h3>
+        <p>掲載数を増やし、サービス内の物件量と見せ方を整える期間です。不動産会社様にとっては、初期費用なしで掲載を始められるタイミングです。</p>
+      </div>
+      <p class="lp-sec__lead" style="margin-bottom:1.5rem;font-weight:600;color:#1a1a1a;" data-reveal><strong>7月から</strong>、以下の有料プランが開始します。</p>
+      <div class="lp-plans" data-reveal>
+        <article class="lp-plan">
+          <h4>ライト</h4>
+          <p class="lp-plan__price">月額 1,000円〜2,000円<small>1物件あたり（税込表記は別途ご案内）</small></p>
+          <ul>
+            <li>通常掲載</li>
+            <li>まず掲載を始めたい会社様向けの入口プラン</li>
+          </ul>
+        </article>
+        <article class="lp-plan lp-plan--hit">
+          <span class="lp-plan__badge">主力プラン</span>
+          <h4>スタンダード</h4>
+          <p class="lp-plan__price">月額 5,000円<small>1物件あたり（税込表記は別途ご案内）</small></p>
+          <ul>
+            <li>優先表示</li>
+            <li>LINE 提案で優先的に紹介</li>
+            <li>SNS 露出の対象</li>
+          </ul>
+        </article>
+        <article class="lp-plan">
+          <h4>プレミアム</h4>
+          <p class="lp-plan__price">月額 10,000円<small>1物件あたり（税込表記は別途ご案内）</small></p>
+          <ul>
+            <li>上位固定表示</li>
+            <li>特集掲載</li>
+            <li>強い露出を取りたい会社様向け</li>
+          </ul>
+        </article>
+      </div>
+      <p class="lp-price-note" data-reveal>※ 表示順・露出の詳細条件は、開始前にご案内いたします。※ 価格は税抜／税込など、契約時に明確化します。</p>
+    </div>
+  </section>
+
+  <section class="lp-sec lp-sec--black" id="photo" style="padding:0;">
+    <div class="lp-photo-split">
+      <div class="lp-photo-split__img" style="background-image:url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=1200&q=80'); background-position:center 40%;" data-reveal role="img" aria-label="一眼レフで撮影するイメージ"></div>
+      <div class="lp-photo-split__body" data-reveal>
+        <p class="lp-photo-split__en">Option</p>
+        <h3>撮影オプション</h3>
+        <p class="lp-photo-split__price">30,000円<span> / 1件</span></p>
+        <ul>
+          <li>一眼レフによる撮影</li>
+          <li>LP に掲載できるきれいな素材</li>
+          <li>SNS 発信にもそのまま活用しやすい</li>
+          <li>他物件との差別化に効きます</li>
+        </ul>
+        <p class="lp-photo-split__note">単なる撮影代行ではなく、<strong>反響を強くするための素材づくり</strong>として位置づけています。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="lp-sec lp-sec--light">
+    <div class="lp-sec__inner">
+      <div class="lp-sec__head" data-reveal>
+        <span class="lp-sec__num">05</span>
+        <div class="lp-sec__meta">
+          <p class="lp-sec__en">Process</p>
+          <h2 class="lp-sec__h">導入の流れ</h2>
+          <p class="lp-sec__lead">お問い合わせから掲載開始まで、シンプルに進められます。</p>
+        </div>
+      </div>
+      <div class="lp-flow" data-reveal>
+        <div class="lp-flow__step">
+          <span class="lp-flow__num">01</span>
+          <h4>お問い合わせ</h4>
+          <p>フォームまたはお電話でご連絡ください。</p>
+        </div>
+        <div class="lp-flow__step">
+          <span class="lp-flow__num">02</span>
+          <h4>掲載相談</h4>
+          <p>プランや露出のイメージをすり合わせます。</p>
+        </div>
+        <div class="lp-flow__step">
+          <span class="lp-flow__num">03</span>
+          <h4>物件情報の共有</h4>
+          <p>写真・文案など、ご提供形式に合わせて進行します。</p>
+        </div>
+        <div class="lp-flow__step">
+          <span class="lp-flow__num">04</span>
+          <h4>掲載開始</h4>
+          <p>4〜6月は無料掲載期間内に順次公開します。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lp-contact" id="contact">
+    <div class="lp-contact__inner">
+      <h2 class="lp-contact__en" data-reveal>Contact</h2>
+      <p class="lp-contact__sub" data-reveal>まずは無料掲載期間について、お気軽にご相談ください。仕組みやプランはヒアリングのうえでご説明します。</p>
+      <form class="lp-form" id="lp-lead-form" data-lead-form novalidate data-reveal>
+        <div class="lp-form__field">
+          <label for="co">会社名</label>
+          <input type="text" id="co" name="company" autocomplete="organization" placeholder="株式会社○○不動産">
+        </div>
+        <div class="lp-form__field">
+          <label for="em">メールアドレス *</label>
+          <input type="email" id="em" name="email" autocomplete="email" required placeholder="contact@example.com">
+        </div>
+        <div class="lp-form__field">
+          <label for="msg">ご用件</label>
+          <textarea id="msg" name="message" placeholder="掲載希望の物件概要やご質問など"></textarea>
+        </div>
+        <button type="submit" class="lp-form__submit">掲載相談を送信</button>
+        <p class="lp-form__err" role="alert">メールアドレスを入力してください。</p>
+        <p class="lp-form__hint">送信でメールアプリが開き、受付先 <code>youtaidajin4@gmail.com</code> 宛の下書きが作成されます。</p>
+      </form>
+    </div>
+  </section>
+
+  <footer class="lp-footer">
+    <p>お問い合わせ内容は掲載相談・ご返信のために利用し、目的外では利用いたしません。</p>
+    <p style="margin-top:0.75rem;">© NAGA ROOM · Nagasaki rental media for partners</p>
+    <p style="margin-top:0.5rem;"><a href="rental.html">ユーザー向け体験（デモ）</a></p>
   </footer>
 
-  <!-- Dify チャットボット（デモ） -->
   <script>
-    window.difyChatbotConfig = {
-      token: '7k6lrRG6adicH9qD',
-      inputs: {},
-      systemVariables: {},
-      userVariables: {},
-    };
+    (function () {
+      var LEAD_MAILTO = 'youtaidajin4@gmail.com';
+      var header = document.getElementById('lp-header');
+
+      window.addEventListener('scroll', function () {
+        if (!header) return;
+        header.classList.toggle('is-solid', window.scrollY > 48);
+      }, { passive: true });
+
+      document.querySelectorAll('[data-scroll]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          var id = el.getAttribute('data-scroll');
+          var t = id ? document.getElementById(id) : null;
+          if (t) {
+            e.preventDefault();
+            t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+
+      var io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) {
+              en.target.classList.add('is-inview');
+              io.unobserve(en.target);
+            }
+          });
+        },
+        { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
+      );
+      document.querySelectorAll('[data-reveal]').forEach(function (el) {
+        io.observe(el);
+      });
+
+      var form = document.getElementById('lp-lead-form');
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          form.classList.remove('is-error');
+          var fd = new FormData(form);
+          var company = String(fd.get('company') || '').trim();
+          var email = String(fd.get('email') || '').trim();
+          var message = String(fd.get('message') || '').trim();
+          if (!email) {
+            form.classList.add('is-error');
+            return;
+          }
+          var body =
+            '【NAGA ROOM 掲載相談】\n\n会社名: ' +
+            (company || '（未入力）') +
+            '\nメール: ' +
+            email +
+            '\n\nご用件:\n' +
+            (message || '（未入力）');
+          window.location.href =
+            'mailto:' +
+            LEAD_MAILTO +
+            '?subject=' +
+            encodeURIComponent('NAGA ROOM 掲載相談') +
+            '&body=' +
+            encodeURIComponent(body);
+        });
+      }
+    })();
   </script>
-  <script
-    src="https://udify.app/embed.min.js"
-    id="7k6lrRG6adicH9qD"
-    defer>
-  </script>
-  <style>
-    /* チャット全体をビューポートに固定：スクロールしても常に同じ位置に表示 */
-    [id^="dify-chatbot-"][id$="-container"],
-    .dify-chatbot-bubble-container {
-      position: fixed !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      left: auto !important;
-      top: auto !important;
-      z-index: 99999 !important;
-    }
-    /* バブルボタン：LPの水色アクセント */
-    #dify-chatbot-bubble-button {
-      background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 100%) !important;
-      width: 56px !important;
-      height: 56px !important;
-      border-radius: 50% !important;
-      box-shadow: 0 4px 20px rgba(103, 232, 249, 0.45), 0 2px 8px rgba(0, 0, 0, 0.08) !important;
-      border: 2px solid rgba(255, 255, 255, 0.9) !important;
-      transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-    }
-    #dify-chatbot-bubble-button:hover {
-      transform: scale(1.08) !important;
-      box-shadow: 0 8px 28px rgba(103, 232, 249, 0.5), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-    }
-    /* チャットウィンドウ：固定＋LP世界観（白基調・水色アクセント） */
-    #dify-chatbot-bubble-window {
-      position: fixed !important;
-      right: 1rem !important;
-      bottom: 5.5rem !important;
-      left: auto !important;
-      top: auto !important;
-      width: 32rem !important;
-      max-width: calc(100vw - 2rem) !important;
-      height: 48rem !important;
-      max-height: calc(100vh - 6rem) !important;
-      border-radius: 1.5rem !important;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(103, 232, 249, 0.25) !important;
-      overflow: hidden !important;
-      background: #fff !important;
-      border: 1px solid rgba(103, 232, 249, 0.3) !important;
-    }
-    /* ウィンドウ内のヘッダー風エリア（udifyが付与するクラスがあれば効く） */
-    #dify-chatbot-bubble-window iframe {
-      border-radius: 0 0 1.5rem 1.5rem !important;
-    }
-  </style>
 </body>
 </html>
