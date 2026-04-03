@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="NAGA ROOM — 長崎エリアの不動産会社向け賃貸集客。チャットボット検索型体験・SNS・LP・LINE。4〜6月無料掲載。">
+  <meta name="description" content="NAGA ROOM — 探すより、話して見つかる部屋探し。長崎エリアの不動産会社向け。チャットボット検索型体験で若年層に届く。4〜6月無料掲載。">
   <title>NAGA ROOM | For Real Estate Partners</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,6 +21,8 @@
       --max: 1200px;
       --font-en: "Syne", system-ui, sans-serif;
       --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --mist: rgba(184, 214, 235, 0.14);
+      --mist-strong: rgba(140, 180, 210, 0.22);
     }
     html { scroll-behavior: smooth; }
     body {
@@ -104,8 +106,8 @@
       min-height: 100vh;
       min-height: 100dvh;
       display: flex;
-      align-items: flex-end;
-      padding: 8rem 1.5rem 4rem;
+      align-items: center;
+      padding: 6.5rem 1.5rem 3.5rem;
       overflow: hidden;
     }
     .lp-hero__bg {
@@ -123,7 +125,7 @@
     .lp-hero__overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(105deg, rgba(13,21,38,0.92) 0%, rgba(13,21,38,0.55) 45%, rgba(13,21,38,0.35) 100%);
+      background: linear-gradient(120deg, rgba(13,21,38,0.94) 0%, rgba(13,21,38,0.72) 42%, rgba(13,21,38,0.45) 100%);
     }
     .lp-hero__grain {
       position: absolute;
@@ -139,6 +141,32 @@
       margin: 0 auto;
       width: 100%;
     }
+    .lp-hero__layout {
+      display: grid;
+      gap: 2.75rem;
+      align-items: center;
+    }
+    @media (min-width: 960px) {
+      .lp-hero__layout { grid-template-columns: 1.05fr 0.95fr; gap: 3.5rem; }
+    }
+    .lp-hero__copy { max-width: 34rem; }
+    .lp-hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-en);
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(200, 230, 250, 0.95);
+      border: 1px solid var(--mist-strong);
+      background: var(--mist);
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      margin: 0 0 1.35rem;
+    }
+    .lp-hero__badge span { color: var(--accent); letter-spacing: 0.12em; }
     .lp-hero__en {
       font-family: var(--font-en);
       font-size: clamp(0.8125rem, 2.5vw, 1rem);
@@ -146,28 +174,147 @@
       letter-spacing: 0.28em;
       text-transform: uppercase;
       color: var(--accent);
-      margin: 0 0 1.25rem;
+      margin: 0 0 1rem;
     }
     .lp-hero__title {
-      font-size: clamp(1.85rem, 5.5vw, 3.25rem);
+      font-size: clamp(1.95rem, 5.2vw, 3.15rem);
       font-weight: 700;
-      line-height: 1.2;
+      line-height: 1.18;
       letter-spacing: 0.02em;
       color: var(--white);
-      margin: 0 0 1.5rem;
-      max-width: 16em;
+      margin: 0 0 1.15rem;
     }
     .lp-hero__lead {
-      font-size: clamp(0.9375rem, 1.8vw, 1.0625rem);
-      color: rgba(250,250,250,0.72);
-      max-width: 36rem;
-      margin: 0 0 2.25rem;
-      line-height: 1.85;
+      font-size: clamp(1rem, 1.9vw, 1.125rem);
+      color: rgba(250,250,250,0.78);
+      max-width: 32rem;
+      margin: 0 0 1.85rem;
+      line-height: 1.75;
+      font-weight: 500;
+    }
+    .lp-hero__lead-sub {
+      display: block;
+      margin-top: 0.5rem;
+      color: rgba(250,250,250,0.52);
+      font-size: 0.92em;
+      font-weight: 400;
     }
     .lp-hero__cta {
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.85rem;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    @media (min-width: 520px) {
+      .lp-hero__cta { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.85rem; }
+    }
+    .lp-hero__cta-note {
+      font-size: 0.75rem;
+      color: rgba(250,250,250,0.45);
+      width: 100%;
+      margin: 0.35rem 0 0;
+      letter-spacing: 0.02em;
+    }
+    .lp-hero-phone {
+      position: relative;
+      justify-self: center;
+      width: 100%;
+      max-width: 340px;
+    }
+    .lp-hero-phone__frame {
+      border-radius: 40px;
+      padding: 11px;
+      background: linear-gradient(160deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 50%, rgba(184,214,235,0.08) 100%);
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow:
+        0 50px 100px rgba(0,0,0,0.45),
+        0 0 0 1px rgba(184,214,235,0.12) inset;
+    }
+    .lp-hero-phone__screen {
+      border-radius: 32px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #121a28 0%, #0d1526 100%);
+      padding: 1rem 1rem 1.25rem;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+    .lp-hero-phone__status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.5625rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 1rem;
+      padding: 0 0.15rem;
+    }
+    .lp-hero-phone__dots { letter-spacing: 0.2em; color: rgba(250,250,250,0.35); }
+    .lp-chat-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      flex: 1;
+    }
+    .lp-bubble {
+      font-size: 0.8125rem;
+      line-height: 1.55;
+      padding: 0.65rem 0.85rem;
+      border-radius: 14px;
+      max-width: 94%;
+      animation: bubbleIn 0.7s var(--ease-out) both;
+    }
+    .lp-bubble:nth-child(1) { animation-delay: 0.05s; }
+    .lp-bubble:nth-child(2) { animation-delay: 0.2s; }
+    .lp-bubble:nth-child(3) { animation-delay: 0.35s; }
+    .lp-bubble:nth-child(4) { animation-delay: 0.5s; }
+    @keyframes bubbleIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+    .lp-bubble--user {
+      align-self: flex-end;
+      background: rgba(201, 169, 98, 0.22);
+      border: 1px solid rgba(201, 169, 98, 0.35);
+      color: rgba(250,250,250,0.95);
+    }
+    .lp-bubble--ai {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(250,250,250,0.9);
+    }
+    .lp-bubble__who {
+      display: block;
+      font-size: 0.5625rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(184,214,235,0.85);
+      margin-bottom: 0.35rem;
+      font-family: var(--font-en);
+    }
+    .lp-mini-card {
+      margin-top: 0.35rem;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.25);
+    }
+    .lp-mini-card__img {
+      height: 88px;
+      background-size: cover;
+      background-position: center;
+    }
+    .lp-mini-card__meta {
+      padding: 0.55rem 0.65rem;
+      font-size: 0.6875rem;
+      color: rgba(250,250,250,0.75);
+    }
+    .lp-mini-card__meta strong {
+      display: block;
+      color: var(--white);
+      font-size: 0.75rem;
+      margin-bottom: 0.15rem;
     }
     .lp-btn {
       display: inline-flex;
@@ -247,6 +394,258 @@
       color: var(--gray);
       line-height: 1.55;
     }
+
+    /* —— Compare flow (従来 vs NAGA) —— */
+    .lp-compare-flow {
+      padding: clamp(3.5rem, 8vw, 5rem) 1.5rem;
+      background: var(--black-soft);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .lp-compare-flow__inner {
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+    .lp-compare-flow__head {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .lp-compare-flow__head .lp-sec__en { margin-bottom: 0.5rem; }
+    .lp-compare-flow__title {
+      font-size: clamp(1.35rem, 3vw, 1.75rem);
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+    .lp-compare-flow__grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+    @media (min-width: 768px) {
+      .lp-compare-flow__grid { grid-template-columns: 1fr 1fr; gap: 2rem; align-items: stretch; }
+    }
+    .lp-compare-col {
+      border-radius: 12px;
+      padding: 1.75rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .lp-compare-col--old {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .lp-compare-col--new {
+      background: linear-gradient(145deg, rgba(184,214,235,0.08) 0%, rgba(13,21,38,0.9) 45%);
+      border: 1px solid rgba(201, 169, 98, 0.35);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+    }
+    .lp-compare-col__label {
+      font-family: var(--font-en);
+      font-size: 0.625rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin: 0 0 1rem;
+    }
+    .lp-compare-col--new .lp-compare-col__label { color: var(--accent); }
+    .lp-compare-col__chain {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.35rem;
+      font-size: clamp(0.9375rem, 2vw, 1.0625rem);
+      font-weight: 600;
+      line-height: 1.5;
+      color: rgba(250,250,250,0.88);
+    }
+    .lp-compare-col--old .lp-compare-col__chain { color: rgba(250,250,250,0.55); }
+    .lp-compare-col__arrow {
+      font-family: var(--font-en);
+      font-size: 0.75rem;
+      color: rgba(250,250,250,0.25);
+      padding: 0 0.15rem;
+    }
+    .lp-compare-col__foot {
+      margin: 1.25rem 0 0;
+      font-size: 0.8125rem;
+      color: rgba(250,250,250,0.45);
+      line-height: 1.6;
+    }
+    .lp-compare-col--new .lp-compare-col__foot { color: rgba(250,250,250,0.6); }
+
+    /* —— Chat showcase (主役) —— */
+    .lp-chat-showcase {
+      position: relative;
+      padding: clamp(4rem, 10vw, 6.5rem) 1.5rem;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, var(--mist) 0%, transparent 55%),
+        var(--black);
+      border-top: 1px solid var(--line);
+    }
+    .lp-chat-showcase__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .lp-chat-showcase__head {
+      text-align: center;
+      margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+    }
+    .lp-chat-showcase__kicker {
+      font-family: var(--font-en);
+      font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+      font-weight: 700;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: rgba(184,214,235,0.95);
+      margin: 0 0 1rem;
+    }
+    .lp-chat-showcase__title {
+      font-size: clamp(1.85rem, 4.5vw, 2.65rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 0 0 0.85rem;
+      letter-spacing: 0.02em;
+    }
+    .lp-chat-showcase__tag {
+      font-size: clamp(1rem, 2.2vw, 1.125rem);
+      color: rgba(250,250,250,0.62);
+      margin: 0 auto;
+      max-width: 28rem;
+      line-height: 1.65;
+      font-weight: 500;
+    }
+    .lp-chat-showcase__demo {
+      display: grid;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (min-width: 900px) {
+      .lp-chat-showcase__demo { grid-template-columns: 1.15fr 0.85fr; gap: 2.5rem; align-items: center; }
+    }
+    .lp-phone-xl {
+      position: relative;
+      max-width: 400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .lp-phone-xl .lp-hero-phone__frame { border-radius: 44px; }
+    .lp-phone-xl .lp-hero-phone__screen { min-height: 460px; }
+    .lp-chat-showcase__aside {
+      padding: 0.5rem 0;
+    }
+    .lp-chat-showcase__aside h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0 0 1rem;
+      letter-spacing: 0.02em;
+    }
+    .lp-chat-showcase__list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .lp-chat-showcase__list li {
+      position: relative;
+      padding-left: 1.1rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.875rem;
+      color: rgba(250,250,250,0.58);
+      line-height: 1.55;
+    }
+    .lp-chat-showcase__list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .lp-chat-showcase__cta {
+      margin-top: 1.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    /* —— Photo before / after —— */
+    .lp-ba {
+      padding-bottom: clamp(3rem, 8vw, 5rem);
+    }
+    .lp-ba__head {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      max-width: 36rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .lp-ba__head h2 { margin-bottom: 0.65rem; }
+    .lp-ba__lead {
+      font-size: clamp(1.15rem, 2.5vw, 1.45rem);
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0 0 0.5rem;
+      line-height: 1.4;
+    }
+    .lp-ba__sub {
+      font-size: 0.875rem;
+      color: #555;
+      margin: 0;
+      line-height: 1.65;
+    }
+    .lp-ba__grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .lp-ba__grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+    }
+    .lp-ba-card {
+      border: 1px solid var(--line-dark);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--white);
+    }
+    .lp-ba-card--after {
+      border-color: rgba(201, 169, 98, 0.45);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.06);
+    }
+    .lp-ba-card__label {
+      display: block;
+      font-family: var(--font-en);
+      font-size: 0.5625rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 0.65rem 1rem;
+      background: #f0f2f5;
+      color: #666;
+      border-bottom: 1px solid var(--line-dark);
+    }
+    .lp-ba-card--after .lp-ba-card__label {
+      background: rgba(201, 169, 98, 0.12);
+      color: #6a5a2a;
+      border-bottom-color: rgba(201, 169, 98, 0.25);
+    }
+    .lp-ba-card__img {
+      aspect-ratio: 16/10;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.85);
+    }
+    .lp-ba-card--after .lp-ba-card__img { filter: none; }
+    .lp-ba-card__body {
+      padding: 1rem 1.1rem 1.25rem;
+    }
+    .lp-ba-card__body p {
+      margin: 0;
+      font-size: 0.8125rem;
+      color: #555;
+      line-height: 1.6;
+    }
+    .lp-ba-card__body strong { color: #1a1a1a; }
 
     /* —— Section shell —— */
     .lp-sec {
@@ -352,15 +751,6 @@
       text-align: center;
       color: #333;
     }
-    .lp-prob-hero {
-      height: min(32vw, 200px);
-      border-radius: 8px;
-      margin-bottom: 1.75rem;
-      background-size: cover;
-      background-position: center 42%;
-      border: 1px solid var(--line-dark);
-    }
-
     /* —— Mechanism cards + photo —— */
     .lp-mech-grid {
       display: grid;
@@ -434,106 +824,6 @@
       margin-right: auto;
       line-height: 1.75;
     }
-
-    /* —— Chat section (split + EN) —— */
-    .lp-chat {
-      display: grid;
-      gap: 0;
-    }
-    @media (min-width: 960px) {
-      .lp-chat { grid-template-columns: 1fr 1fr; min-height: 520px; }
-    }
-    .lp-chat__visual {
-      position: relative;
-      min-height: 280px;
-      background-size: cover;
-      background-position: center;
-    }
-    .lp-chat__visual::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, transparent 50%, rgba(13,21,38,0.68) 100%);
-    }
-    .lp-chat__content {
-      padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      background: var(--black);
-      border-top: 1px solid var(--line);
-    }
-    @media (min-width: 960px) {
-      .lp-chat__content { border-top: none; border-left: 1px solid var(--line); }
-    }
-    .lp-chat__mega {
-      font-family: var(--font-en);
-      font-size: clamp(2.5rem, 8vw, 4.5rem);
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -0.02em;
-      color: rgba(255,255,255,0.12);
-      margin: 0 0 1rem;
-    }
-    .lp-chat__h {
-      font-size: clamp(1.35rem, 3vw, 1.75rem);
-      font-weight: 700;
-      margin: 0 0 1rem;
-    }
-    .lp-chat__lead {
-      font-size: 0.9375rem;
-      color: rgba(250,250,250,0.68);
-      line-height: 1.85;
-      margin: 0 0 1.5rem;
-      max-width: 28rem;
-    }
-    .lp-chat-ui {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      overflow: hidden;
-      max-width: 380px;
-      background: var(--black-soft);
-    }
-    .lp-chat-ui__bar {
-      padding: 0.65rem 1rem;
-      font-size: 0.6875rem;
-      color: var(--gray);
-      border-bottom: 1px solid var(--line);
-    }
-    .lp-chat-ui__body { padding: 1rem; }
-    .lp-chat-b {
-      font-size: 0.75rem;
-      padding: 0.55rem 0.75rem;
-      border-radius: 10px;
-      margin-bottom: 0.5rem;
-      max-width: 92%;
-      background: rgba(255,255,255,0.06);
-      color: rgba(250,250,250,0.88);
-    }
-    .lp-chat-b--user {
-      margin-left: auto;
-      background: rgba(201, 169, 98, 0.2);
-      border: 1px solid rgba(201, 169, 98, 0.25);
-    }
-    .lp-compare {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.8125rem;
-      margin-top: 1.5rem;
-    }
-    .lp-compare th,
-    .lp-compare td {
-      padding: 0.75rem 0;
-      text-align: left;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
-    }
-    .lp-compare th {
-      width: 38%;
-      font-weight: 700;
-      color: var(--white);
-    }
-    .lp-compare td { color: var(--gray); }
 
     /* —— Feature grid photos —— */
     .lp-feat-grid {
@@ -691,82 +981,32 @@
       line-height: 1.65;
     }
 
-    /* —— Photo option full bleed —— */
-    .lp-photo-split {
-      display: grid;
+    .lp-ba-price {
+      margin-top: 2rem;
+      padding: 1.5rem 1.25rem;
+      border-radius: 12px;
+      border: 1px solid var(--line-dark);
+      background: #fafafa;
+      text-align: center;
     }
-    @media (min-width: 900px) {
-      .lp-photo-split { grid-template-columns: 1.1fr 0.9fr; min-height: 480px; }
-    }
-    .lp-photo-split__img {
-      min-height: 280px;
-      background-size: cover;
-      background-position: center;
-    }
-    .lp-photo-split__body {
-      padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      background: var(--black-soft);
-      border-top: 1px solid var(--line);
-    }
-    @media (min-width: 900px) {
-      .lp-photo-split__body { border-top: none; border-left: 1px solid var(--line); }
-    }
-    .lp-photo-split__en {
+    .lp-ba-price__num {
       font-family: var(--font-en);
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-size: 1.75rem;
       font-weight: 800;
-      color: rgba(255,255,255,0.1);
-      line-height: 1;
-      margin-bottom: 0.5rem;
+      color: #1a1a1a;
+      margin: 0 0 0.35rem;
     }
-    .lp-photo-split h3 {
-      font-size: 1.35rem;
-      font-weight: 700;
-      margin: 0 0 0.5rem;
-    }
-    .lp-photo-split__price {
-      font-family: var(--font-en);
-      font-size: 2.25rem;
-      font-weight: 800;
-      color: var(--white);
-      margin: 0 0 1rem;
-    }
-    .lp-photo-split__price span {
+    .lp-ba-price__num span {
       font-family: "Noto Sans JP", sans-serif;
       font-size: 0.875rem;
       font-weight: 600;
-      color: var(--gray);
+      color: #666;
     }
-    .lp-photo-split ul {
-      margin: 0 0 1rem;
-      padding: 0;
-      list-style: none;
-    }
-    .lp-photo-split li {
-      font-size: 0.875rem;
-      color: rgba(250,250,250,0.7);
-      padding: 0.35rem 0;
-      padding-left: 1.1rem;
-      position: relative;
-    }
-    .lp-photo-split li::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0.85em;
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-    .lp-photo-split__note {
-      font-size: 0.875rem;
-      color: rgba(250,250,250,0.72);
-      line-height: 1.75;
+    .lp-ba-price p {
       margin: 0;
+      font-size: 0.8125rem;
+      color: #666;
+      line-height: 1.55;
     }
 
     /* —— Flow —— */
@@ -817,7 +1057,7 @@
     }
     .lp-contact__en {
       font-family: var(--font-en);
-      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-size: clamp(2.35rem, 6vw, 3.5rem);
       font-weight: 800;
       text-align: center;
       color: rgba(255,255,255,0.9);
@@ -896,6 +1136,37 @@
     }
     .lp-form__hint code { font-size: 0.7rem; }
 
+    .lp-cta-bar {
+      padding: 2.25rem 1.5rem;
+      background: linear-gradient(90deg, rgba(184,214,235,0.1) 0%, rgba(13,21,38,0.95) 50%, rgba(184,214,235,0.08) 100%);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .lp-cta-bar__inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      text-align: center;
+    }
+    @media (min-width: 640px) {
+      .lp-cta-bar__inner {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+      }
+    }
+    .lp-cta-bar__inner p {
+      margin: 0;
+      font-size: clamp(1rem, 2vw, 1.125rem);
+      font-weight: 600;
+      color: rgba(250,250,250,0.88);
+      max-width: 28rem;
+      line-height: 1.5;
+    }
+
     .lp-footer {
       padding: 2rem 1.5rem 2.5rem;
       text-align: center;
@@ -914,20 +1185,56 @@
 <body>
   <header class="lp-header" id="lp-header">
     <a href="#" class="lp-logo" aria-label="NAGA ROOM">NAGA ROOM<small>FOR REAL ESTATE</small></a>
-    <a href="#contact" class="lp-header__cta" data-scroll="contact">Contact</a>
+    <a href="#contact" class="lp-header__cta" data-scroll="contact">掲載を試す</a>
   </header>
 
   <section class="lp-hero">
-    <div class="lp-hero__bg" style="background-image:url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1920&q=85'); background-position:center 55%;" role="img" aria-label="モダンな賃貸リビングのイメージ"></div>
+    <div class="lp-hero__bg" style="background-image:url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1920&q=85'); background-position:center 55%;" role="img" aria-label=""></div>
     <div class="lp-hero__overlay"></div>
     <div class="lp-hero__grain"></div>
     <div class="lp-hero__inner">
-      <p class="lp-hero__en" data-reveal>Nagasaki × Rental Media</p>
-      <h1 class="lp-hero__title" data-reveal>不動産会社の賃貸集客を、<br>対話体験で次の層へ。</h1>
-      <p class="lp-hero__lead" data-reveal>SNS・LP・LINE とチャットボット検索型の体験をつなぎ、若年層が入りやすい導線で物件に出会ってもらう。長崎エリアに特化した掲載基盤です。</p>
-      <div class="lp-hero__cta" data-reveal>
-        <a href="#contact" class="lp-btn lp-btn--light" data-scroll="contact">掲載相談を申し込む</a>
-        <a href="#mechanism" class="lp-btn lp-btn--outline" data-scroll="mechanism">サービスを見る</a>
+      <div class="lp-hero__layout">
+        <div class="lp-hero__copy" data-reveal>
+          <p class="lp-hero__badge"><span>Core</span> Chat Search</p>
+          <h1 class="lp-hero__title">探すより、話して見つかる<br>部屋探し。</h1>
+          <p class="lp-hero__lead">チャットで会話するだけで、あなたに合う物件が見えてくる。<span class="lp-hero__lead-sub">長崎エリアの不動産会社向けメディア。</span></p>
+          <div class="lp-hero__cta">
+            <a href="#contact" class="lp-btn lp-btn--light" data-scroll="contact">まずは1件だけ掲載してみる</a>
+            <a href="#chat-experience" class="lp-btn lp-btn--outline" data-scroll="chat-experience">体験を見る</a>
+            <p class="lp-hero__cta-note">4〜6月は無料掲載。まずは無料期間で試せます。</p>
+          </div>
+        </div>
+        <div class="lp-hero-phone" data-reveal>
+          <div class="lp-hero-phone__frame">
+            <div class="lp-hero-phone__screen">
+              <div class="lp-hero-phone__status">
+                <span>NAGA ROOM</span>
+                <span class="lp-hero-phone__dots">···</span>
+              </div>
+              <div class="lp-chat-stack">
+                <div class="lp-bubble lp-bubble--user">
+                  <span class="lp-bubble__who">User</span>
+                  静かな場所がいいです
+                </div>
+                <div class="lp-bubble lp-bubble--ai">
+                  <span class="lp-bubble__who">Chat</span>
+                  了解です。閑静なエリアを優先して探しますね。
+                </div>
+                <div class="lp-bubble lp-bubble--ai">
+                  <span class="lp-bubble__who">Chat</span>
+                  それならこのエリアが合いそうです。近い条件の物件を出します。
+                  <div class="lp-mini-card">
+                    <div class="lp-mini-card__img" style="background-image:url('https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&q=80');"></div>
+                    <div class="lp-mini-card__meta">
+                      <strong>2LDK · 駅徒歩8分</strong>
+                      家賃目安 ¥52,000〜
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <span class="lp-hero__scroll">Scroll</span>
@@ -948,36 +1255,60 @@
     </div>
   </div>
 
+  <section class="lp-compare-flow" id="compare" aria-labelledby="compare-title">
+    <div class="lp-compare-flow__inner">
+      <div class="lp-compare-flow__head" data-reveal>
+        <p class="lp-sec__en">Difference</p>
+        <h2 class="lp-compare-flow__title" id="compare-title">検索サイトの「探す」から、会話の「見つかる」へ</h2>
+      </div>
+      <div class="lp-compare-flow__grid">
+        <div class="lp-compare-col lp-compare-col--old" data-reveal>
+          <p class="lp-compare-col__label">従来</p>
+          <div class="lp-compare-col__chain">
+            <span>検索</span><span class="lp-compare-col__arrow">→</span><span>一覧</span><span class="lp-compare-col__arrow">→</span><span>比較</span><span class="lp-compare-col__arrow">→</span><span>疲れる</span>
+          </div>
+          <p class="lp-compare-col__foot">条件を自分で言語化し、一覧を追いかける。</p>
+        </div>
+        <div class="lp-compare-col lp-compare-col--new" data-reveal>
+          <p class="lp-compare-col__label">NAGA ROOM</p>
+          <div class="lp-compare-col__chain">
+            <span>会話</span><span class="lp-compare-col__arrow">→</span><span>提案</span><span class="lp-compare-col__arrow">→</span><span>発見</span><span class="lp-compare-col__arrow">→</span><span>決まる</span>
+          </div>
+          <p class="lp-compare-col__foot">話した分だけ希望に寄り添い、物件にたどり着く。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="lp-sec lp-sec--light" id="issues">
     <div class="lp-sec__inner">
       <div class="lp-sec__head" data-reveal>
         <span class="lp-sec__num" aria-hidden="true">01</span>
         <div class="lp-sec__meta">
-          <p class="lp-sec__en">Problems</p>
-          <h2 class="lp-sec__h">こんなお悩みはありませんか？</h2>
-          <p class="lp-sec__lead">ポータル掲載は欠かせません。一方で、一覧のなかでは魅力が伝わりきらない。若年層には検索フォームより会話やSNSのほうが入りやすい——そんな距離感に、チャットを核にした接点で応えます。</p>
+          <p class="lp-sec__en">Why</p>
+          <h2 class="lp-sec__h">いま、接点の作り方が変わっている</h2>
+          <p class="lp-sec__lead">一覧のなかに埋もれず、会話から入れるかどうかが鍵です。</p>
         </div>
       </div>
-      <div class="lp-prob-hero" data-reveal style="background-image:url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80');" role="img" aria-label=""></div>
       <div class="lp-prob-grid" data-reveal>
         <div class="lp-prob">
-          <h4>条件検索だけでは届きにくい</h4>
-          <p>まだ言葉にできない希望に、項目入力だけでは刺さりにくい場面があります。</p>
+          <h4>まだ言葉にできない希望がある</h4>
+          <p>項目だけでは伝わりにくいニーズに、会話で寄り添う。</p>
         </div>
         <div class="lp-prob">
-          <h4>写真・見せ方で損している</h4>
-          <p>内見前の印象で差がつく時代。素材の質が反響に直結しやすいです。</p>
+          <h4>見せ方で損している</h4>
+          <p>内見前の印象が反響を分ける。素材の質がそのまま成果に。</p>
         </div>
         <div class="lp-prob">
-          <h4>若年層にリーチしづらい</h4>
-          <p>SNSやメッセージアプリに時間を使う層へ、ポータルだけでは足りないことも。</p>
+          <h4>若年層に届きにくい</h4>
+          <p>検索よりメッセージに慣れた層へ、同じ導線では足りないことも。</p>
         </div>
         <div class="lp-prob">
-          <h4>掲載で終わってしまう</h4>
-          <p>「探される」の手前から、接客の入り口まで設計したい。</p>
+          <h4>掲載で終わらせたくない</h4>
+          <p>「見つけてもらう」から「話が始まる」までをひとつの体験に。</p>
         </div>
       </div>
-      <p class="lp-prob-foot" data-reveal>これらの課題に、<strong>チャットボット検索型体験 × 長崎特化の導線</strong>で向き合います。</p>
+      <p class="lp-prob-foot" data-reveal>中心は<strong>チャットボット検索型体験</strong>。長崎エリアに寄せた導線で応えます。</p>
     </div>
   </section>
 
@@ -987,8 +1318,8 @@
         <span class="lp-sec__num">02</span>
         <div class="lp-sec__meta">
           <p class="lp-sec__en">Flow</p>
-          <h2 class="lp-sec__h">NAGA ROOM の仕組み</h2>
-          <p class="lp-sec__lead">単なる掲載ではなく、<strong>見つけてもらうまでの導線</strong>をひと続きで。チャットボット検索型の体験が中心にあります。</p>
+          <h2 class="lp-sec__h">仕組み：チャットが芯になる導線</h2>
+          <p class="lp-sec__lead">掲載から反響まで、<strong>チャット体験を中心</strong>に一直線でつなぎます。</p>
         </div>
       </div>
       <div class="lp-mech-grid" data-reveal>
@@ -1036,32 +1367,62 @@
       <div class="lp-mech-banner" data-reveal>
         <p class="lp-mech-banner__en">Core</p>
         <h3>チャットボット検索型体験が、差別化の芯</h3>
-        <p>キーワードを並べるのではなく、会話を通じて希望に近づく。掲載が「待ち」だけでなく、接客の入り口として働きやすくなります。</p>
+        <p>会話で希望に近づく。掲載が「待ち」だけでなく、接客の入り口になります。</p>
       </div>
     </div>
   </section>
 
-  <section class="lp-sec lp-sec--black" id="chat-experience">
-    <div class="lp-chat">
-      <div class="lp-chat__visual" style="background-image:url('https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80'); background-position:center 35%;" role="img" aria-label="スマホでメッセージをやりとりするイメージ"></div>
-      <div class="lp-chat__content">
-        <p class="lp-chat__mega" data-reveal>Chat Search</p>
-        <h2 class="lp-chat__h" data-reveal>チャットボット検索型体験</h2>
-        <p class="lp-chat__lead" data-reveal>NAGA ROOM の最大の特徴です。条件の羅列ではなく、<strong>対話のなかで物件に出会う</strong>。若年層にとって検索より入りやすく、LINE や LP との相性も良い設計です。</p>
-        <div class="lp-chat-ui" data-reveal>
-          <div class="lp-chat-ui__bar">Conversation preview</div>
-          <div class="lp-chat-ui__body">
-            <div class="lp-chat-b">落ち着いた雰囲気で、駅から近いと嬉しいです。</div>
-            <div class="lp-chat-b lp-chat-b--user">家賃は5万円前後で考えています</div>
-            <div class="lp-chat-b">ありがとうございます。近い条件のお部屋をご提案しますね。</div>
+  <section class="lp-chat-showcase" id="chat-experience">
+    <div class="lp-chat-showcase__inner">
+      <header class="lp-chat-showcase__head" data-reveal>
+        <p class="lp-chat-showcase__kicker">Chat Search · Core</p>
+        <h2 class="lp-chat-showcase__title">チャットボット検索型体験</h2>
+        <p class="lp-chat-showcase__tag">説明ではなく、<strong style="color:rgba(250,250,250,0.88);">会話の体験</strong>がこのサービスの顔です。</p>
+      </header>
+      <div class="lp-chat-showcase__demo">
+        <div class="lp-phone-xl" data-reveal>
+          <div class="lp-hero-phone__frame">
+            <div class="lp-hero-phone__screen">
+              <div class="lp-hero-phone__status">
+                <span>Preview</span>
+                <span class="lp-hero-phone__dots">···</span>
+              </div>
+              <div class="lp-chat-stack">
+                <div class="lp-bubble lp-bubble--user">
+                  <span class="lp-bubble__who">User</span>
+                  静かな場所がいいです
+                </div>
+                <div class="lp-bubble lp-bubble--ai">
+                  <span class="lp-bubble__who">AI</span>
+                  それならこのエリアが合いそうです。閑静な街並みの物件を優先して出しますね。
+                </div>
+                <div class="lp-bubble lp-bubble--ai">
+                  <span class="lp-bubble__who">Match</span>
+                  おすすめ物件
+                  <div class="lp-mini-card">
+                    <div class="lp-mini-card__img" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&q=80'); background-position:center 45%;"></div>
+                    <div class="lp-mini-card__meta">
+                      <strong>閑静エリア · 2LDK</strong>
+                      条件に近い物件をカードで提示
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <table class="lp-compare" data-reveal>
-          <tbody>
-            <tr><th>一般的な条件検索</th><td>項目入力 → 一覧。言語化しづらい希望は伝わりにくい。</td></tr>
-            <tr><th>チャットボット検索型</th><td>会話で整理 → 合いそうな物件へ。雰囲気や暮らし方にも寄り添える。</td></tr>
-          </tbody>
-        </table>
+        <aside class="lp-chat-showcase__aside" data-reveal>
+          <h3>体験のポイント</h3>
+          <ul class="lp-chat-showcase__list">
+            <li>雰囲気や暮らし方も、会話で拾って提案に反映できる。</li>
+            <li>検索フォームより「話してみる」方が入りやすい若年層に届く。</li>
+            <li>LINE・LP とつなぎ、<strong style="color:rgba(250,250,250,0.85);">反響まで一気通貫</strong>しやすい。</li>
+          </ul>
+          <div class="lp-chat-showcase__cta">
+            <a href="#contact" class="lp-btn lp-btn--light" data-scroll="contact">無料期間中に試してみる</a>
+            <a href="#compare" class="lp-btn lp-btn--outline" data-scroll="compare">従来との違い</a>
+          </div>
+        </aside>
       </div>
     </div>
   </section>
@@ -1072,8 +1433,8 @@
         <span class="lp-sec__num">03</span>
         <div class="lp-sec__meta">
           <p class="lp-sec__en">Strengths</p>
-          <h2 class="lp-sec__h">提供できる価値</h2>
-          <p class="lp-sec__lead">長崎エリアに寄せた設計と、若年層に寄り添う見せ方。チャット体験を軸に、SNS・LINE・LP が連なります。</p>
+          <h2 class="lp-sec__h">チャットを軸に、届く設計</h2>
+          <p class="lp-sec__lead">長崎エリア特化。SNS・LP・LINE がチャット体験とつながります。</p>
         </div>
       </div>
       <div class="lp-feat-grid">
@@ -1083,7 +1444,7 @@
           <div class="lp-feat__body">
             <p class="lp-feat__en">Youth</p>
             <h3>若年層へのアプローチ</h3>
-            <p>検索より会話やSNSに馴染みやすい導線で、最初の一歩を軽くします。</p>
+            <p>会話・SNSに馴染んだ導線で、最初の一歩を軽く。</p>
           </div>
         </article>
         <article class="lp-feat" data-reveal>
@@ -1092,7 +1453,7 @@
           <div class="lp-feat__body">
             <p class="lp-feat__en">Local</p>
             <h3>長崎エリア特化</h3>
-            <p>長崎市・諫早市・大村市・佐世保市を想定した展開です。</p>
+            <p>長崎・諫早・大村・佐世保を想定。</p>
           </div>
         </article>
         <article class="lp-feat" data-reveal>
@@ -1101,7 +1462,7 @@
           <div class="lp-feat__body">
             <p class="lp-feat__en">Landing</p>
             <h3>LP で魅力を伝える</h3>
-            <p>物件ごとに暮らしのイメージを丁寧に見せられます。</p>
+            <p>暮らしの空気感を、物件ごとに。</p>
           </div>
         </article>
         <article class="lp-feat" data-reveal>
@@ -1110,7 +1471,7 @@
           <div class="lp-feat__body">
             <p class="lp-feat__en">Social</p>
             <h3>SNS と相性の良い素材</h3>
-            <p>Instagram 等での発信と連動しやすい見せ方を意識しています。</p>
+            <p>発信と連動しやすい見せ方。</p>
           </div>
         </article>
         <article class="lp-feat" data-reveal>
@@ -1119,7 +1480,7 @@
           <div class="lp-feat__body">
             <p class="lp-feat__en">Line</p>
             <h3>LINE 導線</h3>
-            <p>相談への橋渡し。若い世代との接点をつくりやすくします。</p>
+            <p>相談への橋渡し。接点をつくりやすく。</p>
           </div>
         </article>
         <article class="lp-feat" data-reveal>
@@ -1128,7 +1489,7 @@
           <div class="lp-feat__body">
             <p class="lp-feat__en">Visual</p>
             <h3>写真・空気感</h3>
-            <p>視覚で差がつく掲載。撮影オプションでさらに引き上げ可能です。</p>
+            <p>視覚で差がつく。撮影オプションでさらに引き上げ可能。</p>
           </div>
         </article>
       </div>
@@ -1142,7 +1503,7 @@
         <div class="lp-sec__meta">
           <p class="lp-sec__en">Plans</p>
           <h2 class="lp-sec__h">料金プラン</h2>
-          <p class="lp-sec__lead">掲載の入り方に合わせて選べる三段階。スタンダードが主力プランです。</p>
+          <p class="lp-sec__lead">入り方に合わせて三段階。主力はスタンダード。</p>
         </div>
       </div>
       <div class="lp-price-banner" data-reveal>
@@ -1184,20 +1545,33 @@
     </div>
   </section>
 
-  <section class="lp-sec lp-sec--black" id="photo" style="padding:0;">
-    <div class="lp-photo-split">
-      <div class="lp-photo-split__img" style="background-image:url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=1200&q=80'); background-position:center 40%;" data-reveal role="img" aria-label="一眼レフで撮影するイメージ"></div>
-      <div class="lp-photo-split__body" data-reveal>
-        <p class="lp-photo-split__en">Option</p>
-        <h3>撮影オプション</h3>
-        <p class="lp-photo-split__price">30,000円<span> / 1件</span></p>
-        <ul>
-          <li>一眼レフによる撮影</li>
-          <li>LP に掲載できるきれいな素材</li>
-          <li>SNS 発信にもそのまま活用しやすい</li>
-          <li>他物件との差別化に効きます</li>
-        </ul>
-        <p class="lp-photo-split__note">単なる撮影代行ではなく、<strong>反響を強くするための素材づくり</strong>として位置づけています。</p>
+  <section class="lp-sec lp-sec--light lp-ba" id="photo">
+    <div class="lp-sec__inner">
+      <div class="lp-ba__head" data-reveal>
+        <p class="lp-sec__en">Photo</p>
+        <h2 class="lp-sec__h">撮影オプション</h2>
+        <p class="lp-ba__lead">同じ物件でも、ここまで変わる。</p>
+        <p class="lp-ba__sub">スマホの一枚と、プロの一枚では<strong>反響の入り方が変わる</strong>。掲載の「見える化」として使えます。</p>
+      </div>
+      <div class="lp-ba__grid">
+        <article class="lp-ba-card" data-reveal>
+          <span class="lp-ba-card__label">Before</span>
+          <div class="lp-ba-card__img" style="background-image:url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80'); background-position:center 50%;" role="img" aria-label=""></div>
+          <div class="lp-ba-card__body">
+            <p><strong>スマホ撮影・物撮り中心</strong><br>情報は伝わるが、印象で選ばれにくいことも。</p>
+          </div>
+        </article>
+        <article class="lp-ba-card lp-ba-card--after" data-reveal>
+          <span class="lp-ba-card__label">After · 撮影オプション</span>
+          <div class="lp-ba-card__img" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80'); background-position:center 45%;" role="img" aria-label=""></div>
+          <div class="lp-ba-card__body">
+            <p><strong>一眼・ライティング・空気感</strong><br>LP・SNSにそのまま使える<strong>反響を意識した素材</strong>に。</p>
+          </div>
+        </article>
+      </div>
+      <div class="lp-ba-price" data-reveal>
+        <p class="lp-ba-price__num">30,000円<span> / 1件（税込表記は別途ご案内）</span></p>
+        <p>撮影代行ではなく、<strong>問い合わせにつながる見せ方</strong>としてご利用ください。</p>
       </div>
     </div>
   </section>
@@ -1209,7 +1583,7 @@
         <div class="lp-sec__meta">
           <p class="lp-sec__en">Process</p>
           <h2 class="lp-sec__h">導入の流れ</h2>
-          <p class="lp-sec__lead">お問い合わせから掲載開始まで、シンプルに進められます。</p>
+          <p class="lp-sec__lead">お問い合わせから掲載まで、シンプルに。</p>
         </div>
       </div>
       <div class="lp-flow" data-reveal>
@@ -1240,7 +1614,7 @@
   <section class="lp-contact" id="contact">
     <div class="lp-contact__inner">
       <h2 class="lp-contact__en" data-reveal>Contact</h2>
-      <p class="lp-contact__sub" data-reveal>まずは無料掲載期間について、お気軽にご相談ください。仕組みやプランはヒアリングのうえでご説明します。</p>
+      <p class="lp-contact__sub" data-reveal>まずは<strong style="color:rgba(250,250,250,0.92);">1件だけ</strong>でも。無料掲載期間中に、チャット体験込みの出し方をご案内します。</p>
       <form class="lp-form" id="lp-lead-form" data-lead-form novalidate data-reveal>
         <div class="lp-form__field">
           <label for="co">会社名</label>
@@ -1254,10 +1628,17 @@
           <label for="msg">ご用件</label>
           <textarea id="msg" name="message" placeholder="掲載希望の物件概要やご質問など"></textarea>
         </div>
-        <button type="submit" class="lp-form__submit">掲載相談を送信</button>
+        <button type="submit" class="lp-form__submit">1件から掲載を相談する</button>
         <p class="lp-form__err" role="alert">メールアドレスを入力してください。</p>
         <p class="lp-form__hint">送信でメールアプリが開き、受付先 <code>youtaidajin4@gmail.com</code> 宛の下書きが作成されます。</p>
       </form>
+    </div>
+  </section>
+
+  <section class="lp-cta-bar" aria-label="掲載の呼びかけ">
+    <div class="lp-cta-bar__inner">
+      <p data-reveal>無料期間中に、まずは1件から。チャット体験の出し方もご一緒に。</p>
+      <a href="#contact" class="lp-btn lp-btn--light" data-scroll="contact" data-reveal>まずは1件だけ掲載してみる</a>
     </div>
   </section>
 
