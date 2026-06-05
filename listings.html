@@ -7,13 +7,22 @@
   <title>掲載物件一覧 | NAGA ROOM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/nagaroom-shared.css">
 </head>
 <body class="has-nr-header page-listing">
   <header class="nr-header">
     <div class="nr-header-inner">
-      <a href="index.html" class="nr-brand">NAGA ROOM</a>
+      <a href="index.html" class="nr-brand nr-brand--wordmark">
+        <img
+          src="img/nr-logo-wordmark.png"
+          alt="NAGA ROOM ナガルーム"
+          class="nr-brand-wordmark-img"
+          width="200"
+          height="44"
+          decoding="async"
+        />
+      </a>
       <nav class="nr-nav" aria-label="主要ナビ">
         <a href="rental.html">会話で探す</a>
         <a href="listings.html" aria-current="page">一覧で見る</a>
@@ -23,18 +32,14 @@
 
   <main class="listing-main">
     <header class="listing-hero">
-      <h1>掲載物件一覧</h1>
-      <p class="listing-hero-lead">長崎エリアのお部屋を、落ち着いた見え方でご覧いただけます。気になるものだけ、ゆっくり比べてください。</p>
+      <h1>物件一覧</h1>
+      <p class="listing-hero-lead">長崎エリアの掲載物件。余白を広く、必要な情報だけを表示しています。</p>
     </header>
 
     <section class="listing-chat-banner" aria-label="会話で探す案内">
-      <p>条件がまだふんわりしている方、迷った方へ。会話しながら希望を整理して、あなたに合いそうなお部屋をご提案することもできます。</p>
-      <a class="btn-to-chat" href="rental.html">会話で探す</a>
+      <p>条件がまだ決まっていない方は、<strong>AIチャット</strong>で整理できます。</p>
+      <a class="btn-to-chat btn-primary" href="rental.html" style="font-size:0.8rem;padding:0.65rem 1.2rem;">会話で探す</a>
     </section>
-
-    <p class="listing-line-inline">
-      <a id="topLineLink" href="#" target="_blank" rel="noopener noreferrer">条件の整理から、メッセージで相談する</a>
-    </p>
 
     <section class="filter-panel" aria-label="条件で絞り込み">
       <p class="filter-panel-title">条件で絞り込み</p>
@@ -127,6 +132,8 @@
   </footer>
 
   <script src="js/nagaroom-data.js"></script>
+  <script src="js/nr-favorites.js"></script>
+  <script src="js/properties-source.js"></script>
   <script>
   (function () {
     'use strict';
@@ -139,7 +146,6 @@
     var allProps = [];
     var PROPERTIES_DATA_URL = NR.PROPERTIES_DATA_URL || 'data/properties.json';
 
-    document.getElementById('topLineLink').href = LINE_URL;
     document.getElementById('listingFooterLineBtn').href = LINE_URL;
 
     var elGrid = document.getElementById('listingGrid');
@@ -194,42 +200,89 @@
       }
       list.forEach(function (p) {
         var article = document.createElement('article');
-        article.className = 'property-card';
+        article.className = 'property-card property-card--listing';
         article.setAttribute('data-property-id', p.id);
-        article.innerHTML =
-          '<div class="property-card-img"><img src="' + escapeHtml(p.image) + '" alt="' + escapeHtml(p.name) + 'のイメージ" loading="lazy" width="320" height="200"></div>' +
-          '<div class="property-card-body">' +
-            '<h3 class="property-card-name">' + escapeHtml(p.name) + '</h3>' +
-            '<p class="property-card-meta">' +
-              '<span class="property-tag">' + escapeHtml(p.area) + '</span>' +
-              '<span class="property-tag">' + escapeHtml(p.rent) + '</span>' +
-              '<span class="property-tag">' + escapeHtml(p.layout) + '</span>' +
-            '</p>' +
-            '<p class="property-card-comment">' + escapeHtml(p.comment) + '</p>' +
-            '<div class="property-card-actions">' +
-              '<a class="btn-ghost" href="' + escapeHtml(p.detailUrl) + '">詳細を見る</a>' +
-              '<a class="btn-fill" href="' + LINE_URL + '" target="_blank" rel="noopener noreferrer">この物件について相談する</a>' +
-            '</div>' +
-          '</div>';
+        var detailUrl = p.detailUrl || ('property.html?id=' + encodeURIComponent(p.id));
+        if (window.NR_FAVORITES && NR_FAVORITES.listingCardHtml) {
+          article.innerHTML = NR_FAVORITES.listingCardHtml(p, escapeHtml, detailUrl);
+        }
         elGrid.appendChild(article);
       });
+      if (window.NR_FAVORITES && NR_FAVORITES.wireListingCards) {
+        NR_FAVORITES.wireListingCards(elGrid);
+      }
     }
 
     [fArea, fRent, fLayout, fFeature].forEach(function (el) {
       el.addEventListener('change', render);
     });
+    function enrichListingRow(p) {
+      if (!p || typeof p !== 'object') return p;
+      var city = p.city || '';
+      var region = p.filterRegion;
+      if (!region) {
+        if (/諫早/.test(city)) region = 'isahaya';
+        else if (/大村/.test(city)) region = 'omura';
+        else region = 'nagasaki';
+      }
+      var layout = String(p.layout || '').toUpperCase();
+      var layoutGroup = p.layoutGroup;
+      if (!layoutGroup) {
+        if (/1R|1K/.test(layout)) layoutGroup = 'compact';
+        else if (/LDK|2K|3K/.test(layout)) layoutGroup = 'wide';
+        else layoutGroup = 'mid';
+      }
+      var rentMan = p.rentMan;
+      if (rentMan == null && p.rentYen != null) {
+        rentMan = Math.round((Number(p.rentYen) / 10000) * 10) / 10;
+      }
+      var features = p.features;
+      if (!features || !features.length) {
+        features = [];
+        if (/駅/.test(String(p.station || ''))) features.push('station');
+        if (p.petAllowed || p.pet_ok) features.push('pet');
+        if (/新築|築浅/.test(String(p.buildingAge || '') + String(p.builtYear || '') + String(p.story || ''))) features.push('new');
+        if (p.internetFree) features.push('internet');
+        if (p.autoLock) features.push('security');
+        if (p.deliveryBox) features.push('delivery_box');
+      }
+      p.filterRegion = region;
+      p.layoutGroup = layoutGroup;
+      p.rentMan = rentMan;
+      p.features = features;
+      if (!p.comment && p.story) p.comment = p.story;
+      if (!p.detailUrl && p.id) {
+        p.detailUrl = 'property.html?id=' + encodeURIComponent(p.id);
+      }
+      if (!p.image) {
+        if (Array.isArray(p.images) && p.images.length) p.image = p.images[0];
+        else if (p.image1) p.image = p.image1;
+        else {
+          p.image =
+            'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=640&q=80';
+        }
+      }
+      return p;
+    }
+
     function loadPropertyList() {
+      var loader = window.NR_PROPERTY_LOADER;
+      if (loader && typeof loader.loadPropertyListWithFallback === 'function') {
+        return loader.loadPropertyListWithFallback(NR).then(function (r) {
+          return (r.list || []).map(enrichListingRow);
+        });
+      }
       return fetch(PROPERTIES_DATA_URL, { cache: 'no-store' })
         .then(function (res) {
           if (!res.ok) throw new Error('Failed to load properties.json');
           return res.json();
         })
         .then(function (data) {
-          return Array.isArray(data) ? data : [];
+          return (Array.isArray(data) ? data : []).map(enrichListingRow);
         })
         .catch(function (err) {
           console.error('[listings] properties load error:', err);
-          return Array.isArray(NR.PROPERTIES) ? NR.PROPERTIES : [];
+          return (Array.isArray(NR.PROPERTIES) ? NR.PROPERTIES : []).map(enrichListingRow);
         });
     }
 

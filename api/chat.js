@@ -64,11 +64,57 @@ function normalizeDifyUrl(url) {
   return trimmed;
 }
 
+function buildConditionExtractionPrompt(userMessage) {
+  return [
+    'あなたは賃貸条件抽出アシスタントです。',
+    '次のユーザー発話から条件を抽出し、JSONのみで返してください。',
+    '説明文は不要です。',
+    'スキーマ:',
+    '{"hard":{"budget":number|null,"layout":"","city":"","areas":[],"features":[],"safetyLevel":"","parking":false},"soft":{"preferences":[],"lifestyleTags":[]},"avoid":{"features":[]}}',
+    'features は hard 条件のみ（pet,washstand,separate_bath,supermarket_near,school_near,parking,safe_area）を入れてください。',
+    'soft.preferences には quiet,cafe_near,sunlight,station_access,security,corner,newish,reno を使ってください。',
+    '不明項目は null または空配列/空文字にしてください。',
+    'ユーザー発話:',
+    String(userMessage || '')
+  ].join('\n');
+}
+
+function parseJsonFromText(text) {
+  var src = String(text || '').trim();
+  if (!src) return null;
+  try {
+    return JSON.parse(src);
+  } catch (e) {}
+  var start = src.indexOf('{');
+  var end = src.lastIndexOf('}');
+  if (start === -1 || end <= start) return null;
+  try {
+    return JSON.parse(src.slice(start, end + 1));
+  } catch (e2) {
+    return null;
+  }
+}
+
+function allowedOrigins() {
+  return String(process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map(function (s) { return s.trim(); })
+    .filter(Boolean);
+}
+
+function isOriginAllowed(origin) {
+  var allowed = allowedOrigins();
+  if (!origin || !allowed.length) return true;
+  return allowed.indexOf(origin) !== -1;
+}
+
 /** 別オリジンから rental を開く場合の CORS（プリフライト OPTIONS で 405 にならないようにする） */
 function applyCors(req, res) {
   var origin = req.headers.origin;
   if (origin) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
+    if (isOriginAllowed(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Vary', 'Origin');
   } else {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -95,6 +141,9 @@ module.exports = async function handler(req, res) {
   }
 
   applyCors(req, res);
+  if (!isOriginAllowed(req.headers.origin)) {
+    return res.status(403).json({ error: 'Origin not allowed' });
+  }
 
   var body;
   try {
@@ -107,6 +156,8 @@ module.exports = async function handler(req, res) {
   var conversationId = body.conversationId;
   var userId = body.userId || 'lp_anonymous_user';
   var chatPurpose = body.chatPurpose;
+  var mode = body.mode;
+  var isExtractMode = mode === 'extract_conditions_json' && chatPurpose === 'property';
 
   if (userMessage == null || String(userMessage).trim() === '') {
     return res.status(400).json({ error: 'userMessage is required' });
@@ -159,8 +210,8 @@ module.exports = async function handler(req, res) {
 
   var payload = {
     inputs: {},
-    query: String(userMessage),
-    response_mode: 'streaming',
+    query: isExtractMode ? buildConditionExtractionPrompt(userMessage) : String(userMessage),
+    response_mode: isExtractMode ? 'blocking' : 'streaming',
     user: String(userId),
   };
 
@@ -181,13 +232,13 @@ module.exports = async function handler(req, res) {
       headers: {
         Authorization: 'Bearer ' + apiKey,
         'Content-Type': 'application/json',
-        Accept: 'text/event-stream',
+        Accept: isExtractMode ? 'application/json' : 'text/event-stream',
       },
       body: JSON.stringify(payload),
       signal: abortController.signal,
     });
 
-    if (!upstream.ok || !upstream.body) {
+    if (!upstream.ok || (!upstream.body && !isExtractMode)) {
       var errText = '';
       try {
         errText = await upstream.text();
@@ -203,6 +254,26 @@ module.exports = async function handler(req, res) {
         error: errJson.message || errJson.error || 'Dify API request failed',
         status: upstream.status,
         details: errJson,
+      });
+    }
+
+    if (isExtractMode) {
+      var blockingText = '';
+      try {
+        blockingText = await upstream.text();
+      } catch (e) {}
+      var blockingData = {};
+      try {
+        blockingData = blockingText ? JSON.parse(blockingText) : {};
+      } catch (e2) {
+        blockingData = {};
+      }
+      var answerText = blockingData.answer != null ? String(blockingData.answer) : '';
+      var parsed = parseJsonFromText(answerText);
+      return res.status(200).json({
+        extractedConditions: parsed,
+        answer: answerText,
+        parseError: parsed ? null : 'invalid_json'
       });
     }
 

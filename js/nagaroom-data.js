@@ -31,6 +31,9 @@
     LINE_BASIC_ID: LINE_BASIC_ID,
     /** 入力欄に「相談」が入った状態でトーク画面を開く URL */
     LINE_URL: lineMessageUrl('相談'),
+
+    /** index サイドバー等の Instagram リンク（空なら非表示） */
+    INSTAGRAM_URL: '',
     /**
      * rental.html が Lead 付き文を付けるときのパス部分（末尾スラッシュなし）
      */
@@ -41,12 +44,14 @@
     PROPERTIES_DATA_URL: 'data/properties.json',
 
     /**
-     * Google Apps Script Web アプリ（doGet）の URL（.../exec）。
-     * 空のまま: rental は従来どおり PROPERTIES_DATA_URL の JSON のみ読み込み。
-     * 設定時: ブラウザから GET で JSON を取得し、失敗したら JSON にフォールバック（property.html の詳細表示も同じ URL を参照）。
-     * CORS は GAS 側で Access-Control-Allow-Origin を返すか、後追いで Vercel プロキシを用意してください（docs/GAS_PROPERTIES_GET.md）。
+     * Firestore を物件データの正本にする（Vercel の /api/properties 経由で取得）。
+     * false のときはローカル JSON のみを読み込みます。
+     * 本番で Firebase を使う場合は true にし、Vercel に Firebase 環境変数を設定してください（docs/FIREBASE_SETUP.md）。
      */
-    GAS_PROPERTIES_GET_URL: '',
+    USE_FIREBASE_PROPERTIES: true,
+
+    /** 公開物件一覧 API（USE_FIREBASE_PROPERTIES が true のとき） */
+    PROPERTIES_API_URL: '/api/properties',
 
     /**
      * rental.html 表示直後の「お名前（必須）」ゲートモーダルを出すか。
@@ -93,6 +98,33 @@
      * Dify 返信を 1 文字ずつ出すときの待ち（ミリ秒）。小さいほど速い。
      */
     DIFY_CHAR_MS: 22,
+    /**
+     * property モード時、/api/chat の抽出JSONモードを併用するか。
+     * true にするとローカル抽出の上から Dify 抽出で条件を補強します。
+     */
+    EXTRACT_CONDITIONS_WITH_DIFY: true,
+    /**
+     * ソフト条件の加点重み（大きいほど優先される）。
+     */
+    SOFT_CONDITION_WEIGHTS: {
+      quiet: 2.8,
+      cafe_near: 2.4,
+      sunlight: 2.1,
+      station_access: 2.0,
+      security: 2.0,
+      corner: 1.2,
+      newish: 1.2,
+      reno: 1.1
+    },
+    /**
+     * ソフト条件の同義語辞書（必要に応じて運用で拡張）。
+     */
+    SOFT_SYNONYM_MAP: {
+      quiet: ['静か', '閑静', '落ち着く'],
+      cafe_near: ['カフェ', '喫茶店', 'コーヒー'],
+      sunlight: ['日当たり', '南向き', '明るい'],
+      station_access: ['駅近', '駅チカ', '徒歩圏']
+    },
 
     /**
      * 物件一覧

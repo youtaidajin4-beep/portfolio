@@ -18,10 +18,25 @@
  * 例: const cur = sheet.getRange(targetRow,1,1,numCols).getValues()[0]; と列インデックスでマージ。
  */
 
+function allowedOrigins() {
+  return String(process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map(function (s) { return s.trim(); })
+    .filter(Boolean);
+}
+
+function isOriginAllowed(origin) {
+  var allowed = allowedOrigins();
+  if (!origin || !allowed.length) return true;
+  return allowed.indexOf(origin) !== -1;
+}
+
 function applyCors(req, res) {
   var origin = req.headers.origin;
   if (origin) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
+    if (isOriginAllowed(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Vary', 'Origin');
   } else {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -47,6 +62,10 @@ module.exports = async function handler(req, res) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!isOriginAllowed(req.headers.origin)) {
+    return res.status(403).json({ error: 'Origin not allowed' });
   }
 
   var gasUrl = (process.env.GAS_SHEET_WEBHOOK_URL || '').trim();

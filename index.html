@@ -3,1949 +3,348 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="NAGA ROOM — 探すより、話して見つかる部屋探し。長崎エリアの不動産会社向け。チャットボット検索型体験で若年層に届く。4〜6月無料掲載。">
-  <title>NAGA ROOM | For Real Estate Partners</title>
+  <meta name="description" content="NAGA ROOM — SNS・AI・WEBで20代の賃貸ユーザーに届く、不動産会社向け集客支援。ポータル依存から脱却し、会話で選ばれる仕組みを。モニター限定10社・3ヶ月無料。">
+  <title>NAGA ROOM | 不動産会社向け集客支援</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    :root {
-      --black: #0d1526;
-      --black-soft: #151d2e;
-      --white: #fafafa;
-      --gray: #9a9a9a;
-      --line: rgba(255,255,255,0.08);
-      --line-dark: rgba(0,0,0,0.08);
-      --accent: #c9a962;
-      --max: 1200px;
-      --font-en: "Syne", system-ui, sans-serif;
-      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-      --mist: rgba(184, 214, 235, 0.14);
-      --mist-strong: rgba(140, 180, 210, 0.22);
-    }
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: 4.5rem;
-    }
-    body {
-      margin: 0;
-      min-height: 100%;
-      font-family: "Noto Sans JP", sans-serif;
-      font-size: 16px;
-      line-height: 1.75;
-      color: #e8e8e8;
-      background: var(--black);
-      -webkit-font-smoothing: antialiased;
-    }
-    img { max-width: 100%; height: auto; display: block; }
-    a { color: inherit; text-decoration: none; }
-
-    /* —— Reveal —— */
-    [data-reveal] {
-      opacity: 0;
-      transform: translateY(48px);
-      transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
-    }
-    [data-reveal].is-inview {
-      opacity: 1;
-      transform: none;
-    }
-
-    /* —— Header —— */
-    .lp-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      padding: 1rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: background 0.35s ease, backdrop-filter 0.35s ease;
-    }
-    .lp-header.is-solid {
-      background: rgba(13, 21, 38, 0.88);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--line);
-    }
-    .lp-logo {
-      font-family: var(--font-en);
-      font-weight: 800;
-      font-size: 1.15rem;
-      letter-spacing: 0.06em;
-      color: var(--white);
-    }
-    .lp-logo small {
-      display: block;
-      font-family: "Noto Sans JP", sans-serif;
-      font-size: 0.5625rem;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      color: var(--gray);
-      margin-top: 0.15rem;
-    }
-    .lp-header__cta {
-      font-family: var(--font-en);
-      font-size: 0.6875rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 0.65rem 1.15rem;
-      border: 1px solid rgba(255,255,255,0.35);
-      color: var(--white);
-      transition: background 0.25s, color 0.25s, border-color 0.25s;
-    }
-    .lp-header__cta:hover {
-      background: var(--white);
-      color: var(--black);
-      border-color: var(--white);
-    }
-
-    /* —— Hero —— */
-    .lp-hero {
-      position: relative;
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      padding: 6.5rem 1.5rem 3.5rem;
-      overflow: hidden;
-    }
-    .lp-hero__bg {
-      position: absolute;
-      inset: 0;
-      background-size: cover;
-      background-position: center;
-      transform: scale(1.08);
-      animation: heroKen 22s ease-in-out infinite alternate;
-    }
-    @keyframes heroKen {
-      from { transform: scale(1.06); }
-      to { transform: scale(1.12); }
-    }
-    .lp-hero__overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(120deg, rgba(13,21,38,0.94) 0%, rgba(13,21,38,0.72) 42%, rgba(13,21,38,0.45) 100%);
-    }
-    .lp-hero__grain {
-      position: absolute;
-      inset: 0;
-      opacity: 0.04;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    }
-    .lp-hero__inner {
-      position: relative;
-      z-index: 2;
-      max-width: var(--max);
-      margin: 0 auto;
-      width: 100%;
-    }
-    .lp-hero__layout {
-      display: grid;
-      gap: 2.75rem;
-      align-items: center;
-    }
-    @media (min-width: 960px) {
-      .lp-hero__layout { grid-template-columns: 1.05fr 0.95fr; gap: 3.5rem; }
-    }
-    .lp-hero__copy { max-width: 34rem; }
-    .lp-hero__badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: var(--font-en);
-      font-size: 0.625rem;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(200, 230, 250, 0.95);
-      border: 1px solid var(--mist-strong);
-      background: var(--mist);
-      padding: 0.45rem 0.9rem;
-      border-radius: 999px;
-      margin: 0 0 1.35rem;
-    }
-    .lp-hero__badge span { color: var(--accent); letter-spacing: 0.12em; }
-    .lp-hero__en {
-      font-family: var(--font-en);
-      font-size: clamp(0.8125rem, 2.5vw, 1rem);
-      font-weight: 600;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin: 0 0 1rem;
-    }
-    .lp-hero__title {
-      font-size: clamp(1.95rem, 5.2vw, 3.15rem);
-      font-weight: 700;
-      line-height: 1.18;
-      letter-spacing: 0.02em;
-      color: var(--white);
-      margin: 0 0 1.15rem;
-    }
-    .lp-hero__lead {
-      font-size: clamp(1rem, 1.9vw, 1.125rem);
-      color: rgba(250,250,250,0.78);
-      max-width: 32rem;
-      margin: 0 0 1.85rem;
-      line-height: 1.75;
-      font-weight: 500;
-    }
-    .lp-hero__lead-sub {
-      display: block;
-      margin-top: 0.5rem;
-      color: rgba(250,250,250,0.52);
-      font-size: 0.92em;
-      font-weight: 400;
-    }
-    .lp-hero__cta {
-      display: flex;
-      flex-direction: column;
-      gap: 0.65rem;
-    }
-    @media (min-width: 520px) {
-      .lp-hero__cta { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.85rem; }
-    }
-    .lp-hero__cta-note {
-      font-size: 0.75rem;
-      color: rgba(250,250,250,0.45);
-      width: 100%;
-      margin: 0.35rem 0 0;
-      letter-spacing: 0.02em;
-    }
-    .lp-hero-phone {
-      position: relative;
-      justify-self: center;
-      width: 100%;
-      max-width: 340px;
-    }
-    .lp-hero-phone__frame {
-      border-radius: 40px;
-      padding: 11px;
-      background: linear-gradient(160deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 50%, rgba(184,214,235,0.08) 100%);
-      border: 1px solid rgba(255,255,255,0.14);
-      box-shadow:
-        0 50px 100px rgba(0,0,0,0.45),
-        0 0 0 1px rgba(184,214,235,0.12) inset;
-    }
-    .lp-hero-phone__screen {
-      border-radius: 32px;
-      overflow: hidden;
-      background: linear-gradient(180deg, #121a28 0%, #0d1526 100%);
-      padding: 1rem 1rem 1.25rem;
-      min-height: 400px;
-      display: flex;
-      flex-direction: column;
-    }
-    .lp-hero-phone__status {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.5625rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--gray);
-      margin-bottom: 1rem;
-      padding: 0 0.15rem;
-    }
-    .lp-hero-phone__dots { letter-spacing: 0.2em; color: rgba(250,250,250,0.35); }
-    .lp-chat-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 0.65rem;
-      flex: 1;
-    }
-    .lp-bubble {
-      font-size: 0.8125rem;
-      line-height: 1.55;
-      padding: 0.65rem 0.85rem;
-      border-radius: 14px;
-      max-width: 94%;
-      animation: bubbleIn 0.7s var(--ease-out) both;
-    }
-    .lp-bubble:nth-child(1) { animation-delay: 0.05s; }
-    .lp-bubble:nth-child(2) { animation-delay: 0.2s; }
-    .lp-bubble:nth-child(3) { animation-delay: 0.35s; }
-    .lp-bubble:nth-child(4) { animation-delay: 0.5s; }
-    @keyframes bubbleIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: none; }
-    }
-    .lp-bubble--user {
-      align-self: flex-end;
-      background: rgba(201, 169, 98, 0.22);
-      border: 1px solid rgba(201, 169, 98, 0.35);
-      color: rgba(250,250,250,0.95);
-    }
-    .lp-bubble--ai {
-      align-self: flex-start;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: rgba(250,250,250,0.9);
-    }
-    .lp-bubble__who {
-      display: block;
-      font-size: 0.5625rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(184,214,235,0.85);
-      margin-bottom: 0.35rem;
-      font-family: var(--font-en);
-    }
-    .lp-mini-card {
-      margin-top: 0.35rem;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.25);
-    }
-    .lp-mini-card__img {
-      height: 88px;
-      background-size: cover;
-      background-position: center;
-    }
-    .lp-mini-card__meta {
-      padding: 0.55rem 0.65rem;
-      font-size: 0.6875rem;
-      color: rgba(250,250,250,0.75);
-    }
-    .lp-mini-card__meta strong {
-      display: block;
-      color: var(--white);
-      font-size: 0.75rem;
-      margin-bottom: 0.15rem;
-    }
-    .lp-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--font-en);
-      font-size: 0.6875rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      padding: 1rem 1.6rem;
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition: transform 0.2s, background 0.25s, color 0.25s, border-color 0.25s;
-    }
-    .lp-btn:active { transform: scale(0.98); }
-    .lp-btn--light {
-      background: var(--white);
-      color: var(--black);
-      border-color: var(--white);
-    }
-    .lp-btn--light:hover { background: #e8e8e8; border-color: #e8e8e8; }
-    .lp-btn--outline {
-      background: transparent;
-      color: var(--white);
-      border-color: rgba(255,255,255,0.4);
-    }
-    .lp-btn--outline:hover {
-      border-color: var(--white);
-      background: rgba(255,255,255,0.06);
-    }
-    .lp-hero__scroll {
-      position: absolute;
-      bottom: 2rem;
-      right: 1.5rem;
-      font-family: var(--font-en);
-      font-size: 0.625rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--gray);
-      writing-mode: vertical-rl;
-      display: none;
-    }
-    @media (min-width: 900px) {
-      .lp-hero__scroll { display: block; }
-    }
-
-    /* —— Stats strip —— */
-    .lp-stats {
-      display: grid;
-      grid-template-columns: 1fr;
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-    }
-    @media (min-width: 768px) {
-      .lp-stats { grid-template-columns: repeat(3, 1fr); }
-    }
-    .lp-stats__cell {
-      padding: 2.5rem 1.5rem;
-      text-align: center;
-      border-bottom: 1px solid var(--line);
-    }
-    @media (min-width: 768px) {
-      .lp-stats__cell { border-bottom: none; border-right: 1px solid var(--line); }
-      .lp-stats__cell:last-child { border-right: none; }
-    }
-    .lp-stats__num {
-      font-family: var(--font-en);
-      font-size: clamp(2.5rem, 6vw, 3.5rem);
-      font-weight: 800;
-      line-height: 1;
-      color: var(--white);
-      margin-bottom: 0.5rem;
-    }
-    .lp-stats__label {
-      font-size: 0.8125rem;
-      color: var(--gray);
-      line-height: 1.55;
-    }
-
-    /* —— Compare flow (従来 vs NAGA) —— */
-    .lp-compare-flow {
-      padding: clamp(3.5rem, 8vw, 5rem) 1.5rem;
-      background: var(--black-soft);
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-    }
-    .lp-compare-flow__inner {
-      max-width: var(--max);
-      margin: 0 auto;
-    }
-    .lp-compare-flow__head {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-    .lp-compare-flow__head .lp-sec__en { margin-bottom: 0.5rem; }
-    .lp-compare-flow__title {
-      font-size: clamp(1.35rem, 3vw, 1.75rem);
-      font-weight: 700;
-      margin: 0;
-      letter-spacing: 0.02em;
-    }
-    .lp-compare-flow__grid {
-      display: grid;
-      gap: 1.25rem;
-    }
-    @media (min-width: 768px) {
-      .lp-compare-flow__grid { grid-template-columns: 1fr 1fr; gap: 2rem; align-items: stretch; }
-    }
-    .lp-compare-col {
-      border-radius: 12px;
-      padding: 1.75rem 1.5rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .lp-compare-col--old {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-    .lp-compare-col--new {
-      background: linear-gradient(145deg, rgba(184,214,235,0.08) 0%, rgba(13,21,38,0.9) 45%);
-      border: 1px solid rgba(201, 169, 98, 0.35);
-      box-shadow: 0 24px 60px rgba(0,0,0,0.25);
-    }
-    .lp-compare-col__label {
-      font-family: var(--font-en);
-      font-size: 0.625rem;
-      font-weight: 800;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--gray);
-      margin: 0 0 1rem;
-    }
-    .lp-compare-col--new .lp-compare-col__label { color: var(--accent); }
-    .lp-compare-col__chain {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.5rem 0.35rem;
-      font-size: clamp(0.9375rem, 2vw, 1.0625rem);
-      font-weight: 600;
-      line-height: 1.5;
-      color: rgba(250,250,250,0.88);
-    }
-    .lp-compare-col--old .lp-compare-col__chain { color: rgba(250,250,250,0.55); }
-    .lp-compare-col__arrow {
-      font-family: var(--font-en);
-      font-size: 0.75rem;
-      color: rgba(250,250,250,0.25);
-      padding: 0 0.15rem;
-    }
-    .lp-compare-col__foot {
-      margin: 1.25rem 0 0;
-      font-size: 0.8125rem;
-      color: rgba(250,250,250,0.45);
-      line-height: 1.6;
-    }
-    .lp-compare-col--new .lp-compare-col__foot { color: rgba(250,250,250,0.6); }
-
-    /* —— Chat showcase (主役) —— */
-    .lp-chat-showcase {
-      position: relative;
-      padding: clamp(4rem, 10vw, 6.5rem) 1.5rem;
-      background:
-        radial-gradient(ellipse 80% 50% at 50% 0%, var(--mist) 0%, transparent 55%),
-        var(--black);
-      border-top: 1px solid var(--line);
-    }
-    .lp-chat-showcase__inner {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .lp-chat-showcase__head {
-      text-align: center;
-      margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
-    }
-    .lp-chat-showcase__kicker {
-      font-family: var(--font-en);
-      font-size: clamp(0.75rem, 1.5vw, 0.875rem);
-      font-weight: 700;
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      color: rgba(184,214,235,0.95);
-      margin: 0 0 1rem;
-    }
-    .lp-chat-showcase__title {
-      font-size: clamp(1.85rem, 4.5vw, 2.65rem);
-      font-weight: 700;
-      line-height: 1.2;
-      margin: 0 0 0.85rem;
-      letter-spacing: 0.02em;
-    }
-    .lp-chat-showcase__tag {
-      font-size: clamp(1rem, 2.2vw, 1.125rem);
-      color: rgba(250,250,250,0.62);
-      margin: 0 auto;
-      max-width: 28rem;
-      line-height: 1.65;
-      font-weight: 500;
-    }
-    .lp-chat-showcase__demo {
-      display: grid;
-      gap: 2rem;
-      align-items: start;
-    }
-    @media (min-width: 900px) {
-      .lp-chat-showcase__demo { grid-template-columns: 1.15fr 0.85fr; gap: 2.5rem; align-items: center; }
-    }
-    .lp-phone-xl {
-      position: relative;
-      max-width: 400px;
-      margin: 0 auto;
-      width: 100%;
-    }
-    .lp-phone-xl .lp-hero-phone__frame { border-radius: 44px; }
-    .lp-phone-xl .lp-hero-phone__screen { min-height: 460px; }
-    .lp-chat-showcase__aside {
-      padding: 0.5rem 0;
-    }
-    .lp-chat-showcase__aside h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin: 0 0 1rem;
-      letter-spacing: 0.02em;
-    }
-    .lp-chat-showcase__list {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-    .lp-chat-showcase__list li {
-      position: relative;
-      padding-left: 1.1rem;
-      margin-bottom: 0.75rem;
-      font-size: 0.875rem;
-      color: rgba(250,250,250,0.58);
-      line-height: 1.55;
-    }
-    .lp-chat-showcase__list li::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0.55em;
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-    .lp-chat-showcase__cta {
-      margin-top: 1.75rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-
-    /* —— Photo before / after —— */
-    .lp-ba {
-      padding-bottom: clamp(3rem, 8vw, 5rem);
-    }
-    .lp-ba__head {
-      text-align: center;
-      margin-bottom: 2.5rem;
-      max-width: 36rem;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .lp-ba__head h2 { margin-bottom: 0.65rem; }
-    .lp-ba__lead {
-      font-size: clamp(1.15rem, 2.5vw, 1.45rem);
-      font-weight: 700;
-      color: #1a1a1a;
-      margin: 0 0 0.5rem;
-      line-height: 1.4;
-    }
-    .lp-ba__sub {
-      font-size: 0.875rem;
-      color: #555;
-      margin: 0;
-      line-height: 1.65;
-    }
-    .lp-ba__grid {
-      display: grid;
-      gap: 1.5rem;
-    }
-    @media (min-width: 768px) {
-      .lp-ba__grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
-    }
-    .lp-ba-card {
-      border: 1px solid var(--line-dark);
-      border-radius: 12px;
-      overflow: hidden;
-      background: var(--white);
-    }
-    .lp-ba-card--after {
-      border-color: rgba(201, 169, 98, 0.45);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.06);
-    }
-    .lp-ba-card__label {
-      display: block;
-      font-family: var(--font-en);
-      font-size: 0.5625rem;
-      font-weight: 800;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      padding: 0.65rem 1rem;
-      background: #f0f2f5;
-      color: #666;
-      border-bottom: 1px solid var(--line-dark);
-    }
-    .lp-ba-card--after .lp-ba-card__label {
-      background: rgba(201, 169, 98, 0.12);
-      color: #6a5a2a;
-      border-bottom-color: rgba(201, 169, 98, 0.25);
-    }
-    .lp-ba-card__img {
-      aspect-ratio: 16/10;
-      background-size: cover;
-      background-position: center;
-      filter: saturate(0.85);
-    }
-    .lp-ba-card--after .lp-ba-card__img { filter: none; }
-    .lp-ba-card__body {
-      padding: 1rem 1.1rem 1.25rem;
-    }
-    .lp-ba-card__body p {
-      margin: 0;
-      font-size: 0.8125rem;
-      color: #555;
-      line-height: 1.6;
-    }
-    .lp-ba-card__body strong { color: #1a1a1a; }
-
-    /* —— Section shell —— */
-    .lp-sec {
-      padding: clamp(4.5rem, 12vw, 8rem) 1.5rem;
-      position: relative;
-    }
-    .lp-sec--light {
-      background: var(--white);
-      color: #1a1a1a;
-    }
-    .lp-sec--dark {
-      background: var(--black-soft);
-      color: var(--white);
-    }
-    .lp-sec--black {
-      background: var(--black);
-      color: var(--white);
-    }
-    .lp-sec__inner { max-width: var(--max); margin: 0 auto; }
-
-    .lp-sec__head {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 1.25rem 2rem;
-      align-items: start;
-      margin-bottom: clamp(2.5rem, 6vw, 3.5rem);
-    }
-    @media (max-width: 640px) {
-      .lp-sec__head { grid-template-columns: 1fr; }
-    }
-    .lp-sec__num {
-      font-family: var(--font-en);
-      font-size: clamp(3.5rem, 12vw, 6rem);
-      font-weight: 800;
-      line-height: 0.85;
-      color: rgba(0,0,0,0.06);
-    }
-    .lp-sec--dark .lp-sec__num,
-    .lp-sec--black .lp-sec__num { color: rgba(255,255,255,0.06); }
-    .lp-sec__meta {
-      padding-top: 0.5rem;
-    }
-    .lp-sec__en {
-      font-family: var(--font-en);
-      font-size: 0.6875rem;
-      font-weight: 700;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin: 0 0 0.65rem;
-    }
-    .lp-sec--light .lp-sec__en { color: #8a7340; }
-    .lp-sec__h {
-      font-size: clamp(1.5rem, 3.5vw, 2rem);
-      font-weight: 700;
-      line-height: 1.35;
-      margin: 0 0 0.75rem;
-      letter-spacing: 0.02em;
-    }
-    .lp-sec__lead {
-      font-size: 0.9375rem;
-      line-height: 1.85;
-      margin: 0;
-      max-width: 40rem;
-    }
-    .lp-sec--light .lp-sec__lead { color: #4a4a4a; }
-    .lp-sec--dark .lp-sec__lead,
-    .lp-sec--black .lp-sec__lead { color: rgba(250,250,250,0.65); }
-
-    /* —— Problems —— */
-    .lp-prob-grid {
-      display: grid;
-      gap: 1px;
-      background: var(--line-dark);
-      border: 1px solid var(--line-dark);
-    }
-    @media (min-width: 768px) {
-      .lp-prob-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    .lp-prob {
-      background: var(--white);
-      padding: 1.75rem 1.5rem;
-      transition: box-shadow 0.35s ease;
-    }
-    .lp-prob:hover { box-shadow: 0 20px 50px rgba(0,0,0,0.06); }
-    .lp-prob h4 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin: 0 0 0.65rem;
-      padding-left: 1rem;
-      border-left: 3px solid var(--accent);
-    }
-    .lp-prob p {
-      margin: 0;
-      font-size: 0.875rem;
-      color: #555;
-      line-height: 1.75;
-    }
-    .lp-prob-foot {
-      margin-top: 2rem;
-      font-size: 0.9375rem;
-      font-weight: 600;
-      text-align: center;
-      color: #333;
-    }
-    /* —— Mechanism cards + photo —— */
-    .lp-mech-grid {
-      display: grid;
-      gap: 1.25rem;
-    }
-    @media (min-width: 900px) {
-      .lp-mech-grid { grid-template-columns: repeat(5, 1fr); }
-    }
-    .lp-mech {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--line);
-      overflow: hidden;
-      transition: transform 0.35s var(--ease-out), border-color 0.35s;
-    }
-    .lp-mech:hover {
-      transform: translateY(-6px);
-      border-color: rgba(201, 169, 98, 0.35);
-    }
-    .lp-mech__img {
-      aspect-ratio: 4/3;
-      background-size: cover;
-      background-position: center;
-    }
-    .lp-mech__body { padding: 1.15rem 1rem 1.35rem; }
-    .lp-mech__step {
-      font-family: var(--font-en);
-      font-size: 0.625rem;
-      font-weight: 800;
-      letter-spacing: 0.15em;
-      color: var(--accent);
-      margin-bottom: 0.35rem;
-    }
-    .lp-mech__title {
-      font-size: 0.8125rem;
-      font-weight: 700;
-      margin: 0 0 0.4rem;
-      line-height: 1.45;
-    }
-    .lp-mech__desc {
-      margin: 0;
-      font-size: 0.75rem;
-      color: var(--gray);
-      line-height: 1.6;
-    }
-    .lp-mech-banner {
-      margin-top: 2.5rem;
-      padding: 2rem 1.5rem;
-      border: 1px solid rgba(201, 169, 98, 0.35);
-      background: linear-gradient(135deg, rgba(201, 169, 98, 0.08) 0%, transparent 60%);
-      text-align: center;
-    }
-    .lp-mech-banner__en {
-      font-family: var(--font-en);
-      font-size: 0.625rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-    .lp-mech-banner h3 {
-      font-size: 1.125rem;
-      font-weight: 700;
-      margin: 0 0 0.65rem;
-    }
-    .lp-mech-banner p {
-      margin: 0;
-      font-size: 0.875rem;
-      color: rgba(250,250,250,0.7);
-      max-width: 36rem;
-      margin-left: auto;
-      margin-right: auto;
-      line-height: 1.75;
-    }
-
-    /* —— Feature grid photos —— */
-    .lp-feat-grid {
-      display: grid;
-      gap: 1.25rem;
-    }
-    @media (min-width: 640px) {
-      .lp-feat-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (min-width: 1000px) {
-      .lp-feat-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    .lp-feat {
-      position: relative;
-      overflow: hidden;
-      background: var(--black-soft);
-      border: 1px solid var(--line);
-      min-height: 320px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-    }
-    .lp-feat__bg {
-      position: absolute;
-      inset: 0;
-      background-size: cover;
-      background-position: center;
-      transition: transform 0.7s var(--ease-out);
-    }
-    .lp-feat:hover .lp-feat__bg { transform: scale(1.06); }
-    .lp-feat__overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, transparent 38%, rgba(13,21,38,0.78) 100%);
-    }
-    .lp-feat__body {
-      position: relative;
-      z-index: 2;
-      padding: 1.5rem 1.25rem;
-    }
-    .lp-feat__en {
-      font-family: var(--font-en);
-      font-size: 0.5625rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.35rem;
-    }
-    .lp-feat h3 {
-      font-size: 0.9375rem;
-      font-weight: 700;
-      margin: 0 0 0.4rem;
-    }
-    .lp-feat p {
-      margin: 0;
-      font-size: 0.8125rem;
-      color: rgba(250,250,250,0.65);
-      line-height: 1.6;
-    }
-
-    /* —— Pricing —— */
-    .lp-price-banner {
-      padding: 2rem 1.75rem;
-      background: var(--black);
-      color: var(--white);
-      border: 1px solid var(--line);
-      margin-bottom: 2rem;
-    }
-    .lp-price-banner__en {
-      font-family: var(--font-en);
-      font-size: 0.625rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-    .lp-price-banner h3 {
-      font-size: clamp(1.15rem, 2.5vw, 1.45rem);
-      font-weight: 700;
-      margin: 0 0 0.65rem;
-      line-height: 1.45;
-    }
-    .lp-price-banner p {
-      margin: 0;
-      font-size: 0.875rem;
-      color: rgba(250,250,250,0.7);
-      line-height: 1.75;
-      max-width: 42rem;
-    }
-    .lp-plans {
-      display: grid;
-      gap: 1.25rem;
-    }
-    @media (min-width: 768px) {
-      .lp-plans { grid-template-columns: repeat(3, 1fr); align-items: stretch; }
-    }
-    .lp-plan {
-      border: 1px solid var(--line-dark);
-      padding: 1.75rem 1.35rem;
-      background: var(--white);
-      position: relative;
-    }
-    .lp-plan--hit {
-      border-color: rgba(201, 169, 98, 0.55);
-      box-shadow: 0 24px 60px rgba(0,0,0,0.08);
-    }
-    .lp-plan__badge {
-      position: absolute;
-      top: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: var(--font-en);
-      font-size: 0.5625rem;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      background: var(--black);
-      color: var(--white);
-      padding: 0.35rem 0.75rem;
-    }
-    .lp-plan h4 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin: 0 0 0.35rem;
-    }
-    .lp-plan__price {
-      font-size: 1.0625rem;
-      font-weight: 700;
-      margin: 0 0 1rem;
-    }
-    .lp-plan__price small {
-      display: block;
-      font-size: 0.6875rem;
-      font-weight: 500;
-      color: #888;
-      margin-top: 0.25rem;
-    }
-    .lp-plan ul {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-    .lp-plan li {
-      font-size: 0.8125rem;
-      color: #555;
-      padding: 0.45rem 0;
-      border-top: 1px solid rgba(0,0,0,0.06);
-      line-height: 1.5;
-    }
-    .lp-plan li:first-child { border-top: none; padding-top: 0; }
-    .lp-price-note {
-      margin-top: 1.75rem;
-      font-size: 0.75rem;
-      color: #888;
-      line-height: 1.65;
-    }
-
-    .lp-ba-price {
-      margin-top: 2rem;
-      padding: 1.5rem 1.25rem;
-      border-radius: 12px;
-      border: 1px solid var(--line-dark);
-      background: #fafafa;
-      text-align: center;
-    }
-    .lp-ba-price__num {
-      font-family: var(--font-en);
-      font-size: 1.75rem;
-      font-weight: 800;
-      color: #1a1a1a;
-      margin: 0 0 0.35rem;
-    }
-    .lp-ba-price__num span {
-      font-family: "Noto Sans JP", sans-serif;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #666;
-    }
-    .lp-ba-price p {
-      margin: 0;
-      font-size: 0.8125rem;
-      color: #666;
-      line-height: 1.55;
-    }
-
-    /* —— Flow —— */
-    .lp-flow {
-      display: grid;
-      gap: 1.5rem;
-    }
-    @media (min-width: 768px) {
-      .lp-flow { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-    }
-    .lp-flow__step {
-      text-align: left;
-      padding-top: 1.5rem;
-      border-top: 2px solid var(--black);
-    }
-    .lp-sec--dark .lp-flow__step { border-top-color: rgba(255,255,255,0.25); }
-    .lp-flow__num {
-      font-family: var(--font-en);
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--accent);
-      line-height: 1;
-      margin-bottom: 0.75rem;
-    }
-    .lp-sec--light .lp-flow__num { color: #8a7340; }
-    .lp-flow__step h4 {
-      font-size: 0.9375rem;
-      font-weight: 700;
-      margin: 0 0 0.4rem;
-    }
-    .lp-flow__step p {
-      margin: 0;
-      font-size: 0.8125rem;
-      color: #666;
-      line-height: 1.65;
-    }
-    .lp-sec--dark .lp-flow__step p { color: var(--gray); }
-
-    /* —— Contact —— */
-    .lp-contact {
-      padding: clamp(4rem, 10vw, 6rem) 1.5rem;
-      background: var(--black);
-      border-top: 1px solid var(--line);
-    }
-    .lp-contact__inner {
-      max-width: 560px;
-      margin: 0 auto;
-    }
-    .lp-contact__en {
-      font-family: var(--font-en);
-      font-size: clamp(2.35rem, 6vw, 3.5rem);
-      font-weight: 800;
-      text-align: center;
-      color: rgba(255,255,255,0.9);
-      margin: 0 0 0.35rem;
-      letter-spacing: -0.02em;
-    }
-    .lp-contact__sub {
-      text-align: center;
-      font-size: 0.9375rem;
-      color: var(--gray);
-      margin: 0 0 2rem;
-      line-height: 1.7;
-    }
-    .lp-form {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--line);
-      padding: 2rem 1.5rem;
-    }
-    .lp-form__field { margin-bottom: 1.1rem; }
-    .lp-form__field label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: rgba(250,250,250,0.55);
-      margin-bottom: 0.35rem;
-      letter-spacing: 0.04em;
-    }
-    .lp-form__field input,
-    .lp-form__field textarea {
-      width: 100%;
-      font-family: inherit;
-      font-size: 0.9375rem;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      background: rgba(13, 21, 38, 0.45);
-      color: var(--white);
-    }
-    .lp-form__field input:focus,
-    .lp-form__field textarea:focus {
-      outline: none;
-      border-color: rgba(201, 169, 98, 0.5);
-    }
-    .lp-form__field textarea { min-height: 120px; resize: vertical; }
-    .lp-form__submit {
-      width: 100%;
-      margin-top: 0.5rem;
-      font-family: var(--font-en);
-      font-size: 0.6875rem;
-      font-weight: 800;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      padding: 1.05rem;
-      background: var(--white);
-      color: var(--black);
-      border: none;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s;
-    }
-    .lp-form__submit:hover { opacity: 0.92; }
-    .lp-form__submit:active { transform: scale(0.99); }
-    .lp-form__err {
-      display: none;
-      color: #f87171;
-      font-size: 0.8125rem;
-      text-align: center;
-      margin-top: 0.75rem;
-    }
-    .lp-form.is-error .lp-form__err { display: block; }
-    .lp-form__hint {
-      margin-top: 1rem;
-      font-size: 0.75rem;
-      color: var(--gray);
-      text-align: center;
-      line-height: 1.6;
-    }
-    .lp-form__hint code { font-size: 0.7rem; }
-
-    .lp-cta-bar {
-      padding: 2.25rem 1.5rem;
-      background: linear-gradient(90deg, rgba(184,214,235,0.1) 0%, rgba(13,21,38,0.95) 50%, rgba(184,214,235,0.08) 100%);
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-    }
-    .lp-cta-bar__inner {
-      max-width: var(--max);
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      align-items: center;
-      text-align: center;
-    }
-    @media (min-width: 640px) {
-      .lp-cta-bar__inner {
-        flex-direction: row;
-        justify-content: space-between;
-        text-align: left;
-      }
-    }
-    .lp-cta-bar__inner p {
-      margin: 0;
-      font-size: clamp(1rem, 2vw, 1.125rem);
-      font-weight: 600;
-      color: rgba(250,250,250,0.88);
-      max-width: 28rem;
-      line-height: 1.5;
-    }
-
-    .lp-footer {
-      padding: 2rem 1.5rem 2.5rem;
-      text-align: center;
-      font-size: 0.6875rem;
-      color: var(--gray);
-      border-top: 1px solid var(--line);
-      background: var(--black);
-    }
-    .lp-footer a {
-      color: rgba(250,250,250,0.55);
-      text-decoration: underline;
-      text-underline-offset: 0.2em;
-    }
-
-    /* —— Dify サービス紹介チャット（埋め込み） —— */
-    /*
-      udify embed はルートを #dify-chatbot-bubble-button に置く（旧 #dify-chatbot-bubble は未使用）。
-      position: relative で fixed を上書きすると画面外に飛ぶので、fixed を維持し変数で余白だけ調整する。
-    */
-    #dify-chatbot-bubble-button {
-      position: fixed !important;
-      --dify-chatbot-bubble-button-right: calc(1.25rem + env(safe-area-inset-right, 0px));
-      --dify-chatbot-bubble-button-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
-      z-index: 2147483647 !important;
-      background: linear-gradient(155deg, #1e2a42 0%, #0d1526 45%, #121a2c 100%) !important;
-      border: 2px solid rgba(201, 169, 98, 0.9) !important;
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.06),
-        0 12px 40px rgba(0, 0, 0, 0.5),
-        0 0 0 0 rgba(201, 169, 98, 0.45) !important;
-      animation: lpDifyGlow 2.5s ease-in-out infinite !important;
-      transition: transform 0.2s var(--ease-out), box-shadow 0.2s !important;
-    }
-    #dify-chatbot-bubble-button:hover {
-      transform: scale(1.06) !important;
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.1),
-        0 16px 48px rgba(0, 0, 0, 0.55),
-        0 0 28px rgba(201, 169, 98, 0.55) !important;
-    }
-    @keyframes lpDifyGlow {
-      0%, 100% {
-        box-shadow:
-          0 0 0 1px rgba(255, 255, 255, 0.06),
-          0 12px 40px rgba(0, 0, 0, 0.5),
-          0 0 20px rgba(201, 169, 98, 0.35) !important;
-      }
-      50% {
-        box-shadow:
-          0 0 0 1px rgba(255, 255, 255, 0.1),
-          0 14px 44px rgba(0, 0, 0, 0.55),
-          0 0 36px rgba(201, 169, 98, 0.55) !important;
-      }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      #dify-chatbot-bubble-button { animation: none !important; }
-    }
-    /*
-      embed はプリロード iframe を body 直下に置き position:absolute にする。
-      そのため包含ブロックが文書全体になり、スクロール位置によってパネルがヒーロー付近に出る。
-      fixed でビューポート基準にし、右下ボタンの直上に載せる（LP スクロール時も常に同じ画面位置）。
-    */
-    #dify-chatbot-bubble-window {
-      position: fixed !important;
-      right: calc(1.25rem + env(safe-area-inset-right, 0px)) !important;
-      bottom: calc(1.25rem + 48px + 0.65rem + env(safe-area-inset-bottom, 0px)) !important;
-      left: auto !important;
-      top: auto !important;
-      z-index: 2147483646 !important;
-      width: min(24rem, calc(100vw - 1.5rem)) !important;
-      height: min(40rem, calc(100vh - 5rem)) !important;
-      max-height: min(40rem, calc(100dvh - 7rem)) !important;
-      border-radius: 1rem !important;
-      border: 1px solid rgba(201, 169, 98, 0.35) !important;
-      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.55) !important;
-      overflow: hidden !important;
-    }
-    .lp-dify-hint {
-      position: fixed;
-      z-index: 2147483640;
-      right: 1rem;
-      bottom: 88px;
-      max-width: 15.5rem;
-      padding: 0.75rem 0.95rem;
-      background: linear-gradient(135deg, rgba(13, 21, 38, 0.97) 0%, rgba(21, 29, 46, 0.98) 100%);
-      border: 1px solid rgba(201, 169, 98, 0.55);
-      border-radius: 12px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
-      pointer-events: none;
-      animation: lpDifyHintFloat 3s ease-in-out infinite;
-    }
-    @media (min-width: 900px) {
-      .lp-dify-hint { right: 1.5rem; bottom: 96px; }
-    }
-    @keyframes lpDifyHintFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .lp-dify-hint { animation: none; }
-    }
-    .lp-dify-hint__k {
-      font-family: var(--font-en);
-      font-size: 0.5625rem;
-      font-weight: 800;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(184, 214, 235, 0.95);
-      margin: 0 0 0.35rem;
-    }
-    .lp-dify-hint__t {
-      margin: 0;
-      font-size: 0.8125rem;
-      font-weight: 600;
-      line-height: 1.5;
-      color: rgba(250, 250, 250, 0.92);
-    }
-    .lp-dify-hint__t strong {
-      color: var(--accent);
-      font-weight: 700;
-    }
-    .lp-dify-hint__arr {
-      display: block;
-      margin-top: 0.5rem;
-      font-size: 0.6875rem;
-      color: rgba(250, 250, 250, 0.45);
-      letter-spacing: 0.06em;
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/nagaroom-shared.css">
 </head>
-<body>
-  <header class="lp-header" id="lp-header">
-    <a href="#" class="lp-logo" aria-label="NAGA ROOM">NAGA ROOM<small>FOR REAL ESTATE</small></a>
-    <a href="#contact" class="lp-header__cta" data-scroll="contact">掲載を試す</a>
+<body class="has-nr-header page-b2b-lp">
+  <header class="nr-header">
+    <div class="nr-header-inner">
+      <a href="index.html" class="nr-brand nr-brand--wordmark" aria-current="page">
+        <img src="img/nr-logo-wordmark.png" alt="NAGA ROOM ナガルーム" class="nr-brand-wordmark-img" width="200" height="44" decoding="async" />
+      </a>
+      <nav class="nr-nav" aria-label="主要ナビ">
+        <a href="#advantage">強み</a>
+        <a href="#benefits-b2b">メリット</a>
+        <a href="#flow">集客の流れ</a>
+        <a href="#contact">お問い合わせ</a>
+        <a href="rental.html" class="nr-nav-user">お部屋探しの方</a>
+      </nav>
+    </div>
   </header>
 
-  <section class="lp-hero">
-    <div class="lp-hero__bg" style="background-image:url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1920&q=85'); background-position:center 55%;" role="img" aria-label=""></div>
-    <div class="lp-hero__overlay"></div>
-    <div class="lp-hero__grain"></div>
-    <div class="lp-hero__inner">
-      <div class="lp-hero__layout">
-        <div class="lp-hero__copy" data-reveal>
-          <p class="lp-hero__badge"><span>Core</span> Chat Search</p>
-          <h1 class="lp-hero__title">探すより、話して見つかる<br>部屋探し。</h1>
-          <p class="lp-hero__lead">チャットで会話するだけで、あなたに合う物件が見えてくる。<span class="lp-hero__lead-sub">長崎エリアの不動産会社向けメディア。</span></p>
-          <div class="lp-hero__cta">
-            <a href="#contact" class="lp-btn lp-btn--light" data-scroll="contact">まずは1件だけ掲載してみる</a>
-            <a href="#chat-experience" class="lp-btn lp-btn--outline" data-scroll="chat-experience">体験を見る</a>
-            <p class="lp-hero__cta-note">4〜6月は無料掲載。まずは無料期間で試せます。</p>
-          </div>
+  <section class="nr-lp-hero" aria-labelledby="lp-hero-title">
+    <div class="nr-lp-hero-inner">
+      <div class="nr-lp-hero-copy">
+        <p class="nr-lp-badge">集客支援サービス</p>
+        <h1 id="lp-hero-title" class="nr-lp-hero-title">
+          20代の部屋探しが、<br>変わっている。
+        </h1>
+        <p class="nr-lp-hero-sub">若い世代に選ばれる不動産会社になるために。</p>
+        <p class="nr-lp-hero-desc">
+          SNS・AI・WEBを活用して、20代の賃貸ユーザーにアプローチする集客支援サービスです。
+        </p>
+        <div class="nr-landing-cta">
+          <a href="#contact" class="btn-primary">無料モニターに申し込む</a>
+          <a href="#advantage" class="btn-outline">NAGA ROOMの強み</a>
         </div>
-        <div class="lp-hero-phone" data-reveal>
-          <div class="lp-hero-phone__frame">
-            <div class="lp-hero-phone__screen">
-              <div class="lp-hero-phone__status">
-                <span>NAGA ROOM</span>
-                <span class="lp-hero-phone__dots">···</span>
-              </div>
-              <div class="lp-chat-stack">
-                <div class="lp-bubble lp-bubble--user">
-                  <span class="lp-bubble__who">User</span>
-                  静かな場所がいいです
-                </div>
-                <div class="lp-bubble lp-bubble--ai">
-                  <span class="lp-bubble__who">Chat</span>
-                  了解です。閑静なエリアを優先して探しますね。
-                </div>
-                <div class="lp-bubble lp-bubble--ai">
-                  <span class="lp-bubble__who">Chat</span>
-                  それならこのエリアが合いそうです。近い条件の物件を出します。
-                  <div class="lp-mini-card">
-                    <div class="lp-mini-card__img" style="background-image:url('https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&q=80');"></div>
-                    <div class="lp-mini-card__meta">
-                      <strong>2LDK · 駅徒歩8分</strong>
-                      家賃目安 ¥52,000〜
-                    </div>
-                  </div>
+        <p class="nr-lp-hero-callout">
+          <span class="nr-lp-callout-pill">Instagram / TikTok</span>
+          からの問い合わせが増加しています
+        </p>
+      </div>
+      <div class="nr-lp-hero-visual">
+        <div class="nr-lp-hero-phone-wrap">
+          <div class="nr-phone-frame nr-lp-hero-phone">
+            <div class="nr-phone-screen">
+              <div class="nr-phone-status"><span>Instagram</span><span>···</span></div>
+              <div class="nr-demo-bubble nr-demo-bubble--user" style="font-size:0.72rem;">この物件、内見できますか？</div>
+              <div class="nr-demo-bubble nr-demo-bubble--ai" style="font-size:0.72rem;">
+                もちろんです。AIが条件を整理してご案内しますね。
+                <div class="nr-demo-card">
+                  <div class="nr-demo-card-img" style="background-image:url('https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&q=80');"></div>
+                  <div class="nr-demo-card-meta"><strong>1K · 駅徒歩8分</strong>家賃 ¥5.2万〜</div>
                 </div>
               </div>
             </div>
           </div>
+          <p class="nr-lp-sns-tags" aria-hidden="true">
+            <span>Instagram</span><span>TikTok</span>
+          </p>
         </div>
-      </div>
-    </div>
-    <span class="lp-hero__scroll">Scroll</span>
-  </section>
-
-  <div class="lp-stats">
-    <div class="lp-stats__cell" data-reveal>
-      <div class="lp-stats__num">FREE</div>
-      <p class="lp-stats__label">4月〜6月は物件掲載無料<br>初期費用なしで参加いただけます</p>
-    </div>
-    <div class="lp-stats__cell" data-reveal>
-      <div class="lp-stats__num">4</div>
-      <p class="lp-stats__label">長崎・諫早・大村・佐世保<br>エリア特化の設計</p>
-    </div>
-    <div class="lp-stats__cell" data-reveal>
-      <div class="lp-stats__num">5</div>
-      <p class="lp-stats__label">SNS → LP → チャット → LINE → 反響<br>見つけてもらう導線を一体で</p>
-    </div>
-  </div>
-
-  <section class="lp-compare-flow" id="compare" aria-labelledby="compare-title">
-    <div class="lp-compare-flow__inner">
-      <div class="lp-compare-flow__head" data-reveal>
-        <p class="lp-sec__en">Difference</p>
-        <h2 class="lp-compare-flow__title" id="compare-title">検索サイトの「探す」から、会話の「見つかる」へ</h2>
-      </div>
-      <div class="lp-compare-flow__grid">
-        <div class="lp-compare-col lp-compare-col--old" data-reveal>
-          <p class="lp-compare-col__label">従来</p>
-          <div class="lp-compare-col__chain">
-            <span>検索</span><span class="lp-compare-col__arrow">→</span><span>一覧</span><span class="lp-compare-col__arrow">→</span><span>比較</span><span class="lp-compare-col__arrow">→</span><span>疲れる</span>
-          </div>
-          <p class="lp-compare-col__foot">条件を自分で言語化し、一覧を追いかける。</p>
-        </div>
-        <div class="lp-compare-col lp-compare-col--new" data-reveal>
-          <p class="lp-compare-col__label">NAGA ROOM</p>
-          <div class="lp-compare-col__chain">
-            <span>会話</span><span class="lp-compare-col__arrow">→</span><span>提案</span><span class="lp-compare-col__arrow">→</span><span>発見</span><span class="lp-compare-col__arrow">→</span><span>決まる</span>
-          </div>
-          <p class="lp-compare-col__foot">話した分だけ希望に寄り添い、物件にたどり着く。</p>
-        </div>
+        <p class="nr-lp-partner-badge">いま、一緒に未来をつくる<br>パートナーを探しています！</p>
       </div>
     </div>
   </section>
 
-  <section class="lp-sec lp-sec--light" id="issues">
-    <div class="lp-sec__inner">
-      <div class="lp-sec__head" data-reveal>
-        <span class="lp-sec__num" aria-hidden="true">01</span>
-        <div class="lp-sec__meta">
-          <p class="lp-sec__en">Why</p>
-          <h2 class="lp-sec__h">いま、接点の作り方が変わっている</h2>
-          <p class="lp-sec__lead">一覧のなかに埋もれず、会話から入れるかどうかが鍵です。</p>
-        </div>
-      </div>
-      <div class="lp-prob-grid" data-reveal>
-        <div class="lp-prob">
-          <h4>まだ言葉にできない希望がある</h4>
-          <p>項目だけでは伝わりにくいニーズに、会話で寄り添う。</p>
-        </div>
-        <div class="lp-prob">
-          <h4>見せ方で損している</h4>
-          <p>内見前の印象が反響を分ける。素材の質がそのまま成果に。</p>
-        </div>
-        <div class="lp-prob">
-          <h4>若年層に届きにくい</h4>
-          <p>検索よりメッセージに慣れた層へ、同じ導線では足りないことも。</p>
-        </div>
-        <div class="lp-prob">
-          <h4>掲載で終わらせたくない</h4>
-          <p>「見つけてもらう」から「話が始まる」までをひとつの体験に。</p>
-        </div>
-      </div>
-      <p class="lp-prob-foot" data-reveal>中心は<strong>チャットボット検索型体験</strong>。長崎エリアに寄せた導線で応えます。</p>
+  <section class="nr-lp-monitor" aria-labelledby="monitor-title">
+    <div class="nr-lp-monitor-inner">
+      <p class="nr-lp-monitor-kicker">ただいまモニター企業様を募集しています！</p>
+      <h2 id="monitor-title" class="nr-lp-monitor-title">限定<span>10</span>社</h2>
+      <p class="nr-lp-monitor-offer">3ヶ月間<strong>無料</strong>でお試しいただけます！</p>
+      <ul class="nr-lp-monitor-list">
+        <li>初期費用・月額費用 <strong>0円</strong>（3ヶ月間）</li>
+        <li>SNS投稿・LP制作・AIチャット対応</li>
+        <li>成果に合わせたご提案で柔軟に調整</li>
+        <li>4ヶ月目以降のプランをご提案</li>
+      </ul>
+      <a href="#contact" class="btn-primary nr-lp-monitor-cta">モニターに申し込む</a>
     </div>
   </section>
 
-  <section class="lp-sec lp-sec--dark" id="mechanism">
-    <div class="lp-sec__inner">
-      <div class="lp-sec__head" data-reveal>
-        <span class="lp-sec__num">02</span>
-        <div class="lp-sec__meta">
-          <p class="lp-sec__en">Flow</p>
-          <h2 class="lp-sec__h">仕組み：チャットが芯になる導線</h2>
-          <p class="lp-sec__lead">掲載から反響まで、<strong>チャット体験を中心</strong>に一直線でつなぎます。</p>
+  <section id="advantage" class="nr-b2b-section nr-lp-advantage" aria-labelledby="advantage-title">
+    <div class="nr-b2b-inner">
+      <p class="nr-b2b-kicker">Why NAGA ROOM</p>
+      <h2 class="nr-b2b-heading" id="advantage-title">なぜ、NAGA ROOMは革新的なのか</h2>
+      <p class="nr-b2b-lead nr-b2b-lead--center">
+        掲載して待つ「ポータル型」から、SNSで出会い・会話で選ばれる「体験型」へ。<br>
+        集客の入口から成約まで、ひとつの導線で設計しています。
+      </p>
+      <div class="nr-lp-advantage-grid">
+        <article class="nr-lp-adv-card nr-lp-adv-card--highlight">
+          <span class="nr-lp-adv-num">01</span>
+          <h3>オールインワンで完結</h3>
+          <p>SNS運用・物件LP・AIチャット・LINE導線をバラバラに外注せず、NAGA ROOMひとつで一気通貫。担当者の負担とコストを抑えます。</p>
+        </article>
+        <article class="nr-lp-adv-card">
+          <span class="nr-lp-adv-num">02</span>
+          <h3>20代の行動に合わせた設計</h3>
+          <p>検索サイトより、InstagramやTikTokで「映える物件」を見つける世代へ。彼らが日常的に使う接点から、自然に問い合わせへつなげます。</p>
+        </article>
+        <article class="nr-lp-adv-card">
+          <span class="nr-lp-adv-num">03</span>
+          <h3>AIが24時間ファースト対応</h3>
+          <p>営業時間外の問い合わせも取りこぼさない。条件整理から物件提案まで、チャットで自動対応。人が動くのは本当に必要なタイミングだけ。</p>
+        </article>
+        <article class="nr-lp-adv-card">
+          <span class="nr-lp-adv-num">04</span>
+          <h3>長崎エリアに特化</h3>
+          <p>全国ポータルとの消耗戦ではなく、長崎・諫早・大村・佐世保に集中。地域の暮らしに寄せた発信で、差別化しやすい設計です。</p>
+        </article>
+      </div>
+      <div class="nr-lp-compare-strip">
+        <div class="nr-lp-compare-item nr-lp-compare-item--old">
+          <p class="nr-lp-compare-label">従来のポータル型</p>
+          <p>検索 → 一覧比較 → 問い合わせ疲れ</p>
         </div>
-      </div>
-      <div class="lp-mech-grid" data-reveal>
-        <article class="lp-mech">
-          <div class="lp-mech__img" style="background-image:url('https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&q=80'); background-position:center 40%;"></div>
-          <div class="lp-mech__body">
-            <p class="lp-mech__step">STEP 01</p>
-            <h3 class="lp-mech__title">SNS</h3>
-            <p class="lp-mech__desc">興味のきっかけをつくり、LPへ誘導。</p>
-          </div>
-        </article>
-        <article class="lp-mech">
-          <div class="lp-mech__img" style="background-image:url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'); background-position:center 45%;"></div>
-          <div class="lp-mech__body">
-            <p class="lp-mech__step">STEP 02</p>
-            <h3 class="lp-mech__title">LP</h3>
-            <p class="lp-mech__desc">物件の空気感を丁寧に見せる。</p>
-          </div>
-        </article>
-        <article class="lp-mech">
-          <div class="lp-mech__img" style="background-image:url('https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?w=600&q=80'); background-position:center 42%;"></div>
-          <div class="lp-mech__body">
-            <p class="lp-mech__step">STEP 03</p>
-            <h3 class="lp-mech__title">チャットボット検索</h3>
-            <p class="lp-mech__desc">会話で希望を整理し物件へ。</p>
-          </div>
-        </article>
-        <article class="lp-mech">
-          <div class="lp-mech__img" style="background-image:url('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&q=80'); background-position:center 45%;"></div>
-          <div class="lp-mech__body">
-            <p class="lp-mech__step">STEP 04</p>
-            <h3 class="lp-mech__title">LINE</h3>
-            <p class="lp-mech__desc">相談・深掘り、貴社への接点へ。</p>
-          </div>
-        </article>
-        <article class="lp-mech">
-          <div class="lp-mech__img" style="background-image:url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80'); background-position:center 40%;"></div>
-          <div class="lp-mech__body">
-            <p class="lp-mech__step">STEP 05</p>
-            <h3 class="lp-mech__title">反響</h3>
-            <p class="lp-mech__desc">対話のなかで見えた物件として。</p>
-          </div>
-        </article>
-      </div>
-      <div class="lp-mech-banner" data-reveal>
-        <p class="lp-mech-banner__en">Core</p>
-        <h3>チャットボット検索型体験が、差別化の芯</h3>
-        <p>会話で希望に近づく。掲載が「待ち」だけでなく、接客の入り口になります。</p>
+        <div class="nr-lp-compare-arrow" aria-hidden="true">→</div>
+        <div class="nr-lp-compare-item nr-lp-compare-item--new">
+          <p class="nr-lp-compare-label">NAGA ROOM</p>
+          <p>SNS発見 → 会話 → 提案 → 内見・成約</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="lp-chat-showcase" id="chat-experience">
-    <div class="lp-chat-showcase__inner">
-      <header class="lp-chat-showcase__head" data-reveal>
-        <p class="lp-chat-showcase__kicker">Chat Search · Core</p>
-        <h2 class="lp-chat-showcase__title">チャットボット検索型体験</h2>
-        <p class="lp-chat-showcase__tag">説明ではなく、<strong style="color:rgba(250,250,250,0.88);">会話の体験</strong>がこのサービスの顔です。</p>
-      </header>
-      <div class="lp-chat-showcase__demo">
-        <div class="lp-phone-xl" data-reveal>
-          <div class="lp-hero-phone__frame">
-            <div class="lp-hero-phone__screen">
-              <div class="lp-hero-phone__status">
-                <span>Preview</span>
-                <span class="lp-hero-phone__dots">···</span>
-              </div>
-              <div class="lp-chat-stack">
-                <div class="lp-bubble lp-bubble--user">
-                  <span class="lp-bubble__who">User</span>
-                  静かな場所がいいです
-                </div>
-                <div class="lp-bubble lp-bubble--ai">
-                  <span class="lp-bubble__who">AI</span>
-                  それならこのエリアが合いそうです。閑静な街並みの物件を優先して出しますね。
-                </div>
-                <div class="lp-bubble lp-bubble--ai">
-                  <span class="lp-bubble__who">Match</span>
-                  おすすめ物件
-                  <div class="lp-mini-card">
-                    <div class="lp-mini-card__img" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&q=80'); background-position:center 45%;"></div>
-                    <div class="lp-mini-card__meta">
-                      <strong>閑静エリア · 2LDK</strong>
-                      条件に近い物件をカードで提示
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <aside class="lp-chat-showcase__aside" data-reveal>
-          <h3>体験のポイント</h3>
-          <ul class="lp-chat-showcase__list">
-            <li>雰囲気や暮らし方も、会話で拾って提案に反映できる。</li>
-            <li>検索フォームより「話してみる」方が入りやすい若年層に届く。</li>
-            <li>LINE・LP とつなぎ、<strong style="color:rgba(250,250,250,0.85);">反響まで一気通貫</strong>しやすい。</li>
-          </ul>
-          <div class="lp-chat-showcase__cta">
-            <a href="#contact" class="lp-btn lp-btn--light" data-scroll="contact">無料期間中に試してみる</a>
-            <a href="#compare" class="lp-btn lp-btn--outline" data-scroll="compare">従来との違い</a>
-          </div>
-        </aside>
-      </div>
-    </div>
-  </section>
-
-  <section class="lp-sec lp-sec--dark">
-    <div class="lp-sec__inner">
-      <div class="lp-sec__head" data-reveal>
-        <span class="lp-sec__num">03</span>
-        <div class="lp-sec__meta">
-          <p class="lp-sec__en">Strengths</p>
-          <h2 class="lp-sec__h">チャットを軸に、届く設計</h2>
-          <p class="lp-sec__lead">長崎エリア特化。SNS・LP・LINE がチャット体験とつながります。</p>
-        </div>
-      </div>
-      <div class="lp-feat-grid">
-        <article class="lp-feat" data-reveal>
-          <div class="lp-feat__bg" style="background-image:url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80'); background-position:center 35%;"></div>
-          <div class="lp-feat__overlay"></div>
-          <div class="lp-feat__body">
-            <p class="lp-feat__en">Youth</p>
-            <h3>若年層へのアプローチ</h3>
-            <p>会話・SNSに馴染んだ導線で、最初の一歩を軽く。</p>
-          </div>
-        </article>
-        <article class="lp-feat" data-reveal>
-          <div class="lp-feat__bg" style="background-image:url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80'); background-position:center 60%;"></div>
-          <div class="lp-feat__overlay"></div>
-          <div class="lp-feat__body">
-            <p class="lp-feat__en">Local</p>
-            <h3>長崎エリア特化</h3>
-            <p>長崎・諫早・大村・佐世保を想定。</p>
-          </div>
-        </article>
-        <article class="lp-feat" data-reveal>
-          <div class="lp-feat__bg" style="background-image:url('https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80'); background-position:center 45%;"></div>
-          <div class="lp-feat__overlay"></div>
-          <div class="lp-feat__body">
-            <p class="lp-feat__en">Landing</p>
-            <h3>LP で魅力を伝える</h3>
-            <p>暮らしの空気感を、物件ごとに。</p>
-          </div>
-        </article>
-        <article class="lp-feat" data-reveal>
-          <div class="lp-feat__bg" style="background-image:url('https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80'); background-position:center 50%;"></div>
-          <div class="lp-feat__overlay"></div>
-          <div class="lp-feat__body">
-            <p class="lp-feat__en">Social</p>
-            <h3>SNS と相性の良い素材</h3>
-            <p>発信と連動しやすい見せ方。</p>
-          </div>
-        </article>
-        <article class="lp-feat" data-reveal>
-          <div class="lp-feat__bg" style="background-image:url('https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?w=800&q=80'); background-position:center 40%;"></div>
-          <div class="lp-feat__overlay"></div>
-          <div class="lp-feat__body">
-            <p class="lp-feat__en">Line</p>
-            <h3>LINE 導線</h3>
-            <p>相談への橋渡し。接点をつくりやすく。</p>
-          </div>
-        </article>
-        <article class="lp-feat" data-reveal>
-          <div class="lp-feat__bg" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80'); background-position:center 45%;"></div>
-          <div class="lp-feat__overlay"></div>
-          <div class="lp-feat__body">
-            <p class="lp-feat__en">Visual</p>
-            <h3>写真・空気感</h3>
-            <p>視覚で差がつく。撮影オプションでさらに引き上げ可能。</p>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="lp-sec lp-sec--light" id="pricing">
-    <div class="lp-sec__inner">
-      <div class="lp-sec__head" data-reveal>
-        <span class="lp-sec__num">04</span>
-        <div class="lp-sec__meta">
-          <p class="lp-sec__en">Plans</p>
-          <h2 class="lp-sec__h">料金プラン</h2>
-          <p class="lp-sec__lead">入り方に合わせて三段階。主力はスタンダード。</p>
-        </div>
-      </div>
-      <div class="lp-price-banner" data-reveal>
-        <p class="lp-price-banner__en">Campaign</p>
-        <h3>4月〜6月は、無料で物件掲載いただけます</h3>
-        <p>掲載数を増やし、サービス内の物件量と見せ方を整える期間です。不動産会社様にとっては、初期費用なしで掲載を始められるタイミングです。</p>
-      </div>
-      <p class="lp-sec__lead" style="margin-bottom:1.5rem;font-weight:600;color:#1a1a1a;" data-reveal><strong>7月から</strong>、以下の有料プランが開始します。</p>
-      <div class="lp-plans" data-reveal>
-        <article class="lp-plan">
-          <h4>ライト</h4>
-          <p class="lp-plan__price">月額 2,000円<small>1物件あたり（税込表記は別途ご案内）</small></p>
+  <section id="benefits-b2b" class="nr-b2b-section nr-b2b-section--alt" aria-labelledby="benefits-b2b-title">
+    <div class="nr-b2b-inner">
+      <p class="nr-b2b-kicker">For Partners</p>
+      <h2 class="nr-b2b-heading" id="benefits-b2b-title">不動産会社にとってのメリット</h2>
+      <p class="nr-b2b-lead nr-b2b-lead--center">掲載料を払っても埋もれる、ではなく。選ばれる理由をつくります。</p>
+      <div class="nr-lp-benefit-cols">
+        <article class="nr-lp-benefit-block">
+          <h3>集客コストの最適化</h3>
           <ul>
-            <li>通常掲載</li>
-            <li>まず掲載を始めたい会社様向けの入口プラン</li>
+            <li>SUUMO等ポータルへの依存度を下げ、SNS起点の新規接点を確保</li>
+            <li>モニター期間は初期・月額0円。まず成果を見てから本格導入を判断できる</li>
+            <li>外注を分散させず、運用コストを抑えられるオールインワン設計</li>
           </ul>
         </article>
-        <article class="lp-plan lp-plan--hit">
-          <span class="lp-plan__badge">主力プラン</span>
-          <h4>スタンダード</h4>
-          <p class="lp-plan__price">月額 5,000円<small>1物件あたり（税込表記は別途ご案内）</small></p>
+        <article class="nr-lp-benefit-block">
+          <h3>20代層へのリーチ拡大</h3>
           <ul>
-            <li>優先表示</li>
-            <li>LINE 提案で優先的に紹介</li>
-            <li>SNS 露出の対象</li>
+            <li>電話よりチャット、一覧よりSNS——若年層の行動に合った導線</li>
+            <li>物件の「暮らしのイメージ」をLPとSNSで伝え、内見前の印象を高める</li>
+            <li>問い合わせの質が上がり、成約までの時間を短縮しやすい</li>
           </ul>
         </article>
-        <article class="lp-plan">
-          <h4>プレミアム</h4>
-          <p class="lp-plan__price">月額 10,000円<small>1物件あたり（税込表記は別途ご案内）</small></p>
+        <article class="nr-lp-benefit-block">
+          <h3>業務負担の軽減</h3>
           <ul>
-            <li>上位固定表示</li>
-            <li>特集掲載</li>
-            <li>強い露出を取りたい会社様向け</li>
+            <li>AIが一次対応。よくある質問・条件整理を自動化</li>
+            <li>反響レポートで効果が見える。改善点も一緒に提案</li>
+            <li>SNS投稿・LP制作もお任せ。社内に専任がいなくても始められる</li>
           </ul>
         </article>
       </div>
-      <p class="lp-price-note" data-reveal>※ 表示順・露出の詳細条件は、開始前にご案内いたします。※ 価格は税抜／税込など、契約時に明確化します。</p>
     </div>
   </section>
 
-  <section class="lp-sec lp-sec--light lp-ba" id="photo">
-    <div class="lp-sec__inner">
-      <div class="lp-ba__head" data-reveal>
-        <p class="lp-sec__en">Photo</p>
-        <h2 class="lp-sec__h">撮影オプション</h2>
-        <p class="lp-ba__lead">同じ物件でも、ここまで変わる。</p>
-        <p class="lp-ba__sub">スマホの一枚と、プロの一枚では<strong>反響の入り方が変わる</strong>。掲載の「見える化」として使えます。</p>
-      </div>
-      <div class="lp-ba__grid">
-        <article class="lp-ba-card" data-reveal>
-          <span class="lp-ba-card__label">Before</span>
-          <div class="lp-ba-card__img" style="background-image:url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80'); background-position:center 50%;" role="img" aria-label=""></div>
-          <div class="lp-ba-card__body">
-            <p><strong>スマホ撮影・物撮り中心</strong><br>情報は伝わるが、印象で選ばれにくいことも。</p>
-          </div>
+  <section id="benefits-user" class="nr-b2b-section" aria-labelledby="benefits-user-title">
+    <div class="nr-b2b-inner">
+      <p class="nr-b2b-kicker">For Renters</p>
+      <h2 class="nr-b2b-heading" id="benefits-user-title">ユーザー（20代）にとってのメリット</h2>
+      <p class="nr-b2b-lead nr-b2b-lead--center">
+        ユーザー体験が良いほど、問い合わせは増え、貴社の物件が選ばれやすくなります。
+      </p>
+      <div class="nr-features-grid" style="margin-top:1.75rem;">
+        <article class="nr-feature-card nr-lp-feature">
+          <h3>「探す」より「見つかる」</h3>
+          <p>普段見ているSNSの流れの中で、気になる物件に自然と出会える。わざわざポータルを開かなくていい。</p>
         </article>
-        <article class="lp-ba-card lp-ba-card--after" data-reveal>
-          <span class="lp-ba-card__label">After · 撮影オプション</span>
-          <div class="lp-ba-card__img" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80'); background-position:center 45%;" role="img" aria-label=""></div>
-          <div class="lp-ba-card__body">
-            <p><strong>一眼・ライティング・空気感</strong><br>LP・SNSにそのまま使える<strong>反響を意識した素材</strong>に。</p>
-          </div>
+        <article class="nr-feature-card nr-lp-feature">
+          <h3>会話で条件が整理できる</h3>
+          <p>まだ言葉にできない希望も、チャットなら気軽に伝えられる。AIが整理して、合う物件を提案。</p>
+        </article>
+        <article class="nr-feature-card nr-lp-feature">
+          <h3>いつでも気軽に相談</h3>
+          <p>電話のプレッシャーなし。24時間AIが対応し、必要ならLINEでスタッフにつながる。</p>
+        </article>
+        <article class="nr-feature-card nr-lp-feature">
+          <h3>物件の「空気感」が伝わる</h3>
+          <p>チラシ的な情報だけでなく、暮らしのイメージが伝わるLPと写真。内見前からワクワクできる。</p>
         </article>
       </div>
-      <div class="lp-ba-price" data-reveal>
-        <p class="lp-ba-price__num">30,000円<span> / 1件（税込表記は別途ご案内）</span></p>
-        <p>撮影代行ではなく、<strong>問い合わせにつながる見せ方</strong>としてご利用ください。</p>
+      <p class="nr-lp-user-bridge">
+        <a href="rental.html">実際のチャット体験はこちら →</a>
+      </p>
+    </div>
+  </section>
+
+  <section id="features" class="nr-b2b-section nr-b2b-section--alt" aria-labelledby="features-title">
+    <div class="nr-b2b-inner">
+      <p class="nr-b2b-kicker">Features</p>
+      <h2 class="nr-b2b-heading" id="features-title">NAGA ROOMの特徴</h2>
+      <p class="nr-b2b-lead nr-b2b-lead--center">SNS運用・LP制作・AI対応まで、すべてNAGA ROOMにおまかせください。</p>
+      <div class="nr-features-grid" style="margin-top:1.75rem;">
+        <article class="nr-feature-card nr-lp-feature">
+          <svg class="nr-feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="3.5"/></svg>
+          <h3>SNSで魅せる</h3>
+          <p>Instagram・TikTokで物件の魅力を発信し、若い世代にリーチします。</p>
+        </article>
+        <article class="nr-feature-card nr-lp-feature">
+          <svg class="nr-feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h14" stroke-linecap="round"/></svg>
+          <h3>専用LPで伝える</h3>
+          <p>物件ごとにスタイリッシュなLPを制作。問い合わせにつながる見せ方を設計します。</p>
+        </article>
+        <article class="nr-feature-card nr-lp-feature">
+          <svg class="nr-feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-4l-4 4v-4z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>AIでサポート</h3>
+          <p>24時間対応のAIチャットで、物件の質問や内見予約をスムーズに受け付けます。</p>
+        </article>
+        <article class="nr-feature-card nr-lp-feature">
+          <svg class="nr-feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 19V5M4 19h16M8 15l3-3 3 2 4-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>効果を見える化</h3>
+          <p>アクセス数・問い合わせ数をレポート。改善提案もお伝えします。</p>
+        </article>
       </div>
     </div>
   </section>
 
-  <section class="lp-sec lp-sec--light">
-    <div class="lp-sec__inner">
-      <div class="lp-sec__head" data-reveal>
-        <span class="lp-sec__num">05</span>
-        <div class="lp-sec__meta">
-          <p class="lp-sec__en">Process</p>
-          <h2 class="lp-sec__h">導入の流れ</h2>
-          <p class="lp-sec__lead">お問い合わせから掲載まで、シンプルに。</p>
-        </div>
+  <section id="flow" class="nr-b2b-section" aria-labelledby="flow-title">
+    <div class="nr-b2b-inner">
+      <p class="nr-b2b-kicker">Flow</p>
+      <h2 class="nr-b2b-heading" id="flow-title">集客の流れ</h2>
+      <div class="nr-lp-flow">
+        <article class="nr-lp-flow-step"><span class="nr-lp-flow-num">01</span><h3>SNSで発見</h3><p>Instagram・TikTokで魅力的な物件情報を発信</p></article>
+        <span class="nr-lp-flow-arrow" aria-hidden="true">→</span>
+        <article class="nr-lp-flow-step"><span class="nr-lp-flow-num">02</span><h3>物件LPへ</h3><p>スタイリッシュなLPで興味を引き、詳細へ誘導</p></article>
+        <span class="nr-lp-flow-arrow" aria-hidden="true">→</span>
+        <article class="nr-lp-flow-step"><span class="nr-lp-flow-num">03</span><h3>AIチャットで対応</h3><p>AIが質問に回答し、内見予約までスムーズに</p></article>
+        <span class="nr-lp-flow-arrow" aria-hidden="true">→</span>
+        <article class="nr-lp-flow-step"><span class="nr-lp-flow-num">04</span><h3>内見・成約へ</h3><p>効率的な集客で、成約率の向上につながります</p></article>
       </div>
-      <div class="lp-flow" data-reveal>
-        <div class="lp-flow__step">
-          <span class="lp-flow__num">01</span>
-          <h4>お問い合わせ</h4>
-          <p>フォームまたはお電話でご連絡ください。</p>
-        </div>
-        <div class="lp-flow__step">
-          <span class="lp-flow__num">02</span>
-          <h4>掲載相談</h4>
-          <p>プランや露出のイメージをすり合わせます。</p>
-        </div>
-        <div class="lp-flow__step">
-          <span class="lp-flow__num">03</span>
-          <h4>物件情報の共有</h4>
-          <p>写真・文案など、ご提供形式に合わせて進行します。</p>
-        </div>
-        <div class="lp-flow__step">
-          <span class="lp-flow__num">04</span>
-          <h4>掲載開始</h4>
-          <p>4〜6月は無料掲載期間内に順次公開します。</p>
+    </div>
+  </section>
+
+  <section class="nr-b2b-section nr-b2b-section--alt" aria-labelledby="pain-title">
+    <div class="nr-b2b-inner">
+      <p class="nr-b2b-kicker">Problems</p>
+      <h2 class="nr-b2b-heading" id="pain-title">こんなお悩みありませんか？</h2>
+      <ul class="nr-lp-pain-list nr-lp-pain-list--centered">
+        <li>SNSをやっているが、反応が少ない</li>
+        <li>20代からの問い合わせが増えない</li>
+        <li>SUUMOなどポータルサイトのコストが高い</li>
+        <li>自社サイトからの集客が弱い</li>
+        <li>ITやAIの活用方法がわからない</li>
+      </ul>
+      <p class="nr-lp-pain-solution nr-lp-pain-solution--center">NAGA ROOMが<strong>すべて解決</strong>します！</p>
+    </div>
+  </section>
+
+  <section class="nr-b2b-section nr-lp-rep-section" aria-labelledby="rep-title">
+    <div class="nr-b2b-inner">
+      <div class="nr-lp-rep-layout">
+        <header class="nr-lp-rep-intro">
+          <p class="nr-b2b-kicker">Message</p>
+          <h2 class="nr-b2b-heading" id="rep-title">代表挨拶</h2>
+          <p class="nr-lp-rep-byline nr-lp-rep-byline--in-intro">代表 <strong>大津 祐太</strong></p>
+        </header>
+        <figure class="nr-lp-rep-photo-col">
+          <div class="nr-lp-rep-photo-frame">
+            <img src="img/nr-rep-otsu.png" alt="NAGA ROOM 代表 大津祐太" class="nr-lp-rep-photo" width="983" height="1015" loading="lazy" decoding="async" />
+          </div>
+          <figcaption class="nr-lp-rep-byline nr-lp-rep-byline--under-photo">代表 <strong>大津 祐太</strong></figcaption>
+        </figure>
+        <div class="nr-lp-rep-body-wrap">
+          <div class="nr-lp-rep-body">
+            <p>はじめまして、NAGA ROOM代表の大津祐太です。</p>
+            <p>私はこれまで、AI支援導入事業やSNSマーケティング支援に携わり、多くの企業の集客や業務効率化をサポートしてきました。</p>
+            <p>そんな中で、父が勤めている大通エージェンシーの課題や、長崎の不動産業界が抱える集客・情報発信の遅れを真摯に受けとめました。</p>
+            <p>長崎の不動産業界がもっと進化し、若い世代に選ばれる業界へ。その想いで、このプロジェクトを始めました。</p>
+            <p>不動産会社様と一緒に、20代に選ばれる新しい集客のカタチをつくり、長崎の未来を本気で盛り上げていきます。</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="lp-contact" id="contact">
-    <div class="lp-contact__inner">
-      <h2 class="lp-contact__en" data-reveal>Contact</h2>
-      <p class="lp-contact__sub" data-reveal>まずは<strong style="color:rgba(250,250,250,0.92);">1件だけ</strong>でも。無料掲載期間中に、チャット体験込みの出し方をご案内します。</p>
-      <form class="lp-form" id="lp-lead-form" data-lead-form novalidate data-reveal>
-        <div class="lp-form__field">
-          <label for="co">会社名</label>
-          <input type="text" id="co" name="company" autocomplete="organization" placeholder="株式会社○○不動産">
-        </div>
-        <div class="lp-form__field">
-          <label for="em">メールアドレス *</label>
-          <input type="email" id="em" name="email" autocomplete="email" required placeholder="contact@example.com">
-        </div>
-        <div class="lp-form__field">
-          <label for="msg">ご用件</label>
-          <textarea id="msg" name="message" placeholder="掲載希望の物件概要やご質問など"></textarea>
-        </div>
-        <button type="submit" class="lp-form__submit">1件から掲載を相談する</button>
-        <p class="lp-form__err" role="alert">メールアドレスを入力してください。</p>
-        <p class="lp-form__hint">送信でメールアプリが開き、受付先 <code>youtaidajin4@gmail.com</code> 宛の下書きが作成されます。</p>
+  <section id="contact" class="nr-b2b-contact" aria-labelledby="contact-title">
+    <div class="nr-b2b-inner nr-lp-contact-grid">
+      <div class="nr-lp-contact-info">
+        <p class="nr-b2b-kicker">Contact</p>
+        <h2 class="nr-b2b-heading" id="contact-title" style="color:#fff;">まずはお気軽にご相談ください！</h2>
+        <p class="nr-b2b-contact-lead">ご相談・お問い合わせお待ちしております！モニター枠は<strong>限定10社</strong>です。</p>
+        <ul class="nr-lp-contact-list">
+          <li><span class="nr-lp-contact-label">TEL</span><a href="tel:07024100358">070-2410-0358</a></li>
+          <li><span class="nr-lp-contact-label">MAIL</span><a href="mailto:youtaidajin4@gmail.com">youtaidajin4@gmail.com</a></li>
+          <li><span class="nr-lp-contact-label">Instagram</span><a href="https://www.instagram.com/yuta___otsu/" target="_blank" rel="noopener noreferrer">@yuta___otsu</a></li>
+          <li><span class="nr-lp-contact-label">NAGA ROOM</span><a href="https://www.instagram.com/nagaroom_official/" target="_blank" rel="noopener noreferrer">@nagaroom_official</a></li>
+          <li><span class="nr-lp-contact-label">LINE</span><a href="https://line.me/ti/p/pPiqI53v4p" target="_blank" rel="noopener noreferrer">LINEで相談する</a></li>
+        </ul>
+      </div>
+      <form class="nr-b2b-form" id="b2bLeadForm" novalidate>
+        <label class="nr-b2b-field"><span>会社名</span><input type="text" name="company" autocomplete="organization" placeholder="株式会社○○不動産"></label>
+        <label class="nr-b2b-field"><span>お名前 <em>*</em></span><input type="text" name="name" autocomplete="name" required placeholder="山田 太郎"></label>
+        <label class="nr-b2b-field"><span>メールアドレス <em>*</em></span><input type="email" name="email" autocomplete="email" required placeholder="contact@example.com"></label>
+        <label class="nr-b2b-field"><span>電話番号</span><input type="tel" name="phone" autocomplete="tel" placeholder="090-0000-0000"></label>
+        <label class="nr-b2b-field"><span>ご用件</span><textarea name="message" rows="4" placeholder="モニター参加のご希望、掲載物件数、ご質問など"></textarea></label>
+        <button type="submit" class="btn-primary nr-b2b-submit">1件から掲載を相談する</button>
+        <p class="nr-b2b-form-err" role="alert" hidden>お名前とメールアドレスを入力してください。</p>
+        <p class="nr-b2b-form-hint">送信でメールアプリが開き、受付先 <code>youtaidajin4@gmail.com</code> 宛の下書きが作成されます。</p>
       </form>
     </div>
   </section>
 
-  <section class="lp-cta-bar" aria-label="掲載の呼びかけ">
-    <div class="lp-cta-bar__inner">
-      <p data-reveal>無料期間中に、まずは1件から。チャット体験の出し方もご一緒に。</p>
-      <a href="#contact" class="lp-btn lp-btn--light" data-scroll="contact" data-reveal>まずは1件だけ掲載してみる</a>
-    </div>
-  </section>
-
-  <footer class="lp-footer">
-    <p>お問い合わせ内容は掲載相談・ご返信のために利用し、目的外では利用いたしません。</p>
-    <p style="margin-top:0.75rem;">© NAGA ROOM · Nagasaki rental media for partners</p>
-    <p style="margin-top:0.5rem;"><a href="rental.html">ユーザー向け体験（デモ）</a></p>
+  <footer class="nr-page-footer nr-lp-footer">
+    <a href="index.html">サービスTOP</a>
+    <a href="rental.html">お部屋探し（チャット）</a>
+    <a href="listings.html">物件一覧</a>
+    <a href="#contact">お問い合わせ</a>
+    <p class="nr-lp-footer-copy">© NAGA ROOM · 代表 大津 祐太</p>
   </footer>
 
   <script>
-    (function () {
-      var LEAD_MAILTO = 'youtaidajin4@gmail.com';
-      var header = document.getElementById('lp-header');
-
-      window.addEventListener('scroll', function () {
-        if (!header) return;
-        header.classList.toggle('is-solid', window.scrollY > 48);
-      }, { passive: true });
-
-      document.querySelectorAll('[data-scroll]').forEach(function (el) {
-        el.addEventListener('click', function (e) {
-          var id = el.getAttribute('data-scroll');
-          var t = id ? document.getElementById(id) : null;
-          if (t) {
-            e.preventDefault();
-            t.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        });
-      });
-
-      var io = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (en) {
-            if (en.isIntersecting) {
-              en.target.classList.add('is-inview');
-              io.unobserve(en.target);
-            }
-          });
-        },
-        { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
-      );
-      document.querySelectorAll('[data-reveal]').forEach(function (el) {
-        io.observe(el);
-      });
-
-      var form = document.getElementById('lp-lead-form');
-      if (form) {
-        form.addEventListener('submit', function (e) {
-          e.preventDefault();
-          form.classList.remove('is-error');
-          var fd = new FormData(form);
-          var company = String(fd.get('company') || '').trim();
-          var email = String(fd.get('email') || '').trim();
-          var message = String(fd.get('message') || '').trim();
-          if (!email) {
-            form.classList.add('is-error');
-            return;
-          }
-          var body =
-            '【NAGA ROOM 掲載相談】\n\n会社名: ' +
-            (company || '（未入力）') +
-            '\nメール: ' +
-            email +
-            '\n\nご用件:\n' +
-            (message || '（未入力）');
-          window.location.href =
-            'mailto:' +
-            LEAD_MAILTO +
-            '?subject=' +
-            encodeURIComponent('NAGA ROOM 掲載相談') +
-            '&body=' +
-            encodeURIComponent(body);
-        });
-      }
-    })();
-  </script>
-  <!--
-    Dify / UDify でチャットアプリを更新したら:
-    1) 埋め込みコードを再発行し、下の token が最新か確認する（古いトークンのままだと旧アプリに繋がる）
-    2) スクリプト内 DIFY_EMBED_CACHE_BUST の値を変えて保存（embed.min.js のブラウザキャッシュを避ける）
-  -->
-  <script>
-    (function () {
-      var DIFY_TOKEN = 'AnAuoBxIhyE6PJJ6';
-      var DIFY_EMBED_CACHE_BUST = '20260329-chat-fixed';
-
-      try {
-        var i;
-        var toDrop = [];
-        /* 「embed」単体は広すぎるので除外（他スクリプトのキーを消さない） */
-        var keyRe = /dify|udify|chatbot|7k6lrRG6adicH9qD|AnAuoBxIhyE6PJJ6/i;
-        for (i = 0; i < localStorage.length; i++) {
-          var lk = localStorage.key(i);
-          if (lk && keyRe.test(lk)) toDrop.push(lk);
+  (function () {
+    var LEAD_MAILTO = 'youtaidajin4@gmail.com';
+    var form = document.getElementById('b2bLeadForm');
+    if (!form) return;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var err = form.querySelector('.nr-b2b-form-err');
+      var fd = new FormData(form);
+      var company = String(fd.get('company') || '').trim();
+      var name = String(fd.get('name') || '').trim();
+      var email = String(fd.get('email') || '').trim();
+      var phone = String(fd.get('phone') || '').trim();
+      var message = String(fd.get('message') || '').trim();
+      if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (err) {
+          err.textContent = !name || !email
+            ? 'お名前とメールアドレスを入力してください。'
+            : 'メールアドレスの形式を確認してください。';
+          err.hidden = false;
         }
-        toDrop.forEach(function (k) { localStorage.removeItem(k); });
-        toDrop = [];
-        for (i = 0; i < sessionStorage.length; i++) {
-          var sk = sessionStorage.key(i);
-          if (sk && keyRe.test(sk)) toDrop.push(sk);
-        }
-        toDrop.forEach(function (k) { sessionStorage.removeItem(k); });
-      } catch (e) {}
-
-      window.difyChatbotConfig = {
-        token: DIFY_TOKEN,
-        inputs: {},
-        systemVariables: {},
-        userVariables: {}
-      };
-
-      function lpPinDifyToViewport() {
-        var btn = document.getElementById('dify-chatbot-bubble-button');
-        if (!btn) return;
-        btn.style.setProperty(
-          '--dify-chatbot-bubble-button-right',
-          'calc(1.25rem + env(safe-area-inset-right, 0px))'
-        );
-        btn.style.setProperty(
-          '--dify-chatbot-bubble-button-bottom',
-          'calc(1.25rem + env(safe-area-inset-bottom, 0px))'
-        );
+        return;
       }
-
-      /* embed の resetIframePosition が inline で top/bottom を書き換えるので !important と併用 */
-      function lpPinDifyChatIframe() {
-        var el = document.getElementById('dify-chatbot-bubble-window');
-        if (!el) return;
-        el.style.setProperty('position', 'fixed', 'important');
-        el.style.setProperty('right', 'calc(1.25rem + env(safe-area-inset-right, 0px))', 'important');
-        el.style.setProperty(
-          'bottom',
-          'calc(1.25rem + 48px + 0.65rem + env(safe-area-inset-bottom, 0px))',
-          'important'
-        );
-        el.style.setProperty('left', 'auto', 'important');
-        el.style.setProperty('top', 'auto', 'important');
-      }
-
-      document.addEventListener(
-        'click',
-        function (ev) {
-          var t = ev.target;
-          if (!t || !t.closest) return;
-          if (!t.closest('#dify-chatbot-bubble-button')) return;
-          [0, 50, 200, 500].forEach(function (ms) {
-            setTimeout(lpPinDifyChatIframe, ms);
-          });
-        },
-        true
-      );
-
-      var s = document.createElement('script');
-      s.src = 'https://udify.app/embed.min.js?v=' + encodeURIComponent(DIFY_EMBED_CACHE_BUST);
-      /* トークンを id に使わない（#トークン でページ末尾の script へジャンプするのを防ぐ） */
-      s.id = 'lp-dify-embed-loader';
-      s.defer = true;
-      s.onload = function () {
-        [0, 400, 1200, 2800].forEach(function (ms) {
-          setTimeout(function () {
-            lpPinDifyToViewport();
-            lpPinDifyChatIframe();
-          }, ms);
-        });
-      };
-      document.body.appendChild(s);
-
-      window.addEventListener('load', function lpDifyLoadOnce() {
-        window.removeEventListener('load', lpDifyLoadOnce);
-        setTimeout(function () {
-          lpPinDifyToViewport();
-          lpPinDifyChatIframe();
-        }, 0);
-      });
-
-      window.addEventListener(
-        'resize',
-        function () {
-          lpPinDifyChatIframe();
-        },
-        { passive: true }
-      );
-    })();
+      if (err) err.hidden = true;
+      var body = '【NAGA ROOM モニター・掲載相談】\n\n会社名: ' + (company || '（未入力）') + '\nお名前: ' + name + '\nメール: ' + email + '\n電話: ' + (phone || '（未入力）') + '\n\nご用件:\n' + (message || '（未入力）');
+      window.location.href = 'mailto:' + LEAD_MAILTO + '?subject=' + encodeURIComponent('NAGA ROOM お問い合わせ') + '&body=' + encodeURIComponent(body);
+    });
+  })();
   </script>
-  <div class="lp-dify-hint" role="note" aria-live="polite">
-    <p class="lp-dify-hint__k">Support Chat</p>
-    <p class="lp-dify-hint__t">サービス紹介・ご質問は<br><strong>右下のチャット</strong>でどうぞ</p>
-    <span class="lp-dify-hint__arr">↓ タップして試せます</span>
-  </div>
 </body>
 </html>

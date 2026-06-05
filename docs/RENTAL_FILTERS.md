@@ -4,10 +4,11 @@
 
 | やりたいこと | 場所 |
 |--------------|------|
-| 物件データ（GAS の JSON）の URL | [`js/nagaroom-data.js`](../js/nagaroom-data.js) の **`GAS_PROPERTIES_GET_URL`**（`.../exec`） |
+| 物件データの正本 | [`admin.html`](../admin.html) から Firestore に登録 |
+| 公開サイトの物件API | [`js/nagaroom-data.js`](../js/nagaroom-data.js) の **`PROPERTIES_API_URL`**（通常 `/api/properties`） |
 | フィルタ用のコード変更 | **不要**。URL のクエリと会話から自動で動きます |
 
-CORS や GAS の返却形式は [`GAS_PROPERTIES_GET.md`](GAS_PROPERTIES_GET.md) を参照してください。
+Firebase / admin の設定は [`FIREBASE_SETUP.md`](FIREBASE_SETUP.md) を参照してください。API 失敗時のみ `data/properties.json` を最終フォールバックとして読みます。
 
 ## URL パラメータ（自動フィルタ）
 
@@ -54,17 +55,19 @@ rental.html?budget=60000&layout=1K&features=pet,washstand
 - `renderPropertyCards()` … 横スライド帯の描画
 - `properties` / `filteredProperties` … それぞれ `PROPERTY_LIST` / `FILTERED_PROPERTY_LIST` と同期した別名
 
-## features スラッグとスプレッドシート（GAS）列
+## features スラッグと物件フィールド
 
 会話から拾ったスラッグは、物件オブジェクトの次の真偽フィールドと対応します（**両方 true とみなす値**に対応: `true`, `1`, `"TRUE"`, `"はい"` など）。
 
-| スラッグ | GAS フィールド |
+| スラッグ | 物件フィールド |
 |----------|----------------|
 | `pet` | `pet_ok` |
-| `washstand` | `independent_washstand` |
+| `washstand` | `washstand` |
 | `separate_bath` | `bath_toilet_separate` |
-| `station` | `super_near` |
+| `supermarket_near` | `super_near` |
 | `school_near` | `school_near` |
+| `parking` | `parking` |
+| `safe_area` | `safetyLevel` |
 
 上記以外のスラッグは **一覧フィルタでは無視**されます（将来 `tags` 連携で拡張可能）。
 
@@ -78,7 +81,7 @@ rental.html?budget=60000&layout=1K&features=pet,washstand
 
 ## データがない・0 件のとき
 
-- GAS 未設定で JSON も空、かつ URL にフィルタもない → 一覧セクションは非表示のままです。
+- Firebase API と JSON が空、かつ URL にフィルタもない → 一覧セクションは非表示のままです。
 - フィルタはかかっているが **該当物件 0 件** → セクション内に **「条件に合うお部屋が見つかりません」** と表示します。
 
 ## 状態変数（デバッグ用）

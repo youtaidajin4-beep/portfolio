@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>物件管理 | NAGA ROOM Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/nagaroom-shared.css">
+  <style>
+    .nr-admin { max-width: 920px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    .nr-admin h1 { font-size: 1.35rem; margin: 0 0 0.5rem; color: var(--nr-primary); }
+    .nr-admin-lead { color: #5a6a78; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .nr-admin-card { background: #fff; border: 1px solid #dce5ec; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+    .nr-admin-grid { display: grid; gap: 0.75rem; }
+    @media (min-width: 640px) { .nr-admin-grid--2 { grid-template-columns: 1fr 1fr; } }
+    .nr-admin label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.25rem; color: #3d4f5f; }
+    .nr-admin input, .nr-admin textarea, .nr-admin select { width: 100%; padding: 0.55rem 0.65rem; border: 1px solid #c5d3de; border-radius: 8px; font: inherit; box-sizing: border-box; }
+    .nr-admin textarea { min-height: 88px; resize: vertical; }
+    .nr-admin-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+    .nr-admin-btn { border: none; border-radius: 8px; padding: 0.55rem 1rem; font: inherit; cursor: pointer; }
+    .nr-admin-btn--primary { background: #2f6f8f; color: #fff; }
+    .nr-admin-btn--ghost { background: #eef4f8; color: #2f4f5f; }
+    .nr-admin-btn--danger { background: #fde8e8; color: #9b2c2c; }
+    .nr-admin-msg { font-size: 0.85rem; margin-top: 0.75rem; }
+    .nr-admin-msg--err { color: #9b2c2c; }
+    .nr-admin-msg--ok { color: #276749; }
+    .nr-admin-list { list-style: none; padding: 0; margin: 0; }
+    .nr-admin-list li { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 0.65rem 0; border-bottom: 1px solid #edf2f6; font-size: 0.9rem; }
+    .nr-admin-list button { font-size: 0.8rem; }
+    .nr-admin-hidden { display: none !important; }
+    .nr-admin-toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; align-items: center; }
+    .nr-admin-user { margin-left: auto; font-size: 0.8rem; color: #5a6a78; }
+    .nr-admin-steps { margin: 0 0 1rem; padding-left: 1.25rem; font-size: 0.88rem; color: #3d4f5f; line-height: 1.55; }
+    .nr-admin-steps li { margin-bottom: 0.35rem; }
+    .nr-admin-steps a { color: #2f6f8f; }
+    .nr-admin-rules { font-family: ui-monospace, monospace; font-size: 0.75rem; min-height: 140px; }
+    .nr-admin-hint { font-size: 0.8rem; color: #5a6a78; margin: 0.5rem 0 0; }
+    .nr-admin-section { grid-column: 1 / -1; border: 1px solid #edf2f6; border-radius: 12px; padding: 1rem; background: #fbfdff; }
+    .nr-admin-section-title { margin: 0 0 0.75rem; font-size: 0.92rem; color: #2f4f5f; }
+    .nr-admin-checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.4rem 0.75rem; }
+    .nr-admin-checks label { display: flex; align-items: center; gap: 0.4rem; margin: 0; font-weight: 500; }
+    .nr-admin-checks input { width: auto; }
+    .nr-admin-image-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.6rem; margin-top: 0.75rem; }
+    .nr-admin-image-preview figure { margin: 0; border: 1px solid #dce5ec; border-radius: 10px; overflow: hidden; background: #fff; }
+    .nr-admin-image-preview img { display: block; width: 100%; height: 92px; object-fit: cover; }
+    .nr-admin-image-preview figcaption { padding: 0.35rem; font-size: 0.72rem; color: #5a6a78; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body class="page-chat">
+  <div class="nr-admin">
+    <h1>NAGA ROOM 物件管理</h1>
+    <p class="nr-admin-lead">Firestore に物件を登録します。初回は下のセットアップから始めてください。</p>
+
+    <section id="adminSetupSection" class="nr-admin-card nr-admin-hidden">
+      <h2 style="margin:0 0 0.75rem;font-size:1rem;">初回セットアップ（ローカル）</h2>
+      <p class="nr-admin-hint">Firebase Console で次の3つを済ませてから、下のフォームに Web アプリの設定を貼ってください。</p>
+      <ol class="nr-admin-steps">
+        <li><a href="https://console.firebase.google.com/" target="_blank" rel="noopener">Firebase Console</a> → あなたのプロジェクト → <strong>構築</strong> → <strong>Firestore Database</strong> → データベースを作成（リージョンは <code>asia-northeast1</code> 推奨）</li>
+        <li>Firestore → <strong>ルール</strong> → 下のルール全文をコピーして貼り付け → <strong>公開</strong></li>
+        <li>プロジェクトの設定（歯車）→ <strong>全般</strong> → 「アプリを追加」→ <strong>Web</strong> → 表示された <code>firebaseConfig</code> の値を下に入力（または JSON を一括貼り付け）</li>
+      </ol>
+      <label for="adminRulesText">Firestore ルール（Console にコピー用）</label>
+      <textarea id="adminRulesText" class="nr-admin-rules" readonly rows="8"></textarea>
+      <div class="nr-admin-actions">
+        <button type="button" class="nr-admin-btn nr-admin-btn--ghost" id="adminCopyRulesBtn">ルールをコピー</button>
+      </div>
+      <hr style="border:none;border-top:1px solid #edf2f6;margin:1.25rem 0" />
+      <label for="adminConfigJson">firebaseConfig を JSON で一括貼り付け（任意）</label>
+      <textarea id="adminConfigJson" placeholder='{ "apiKey": "...", "authDomain": "...", ... }'></textarea>
+      <p class="nr-admin-hint">JSON を貼ったあと「フォームに反映」を押すと、下の各項目に入ります。</p>
+      <div class="nr-admin-actions">
+        <button type="button" class="nr-admin-btn nr-admin-btn--ghost" id="adminApplyJsonBtn">フォームに反映</button>
+      </div>
+      <div class="nr-admin-grid nr-admin-grid--2" style="margin-top:1rem">
+        <div>
+          <label for="setupApiKey">apiKey *</label>
+          <input type="text" id="setupApiKey" autocomplete="off" />
+        </div>
+        <div>
+          <label for="setupProjectId">projectId *</label>
+          <input type="text" id="setupProjectId" autocomplete="off" />
+        </div>
+        <div>
+          <label for="setupAuthDomain">authDomain</label>
+          <input type="text" id="setupAuthDomain" autocomplete="off" />
+        </div>
+        <div>
+          <label for="setupStorageBucket">storageBucket</label>
+          <input type="text" id="setupStorageBucket" autocomplete="off" />
+        </div>
+        <div>
+          <label for="setupMessagingSenderId">messagingSenderId</label>
+          <input type="text" id="setupMessagingSenderId" autocomplete="off" />
+        </div>
+        <div>
+          <label for="setupAppId">appId</label>
+          <input type="text" id="setupAppId" autocomplete="off" />
+        </div>
+      </div>
+      <div class="nr-admin-actions">
+        <button type="button" class="nr-admin-btn nr-admin-btn--primary" id="adminSaveConfigBtn">設定を保存して続行</button>
+        <button type="button" class="nr-admin-btn nr-admin-btn--ghost nr-admin-hidden" id="adminResetConfigBtn">設定をやり直す</button>
+      </div>
+      <p id="adminSetupMsg" class="nr-admin-msg"></p>
+    </section>
+
+    <section id="adminLoginSection" class="nr-admin-card nr-admin-hidden">
+      <h2 style="margin:0 0 0.75rem;font-size:1rem;">ログイン</h2>
+      <p id="adminConfigError" class="nr-admin-msg nr-admin-msg--err nr-admin-hidden"></p>
+      <div class="nr-admin-grid">
+        <div>
+          <label for="adminEmail">メールアドレス</label>
+          <input type="email" id="adminEmail" autocomplete="username" />
+        </div>
+        <div>
+          <label for="adminPassword">パスワード</label>
+          <input type="password" id="adminPassword" autocomplete="current-password" />
+        </div>
+      </div>
+      <div class="nr-admin-actions">
+        <button type="button" class="nr-admin-btn nr-admin-btn--primary" id="adminLoginBtn">ログイン</button>
+      </div>
+      <p id="adminLoginMsg" class="nr-admin-msg"></p>
+    </section>
+
+    <section id="adminAppSection" class="nr-admin-hidden">
+      <div class="nr-admin-toolbar">
+        <button type="button" class="nr-admin-btn nr-admin-btn--primary" id="adminNewBtn">新規物件</button>
+        <button type="button" class="nr-admin-btn nr-admin-btn--ghost" id="adminImportBtn">JSONからインポート</button>
+        <button type="button" class="nr-admin-btn nr-admin-btn--ghost" id="adminRefreshBtn">一覧を更新</button>
+        <button type="button" class="nr-admin-btn nr-admin-btn--ghost" id="adminLogoutBtn">ログアウト</button>
+        <span class="nr-admin-user" id="adminUserLabel"></span>
+      </div>
+
+      <div class="nr-admin-card" id="adminListCard">
+        <h2 style="margin:0 0 0.75rem;font-size:1rem;">登録物件</h2>
+        <ul class="nr-admin-list" id="adminPropertyList"></ul>
+        <p id="adminListEmpty" class="nr-admin-msg nr-admin-hidden">まだ物件がありません。</p>
+      </div>
+
+      <div class="nr-admin-card nr-admin-hidden" id="adminFormCard">
+        <h2 id="adminFormTitle" style="margin:0 0 0.75rem;font-size:1rem;">新規物件</h2>
+        <form id="adminPropertyForm" class="nr-admin-grid nr-admin-grid--2">
+          <section class="nr-admin-section nr-admin-grid nr-admin-grid--2">
+            <h3 class="nr-admin-section-title" style="grid-column:1/-1">基本情報</h3>
+            <div>
+              <label for="fId">物件ID</label>
+              <input type="text" id="fId" placeholder="空欄で自動生成" />
+            </div>
+            <div>
+              <label for="fStatus">公開状態</label>
+              <select id="fStatus">
+                <option value="公開">公開</option>
+                <option value="下書き">下書き</option>
+              </select>
+            </div>
+            <div>
+              <label for="fPropertyType">物件種別</label>
+              <input type="text" id="fPropertyType" placeholder="賃貸マンション" />
+            </div>
+            <div>
+              <label for="fApplicationStatus">募集状況</label>
+              <input type="text" id="fApplicationStatus" placeholder="募集中 / 申込あり" />
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fName">物件名 *</label>
+              <input type="text" id="fName" required />
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fCatchCopy">キャッチコピー</label>
+              <input type="text" id="fCatchCopy" maxlength="120" />
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fShortReason">おすすめ理由（短い一文）</label>
+              <input type="text" id="fShortReason" maxlength="80" />
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fStory">ストーリー</label>
+              <textarea id="fStory"></textarea>
+            </div>
+          </section>
+
+          <section class="nr-admin-section nr-admin-grid nr-admin-grid--2">
+            <h3 class="nr-admin-section-title" style="grid-column:1/-1">所在地・交通</h3>
+            <div>
+              <label for="fCity">市</label>
+              <input type="text" id="fCity" placeholder="長崎市" />
+            </div>
+            <div>
+              <label for="fArea">エリア</label>
+              <input type="text" id="fArea" placeholder="浦上" />
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fAddress">所在地</label>
+              <input type="text" id="fAddress" />
+            </div>
+            <div>
+              <label for="fStation">最寄り駅</label>
+              <input type="text" id="fStation" />
+            </div>
+            <div>
+              <label for="fWalkMinutes">徒歩分数</label>
+              <input type="number" id="fWalkMinutes" min="0" step="1" />
+            </div>
+            <div>
+              <label for="fBusStop">最寄りバス停</label>
+              <input type="text" id="fBusStop" />
+            </div>
+            <div>
+              <label for="fSafetyLevel">治安レベル</label>
+              <input type="text" id="fSafetyLevel" placeholder="高い" />
+            </div>
+          </section>
+
+          <section class="nr-admin-section nr-admin-grid nr-admin-grid--2">
+            <h3 class="nr-admin-section-title" style="grid-column:1/-1">費用・契約</h3>
+            <div>
+              <label for="fRent">家賃表示（例: 4.9万円）</label>
+              <input type="text" id="fRent" />
+            </div>
+            <div>
+              <label for="fRentYen">家賃（円・数値）</label>
+              <input type="number" id="fRentYen" min="0" step="1000" />
+            </div>
+            <div>
+              <label for="fManagementFeeYen">管理費・共益費（円）</label>
+              <input type="number" id="fManagementFeeYen" min="0" step="500" />
+            </div>
+            <div>
+              <label for="fDeposit">敷金</label>
+              <input type="text" id="fDeposit" placeholder="0ヶ月" />
+            </div>
+            <div>
+              <label for="fKeyMoney">礼金</label>
+              <input type="text" id="fKeyMoney" placeholder="1ヶ月" />
+            </div>
+            <div>
+              <label for="fBrokerageFee">仲介手数料</label>
+              <input type="text" id="fBrokerageFee" />
+            </div>
+            <div>
+              <label for="fRenewalFee">更新料</label>
+              <input type="text" id="fRenewalFee" />
+            </div>
+            <div>
+              <label for="fInsuranceFee">火災保険</label>
+              <input type="text" id="fInsuranceFee" />
+            </div>
+            <div>
+              <label for="fGuarantorFee">保証会社費用</label>
+              <input type="text" id="fGuarantorFee" />
+            </div>
+            <div>
+              <label for="fAvailableFrom">入居可能時期</label>
+              <input type="text" id="fAvailableFrom" placeholder="即入居可" />
+            </div>
+            <div>
+              <label for="fContractTerm">契約期間</label>
+              <input type="text" id="fContractTerm" />
+            </div>
+            <div>
+              <label for="fTransactionType">取引態様</label>
+              <input type="text" id="fTransactionType" />
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fInitialCostNote">初期費用メモ</label>
+              <textarea id="fInitialCostNote"></textarea>
+            </div>
+          </section>
+
+          <section class="nr-admin-section nr-admin-grid nr-admin-grid--2">
+            <h3 class="nr-admin-section-title" style="grid-column:1/-1">部屋・建物</h3>
+            <div>
+              <label for="fLayout">間取り</label>
+              <input type="text" id="fLayout" placeholder="1K" />
+            </div>
+            <div>
+              <label for="fFloorPlanDetail">間取り補足</label>
+              <input type="text" id="fFloorPlanDetail" placeholder="洋室8帖" />
+            </div>
+            <div>
+              <label for="fExclusiveAreaSqm">専有面積（㎡）</label>
+              <input type="number" id="fExclusiveAreaSqm" min="0" step="0.01" />
+            </div>
+            <div>
+              <label for="fFloor">所在階</label>
+              <input type="text" id="fFloor" placeholder="2階" />
+            </div>
+            <div>
+              <label for="fTotalFloors">建物階数</label>
+              <input type="text" id="fTotalFloors" placeholder="5階建" />
+            </div>
+            <div>
+              <label for="fBuildingAge">築年数</label>
+              <input type="text" id="fBuildingAge" />
+            </div>
+            <div>
+              <label for="fBuiltYear">築年月</label>
+              <input type="text" id="fBuiltYear" placeholder="2018年3月" />
+            </div>
+            <div>
+              <label for="fStructure">構造</label>
+              <input type="text" id="fStructure" placeholder="RC造" />
+            </div>
+            <div>
+              <label for="fOrientation">向き</label>
+              <input type="text" id="fOrientation" placeholder="南向き" />
+            </div>
+            <div>
+              <label for="fUnitNumber">部屋番号</label>
+              <input type="text" id="fUnitNumber" />
+            </div>
+          </section>
+
+          <section class="nr-admin-section">
+            <h3 class="nr-admin-section-title">設備・条件</h3>
+            <div class="nr-admin-checks">
+              <label><input type="checkbox" id="fWashstand" /> 独立洗面台</label>
+              <label><input type="checkbox" id="fBathSeparate" /> 風呂トイレ別</label>
+              <label><input type="checkbox" id="fPet" /> ペット可</label>
+              <label><input type="checkbox" id="fInternetFree" /> インターネット無料</label>
+              <label><input type="checkbox" id="fAutoLock" /> オートロック</label>
+              <label><input type="checkbox" id="fDeliveryBox" /> 宅配ボックス</label>
+              <label><input type="checkbox" id="fAircon" /> エアコン</label>
+              <label><input type="checkbox" id="fIndoorLaundry" /> 室内洗濯機置場</label>
+              <label><input type="checkbox" id="fBalcony" /> バルコニー</label>
+              <label><input type="checkbox" id="fReheatingBath" /> 追い焚き</label>
+              <label><input type="checkbox" id="fSystemKitchen" /> システムキッチン</label>
+            </div>
+            <div class="nr-admin-grid nr-admin-grid--2" style="margin-top:0.75rem">
+              <div>
+                <label for="fParking">駐車場</label>
+                <input type="text" id="fParking" />
+              </div>
+              <div>
+                <label for="fBicycleParking">駐輪場</label>
+                <input type="text" id="fBicycleParking" />
+              </div>
+              <div>
+                <label for="fMotorbikeParking">バイク置場</label>
+                <input type="text" id="fMotorbikeParking" />
+              </div>
+            </div>
+          </section>
+
+          <section class="nr-admin-section">
+            <h3 class="nr-admin-section-title">周辺・生活</h3>
+            <div class="nr-admin-checks">
+              <label><input type="checkbox" id="fSuper" /> スーパー近い</label>
+              <label><input type="checkbox" id="fSchool" /> 学校近い</label>
+              <label><input type="checkbox" id="fConvenienceStore" /> コンビニ近い</label>
+              <label><input type="checkbox" id="fHospital" /> 病院近い</label>
+              <label><input type="checkbox" id="fPark" /> 公園近い</label>
+              <label><input type="checkbox" id="fShoppingStreet" /> 商店街近い</label>
+            </div>
+            <div style="margin-top:0.75rem">
+              <label for="fNearbyNote">周辺メモ</label>
+              <textarea id="fNearbyNote"></textarea>
+            </div>
+          </section>
+
+          <section class="nr-admin-section nr-admin-grid nr-admin-grid--2">
+            <h3 class="nr-admin-section-title" style="grid-column:1/-1">タグ・マッチング</h3>
+            <div style="grid-column:1/-1">
+              <label for="fTags">タグ（カンマ区切り）</label>
+              <input type="text" id="fTags" />
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fAtmosphere">雰囲気タグ（カンマ区切り）</label>
+              <input type="text" id="fAtmosphere" placeholder="静か, 落ち着く" />
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fNearby">周辺タグ（カンマ区切り）</label>
+              <input type="text" id="fNearby" placeholder="カフェ, スーパー" />
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fLifestyle">ライフスタイルタグ（カンマ区切り）</label>
+              <input type="text" id="fLifestyle" />
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fTargetPersona">合いそうな人</label>
+              <textarea id="fTargetPersona" placeholder="初めての一人暮らし、在宅ワーク中心など"></textarea>
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fAppealPoints">魅力ポイント（カンマ区切り）</label>
+              <input type="text" id="fAppealPoints" />
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fAvoidPoints">注意点・合わない条件（カンマ区切り）</label>
+              <input type="text" id="fAvoidPoints" />
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fSearchKeywords">検索キーワード（カンマ区切り）</label>
+              <input type="text" id="fSearchKeywords" />
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fInternalMemo">管理メモ（公開APIには含めますが、画面には原則出しません）</label>
+              <textarea id="fInternalMemo"></textarea>
+            </div>
+          </section>
+
+          <section class="nr-admin-section nr-admin-grid nr-admin-grid--2">
+            <h3 class="nr-admin-section-title" style="grid-column:1/-1">画像</h3>
+            <div style="grid-column:1/-1">
+              <label for="fImageFiles">画像ファイルをアップロード</label>
+              <input type="file" id="fImageFiles" accept="image/*" multiple />
+              <p class="nr-admin-hint">Firebase Storage に保存し、下の画像URL欄へ自動で追加します。先に物件IDが空なら仮IDを作成します。</p>
+              <p id="adminImageUploadMsg" class="nr-admin-msg"></p>
+            </div>
+            <div style="grid-column:1/-1">
+              <label for="fImages">画像URL（1行1件またはカンマ区切り）</label>
+              <textarea id="fImages" placeholder="https://..."></textarea>
+            </div>
+            <div>
+              <label for="fMainImageIndex">メイン画像番号</label>
+              <input type="number" id="fMainImageIndex" min="0" step="1" placeholder="0" />
+            </div>
+            <div>
+              <label for="fImageCaptions">画像キャプション（1行1件）</label>
+              <textarea id="fImageCaptions"></textarea>
+            </div>
+            <div id="adminImagePreview" class="nr-admin-image-preview" style="grid-column:1/-1"></div>
+          </section>
+        </form>
+        <div class="nr-admin-actions">
+          <button type="button" class="nr-admin-btn nr-admin-btn--primary" id="adminSaveBtn">保存</button>
+          <button type="button" class="nr-admin-btn nr-admin-btn--ghost" id="adminCancelBtn">キャンセル</button>
+          <button type="button" class="nr-admin-btn nr-admin-btn--danger nr-admin-hidden" id="adminDeleteBtn">削除</button>
+        </div>
+        <p id="adminFormMsg" class="nr-admin-msg"></p>
+        <p id="adminPreviewLink" class="nr-admin-msg"></p>
+      </div>
+    </section>
+  </div>
+
+  <input type="file" id="adminImportFile" accept="application/json,.json" class="nr-admin-hidden" />
+
+  <script src="js/firebase-client-config.js"></script>
+  <script src="js/firebase-config-loader.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="js/admin-properties.js"></script>
+</body>
+</html>

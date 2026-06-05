@@ -7,25 +7,29 @@
   <title>物件詳細 | NAGA ROOM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/nagaroom-shared.css">
 </head>
 <body class="has-nr-header page-chat">
-  <!--
-    【初心者向け】物件詳細のデータ元
-    GAS の一覧 JSON を読む URL は、rental と同じ場所に1か所だけ書きます。
-    → js/nagaroom-data.js を開き、GAS_PROPERTIES_GET_URL に Web アプリの doGet URL（.../exec）を貼る。
-    rental の一覧・この詳細ページの両方が同じ URL を参照します（ここでは URL を書かない）。
-    「この物件が合う人」はタイトル直下に JS で差し込みます。GAS に short_reason があれば優先、なければ story_comment の先頭〜2文を仮表示します（本文のストーリー欄とは別）。
-  -->
   <header class="nr-header">
     <div class="nr-header-inner">
-      <a href="index.html" class="nr-brand">NAGA ROOM</a>
+      <a href="index.html" class="nr-brand">
+        <svg class="nr-brand-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z" stroke="#2D6CDF" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M9.5 11.5a2.5 2.5 0 0 1 5 0" stroke="#37C6C0" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        NAGA ROOM
+      </a>
       <nav class="nr-nav" aria-label="主要ナビ">
         <a href="rental.html">会話で探す</a>
         <a href="listings.html">一覧で見る</a>
       </nav>
     </div>
+    </header>
+
+  <header class="page-chat-header" aria-label="物件詳細">
+    <h1>物件詳細</h1>
+    <a href="listings.html" class="page-chat-header-back">← 一覧に戻る</a>
   </header>
 
   <main class="main">
@@ -41,20 +45,12 @@
   </footer>
 
   <script src="js/nagaroom-data.js"></script>
+  <script src="js/properties-source.js"></script>
   <script>
   (function () {
     'use strict';
 
     var NR = window.NAGA_ROOM || {};
-    var GAS_URL = typeof NR.GAS_PROPERTIES_GET_URL === 'string' ? NR.GAS_PROPERTIES_GET_URL.trim() : '';
-
-    /** rental と同じラップ形式に対応（配列 / items / properties） */
-    function parseGasPropertiesJson(data) {
-      if (Array.isArray(data)) return data;
-      if (data && Array.isArray(data.items)) return data.items;
-      if (data && Array.isArray(data.properties)) return data.properties;
-      return [];
-    }
 
     function escapeHtml(s) {
       var d = document.createElement('div');
@@ -62,10 +58,13 @@
       return d.innerHTML;
     }
 
-    function formatRent(rent) {
-      if (rent == null || rent === '') return '—';
-      if (typeof rent === 'number' && !isNaN(rent)) return rent + '万円';
-      return String(rent);
+    function formatRent(rent, rentYen) {
+      if (rent != null && String(rent).trim()) return String(rent);
+      if (rentYen != null && !isNaN(rentYen)) {
+        if (rentYen >= 10000) return Math.round(rentYen / 10000 * 10) / 10 + '万円';
+        return String(rentYen) + '円';
+      }
+      return '—';
     }
 
     function formatArea(row) {
@@ -76,40 +75,21 @@
       return joined || area || city || '—';
     }
 
-    function rowId(row) {
-      return row && row.id != null ? String(row.id).trim() : '';
-    }
-
-    function findRowById(rows, wanted) {
-      var w = wanted == null ? '' : String(wanted).trim();
-      if (!w) return null;
-      for (var i = 0; i < rows.length; i++) {
-        if (rowId(rows[i]) === w) return rows[i];
-      }
-      return null;
-    }
-
     function collectImages(row) {
-      var keys = ['image1', 'image2', 'image3'];
+      if (Array.isArray(row.images) && row.images.length) return row.images;
+      var keys = ['image', 'image1', 'image2', 'image3'];
       var out = [];
       keys.forEach(function (k) {
         var u = row[k] != null ? String(row[k]).trim() : '';
-        if (u) out.push(u);
+        if (u && out.indexOf(u) === -1) out.push(u);
       });
       return out;
     }
 
     function renderTags(tags) {
       if (tags == null || tags === '') return '';
-      var parts = [];
-      if (Array.isArray(tags)) {
-        parts = tags.map(function (t) { return String(t).trim(); }).filter(Boolean);
-      } else {
-        String(tags).split(/[,、]/).forEach(function (t) {
-          var x = t.trim();
-          if (x) parts.push(x);
-        });
-      }
+      var parts = Array.isArray(tags) ? tags : String(tags).split(/[,、]/);
+      parts = parts.map(function (t) { return String(t).trim(); }).filter(Boolean);
       if (!parts.length) return '';
       return (
         '<p class="property-card-meta property-detail-tags">' +
@@ -130,151 +110,178 @@
       );
     }
 
-    /** story_comment から最大2文を取り出す（short_reason 未設定時の仮表示用） */
-    function extractAudienceLinesFromStory(story) {
-      story = String(story || '').replace(/\s+/g, ' ').trim();
-      if (!story) return [];
-      var parts = story.split(/([。！？!?])/);
-      var sentences = [];
-      for (var i = 0; i < parts.length; i += 2) {
-        var seg = (parts[i] || '').trim();
-        var punct = parts[i + 1] || '';
-        var sent = (seg + punct).trim();
-        if (sent) sentences.push(sent);
-        if (sentences.length >= 2) break;
-      }
-      if (!sentences.length) {
-        if (story.length <= 90) return [story];
-        return [story.slice(0, 88) + '…'];
-      }
-      return sentences;
+    function formatYen(value) {
+      if (value == null || value === '' || isNaN(Number(value))) return '';
+      return Number(value).toLocaleString('ja-JP') + '円';
     }
 
-    /** タイトル直下用。「この物件が合う人」（story_comment 本体とは別枠） */
+    function renderDetailSection(title, rows) {
+      rows = (rows || []).filter(function (row) {
+        return row && row.value != null && String(row.value).trim() !== '';
+      });
+      if (!rows.length) return '';
+      return (
+        '<section class="property-detail-extra">' +
+        '<h2 class="property-detail-section-title">' + escapeHtml(title) + '</h2>' +
+        '<dl class="property-detail-spec">' +
+        rows.map(function (row) { return renderDlItem(row.label, row.value); }).join('') +
+        '</dl>' +
+        '</section>'
+      );
+    }
+
+    function renderFeatureList(row) {
+      var features = [
+        ['独立洗面台', row.washstand],
+        ['風呂トイレ別', row.bathToiletSeparate || row.bath_toilet_separate],
+        ['ペット可', row.petAllowed || row.pet_ok],
+        ['インターネット無料', row.internetFree],
+        ['オートロック', row.autoLock],
+        ['宅配ボックス', row.deliveryBox],
+        ['エアコン', row.aircon],
+        ['室内洗濯機置場', row.indoorLaundry],
+        ['バルコニー', row.balcony],
+        ['追い焚き', row.reheatingBath],
+        ['システムキッチン', row.systemKitchen]
+      ].filter(function (item) { return item[1] === true; });
+      if (!features.length) return '';
+      return (
+        '<section class="property-detail-extra">' +
+        '<h2 class="property-detail-section-title">設備・条件</h2>' +
+        '<p class="property-card-meta property-detail-tags">' +
+        features.map(function (item) {
+          return '<span class="property-tag">' + escapeHtml(item[0]) + '</span>';
+        }).join('') +
+        '</p>' +
+        '</section>'
+      );
+    }
+
     function buildAudienceMatchBlock(row) {
-      row = row || {};
-      var lines = [];
-      var explicit = row.short_reason != null ? String(row.short_reason).trim() : '';
-      if (explicit) {
-        lines = [explicit];
-      } else {
-        lines = extractAudienceLinesFromStory(row.story_comment);
+      var explicit = row.shortReason || row.short_reason || '';
+      if (!explicit && row.story) {
+        explicit = String(row.story).slice(0, 80);
+        if (row.story.length > 80) explicit += '…';
       }
-      if (!lines.length) return '';
-      var inner = lines
-        .map(function (s) {
-          return '<p class="property-detail-audience-line">' + escapeHtml(s) + '</p>';
-        })
-        .join('');
+      if (!explicit) return '';
       return (
         '<div class="property-detail-audience">' +
         '<p class="property-detail-audience-kicker">この物件が合う人</p>' +
-        inner +
+        '<p class="property-detail-audience-line">' + escapeHtml(explicit) + '</p>' +
         '</div>'
       );
     }
 
     function renderState(html) {
       var mount = document.getElementById('propertyDetailMount');
-      if (!mount) return;
-      mount.innerHTML = html;
+      if (mount) mount.innerHTML = html;
     }
 
     function renderLoading() {
-      renderState(
-        '<p class="chat-intro-desc property-detail-lead">読み込み中です…</p>' +
-        '<p class="property-detail-actions"><a class="btn-ghost" href="rental.html">会話で探すに戻る</a></p>'
-      );
-    }
-
-    function renderNoUrl() {
-      renderState(
-        '<h1 class="gas-listing-heading property-detail-page-title">物件詳細</h1>' +
-        '<p class="chat-intro-desc">物件データの取得先（GAS の URL）が設定されていません。</p>' +
-        '<p class="chat-intro-desc">' +
-        '<strong>設定手順:</strong> プロジェクト内の <code>js/nagaroom-data.js</code> を開き、' +
-        '<code>GAS_PROPERTIES_GET_URL</code> に Web アプリの URL（<code>.../exec</code>）を貼って保存してください。' +
-        '</p>' +
-        '<p class="property-detail-actions"><a class="btn-ghost" href="rental.html">会話で探すに戻る</a></p>'
-      );
-    }
-
-    function renderError(msg) {
-      renderState(
-        '<h1 class="gas-listing-heading property-detail-page-title">物件詳細</h1>' +
-        '<p class="chat-intro-desc">データを読み込めませんでした。時間をおいて再度お試しください。</p>' +
-        '<p class="chat-intro-desc property-detail-muted">' + escapeHtml(msg || '') + '</p>' +
-        '<p class="property-detail-actions"><a class="btn-ghost" href="rental.html">会話で探すに戻る</a></p>'
-      );
-    }
-
-    function renderMissingId() {
-      renderState(
-        '<h1 class="gas-listing-heading property-detail-page-title">物件詳細</h1>' +
-        '<p class="chat-intro-desc property-detail-emphasis">物件IDが指定されていません</p>' +
-        '<p class="chat-intro-desc">URL に <code>?id=</code> と物件IDを付けてアクセスしてください。</p>' +
-        '<p class="property-detail-actions"><a class="btn-ghost" href="rental.html">会話で探すに戻る</a></p>'
-      );
+      renderState('<p class="chat-intro-desc property-detail-lead">読み込み中です…</p>');
     }
 
     function renderNotFound(requestedId) {
       renderState(
         '<h1 class="gas-listing-heading property-detail-page-title">物件詳細</h1>' +
         '<p class="chat-intro-desc property-detail-emphasis">物件が見つかりません</p>' +
-        '<p class="chat-intro-desc">指定されたIDの物件は一覧にありませんでした。</p>' +
         '<p class="chat-intro-desc property-detail-muted">ID: ' + escapeHtml(requestedId) + '</p>' +
         '<p class="property-detail-actions"><a class="btn-ghost" href="rental.html">会話で探すに戻る</a></p>'
       );
     }
 
     function renderDetail(row) {
-      var title = row.title != null ? String(row.title).trim() : '物件';
+      var title = row.name || row.title || '物件';
       document.title = title + ' | NAGA ROOM';
-
       var imgs = collectImages(row);
-      var gallery = '';
-      if (imgs.length) {
-        gallery =
-          '<div class="property-detail-gallery">' +
+      var gallery = imgs.length
+        ? '<div class="property-detail-gallery">' +
           imgs.map(function (src) {
             return (
               '<div class="property-card-img property-detail-gallery-cell">' +
-              '<img src="' + escapeHtml(src) + '" alt="' + escapeHtml(title) + 'の写真" loading="lazy" width="640" height="400">' +
+              '<img src="' + escapeHtml(src) + '" alt="' + escapeHtml(title) + 'の写真" loading="lazy">' +
               '</div>'
             );
           }).join('') +
-          '</div>';
-      }
+          '</div>'
+        : '';
+      var story = row.story || row.comment || row.story_comment || '';
+      var station = row.station || row.station_info || '';
+      var nearbyTags = []
+        .concat(row.nearbyTags || row.nearby_tags || [])
+        .concat(row.supermarketNearby || row.super_near ? ['スーパー近い'] : [])
+        .concat(row.schoolNearby || row.school_near ? ['学校近い'] : [])
+        .concat(row.convenienceStoreNear ? ['コンビニ近い'] : [])
+        .concat(row.hospitalNear ? ['病院近い'] : [])
+        .concat(row.parkNear ? ['公園近い'] : [])
+        .concat(row.shoppingStreetNear ? ['商店街近い'] : []);
 
-      var story = row.story_comment != null ? String(row.story_comment).trim() : '';
-      var station = row.station_info != null ? String(row.station_info).trim() : '';
-      var audienceBlock = buildAudienceMatchBlock(row);
-
-      var body =
+      renderState(
         '<article class="property-card property-detail-article">' +
         gallery +
         '<div class="property-card-body">' +
         '<h1 class="property-card-name property-detail-h1">' + escapeHtml(title) + '</h1>' +
-        audienceBlock +
+        buildAudienceMatchBlock(row) +
         '<p class="property-card-meta">' +
-        '<span class="property-tag">' + escapeHtml(formatRent(row.rent)) + '</span>' +
-        '<span class="property-tag">' + escapeHtml(row.layout != null && String(row.layout).trim() ? String(row.layout).trim() : '—') + '</span>' +
+        '<span class="property-tag">' + escapeHtml(formatRent(row.rent, row.rentYen)) + '</span>' +
+        '<span class="property-tag">' + escapeHtml(row.layout || '—') + '</span>' +
         '<span class="property-tag">' + escapeHtml(formatArea(row)) + '</span>' +
         '</p>' +
         renderTags(row.tags) +
         '<dl class="property-detail-spec">' +
         renderDlItem('最寄り', station) +
+        renderDlItem('築年数', row.buildingAge) +
+        renderDlItem('駐車場', row.parking) +
         '</dl>' +
-        (story
-          ? '<p class="property-card-comment property-detail-story">' + escapeHtml(story) + '</p>'
-          : '') +
+        renderDetailSection('費用', [
+          { label: '管理費・共益費', value: formatYen(row.managementFeeYen) },
+          { label: '敷金', value: row.deposit },
+          { label: '礼金', value: row.keyMoney },
+          { label: '仲介手数料', value: row.brokerageFee },
+          { label: '更新料', value: row.renewalFee },
+          { label: '火災保険', value: row.insuranceFee },
+          { label: '保証会社', value: row.guarantorFee },
+          { label: '初期費用メモ', value: row.initialCostNote }
+        ]) +
+        renderDetailSection('建物・部屋', [
+          { label: '物件種別', value: row.propertyType },
+          { label: '専有面積', value: row.exclusiveAreaSqm ? row.exclusiveAreaSqm + '㎡' : '' },
+          { label: '間取り補足', value: row.floorPlanDetail },
+          { label: '所在階', value: row.floor },
+          { label: '建物階数', value: row.totalFloors },
+          { label: '築年月', value: row.builtYear },
+          { label: '構造', value: row.structure },
+          { label: '向き', value: row.orientation },
+          { label: '部屋番号', value: row.unitNumber }
+        ]) +
+        renderDetailSection('契約・入居', [
+          { label: '募集状況', value: row.applicationStatus },
+          { label: '入居可能時期', value: row.availableFrom },
+          { label: '契約期間', value: row.contractTerm },
+          { label: '取引態様', value: row.transactionType }
+        ]) +
+        renderFeatureList(row) +
+        renderDetailSection('周辺・生活', [
+          { label: '所在地', value: row.address },
+          { label: 'バス停', value: row.busStop },
+          { label: '徒歩分数', value: row.walkMinutes != null ? '徒歩' + row.walkMinutes + '分' : '' },
+          { label: '周辺タグ', value: nearbyTags.join('、') },
+          { label: '周辺メモ', value: row.nearbyNote }
+        ]) +
+        renderDetailSection('この部屋の見方', [
+          { label: 'キャッチコピー', value: row.catchCopy },
+          { label: '合いそうな人', value: row.targetPersona || row.target_persona },
+          { label: '魅力ポイント', value: (row.appealPoints || row.appeal_points || []).join('、') },
+          { label: '注意点', value: (row.avoidPoints || row.avoid_points || []).join('、') }
+        ]) +
+        (story ? '<p class="property-card-comment property-detail-story">' + escapeHtml(story) + '</p>' : '') +
         '<div class="property-card-actions property-detail-actions-inner">' +
         '<a class="btn-ghost" href="rental.html">会話で探すに戻る</a>' +
+        '<a class="btn-ghost" href="listings.html">一覧へ</a>' +
         '</div>' +
         '</div>' +
-        '</article>';
-
-      renderState(body);
+        '</article>'
+      );
     }
 
     var params = new URLSearchParams(window.location.search);
@@ -283,26 +290,24 @@
       if (idParam) idParam = decodeURIComponent(idParam);
     } catch (e) {}
 
-    if (!GAS_URL) {
-      renderNoUrl();
-      return;
-    }
-
     if (!idParam || !String(idParam).trim()) {
-      renderMissingId();
+      renderState(
+        '<h1 class="gas-listing-heading property-detail-page-title">物件詳細</h1>' +
+        '<p class="chat-intro-desc">URL に <code>?id=物件ID</code> を指定してください。</p>' +
+        '<p class="property-detail-actions"><a class="btn-ghost" href="rental.html">会話で探すに戻る</a></p>'
+      );
       return;
     }
 
     renderLoading();
+    var loader = window.NR_PROPERTY_LOADER;
+    var loadPromise =
+      loader && typeof loader.fetchPropertyById === 'function'
+        ? loader.fetchPropertyById(NR, idParam)
+        : Promise.resolve(null);
 
-    fetch(GAS_URL, { method: 'GET', cache: 'no-store' })
-      .then(function (res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.json();
-      })
-      .then(function (data) {
-        var rows = parseGasPropertiesJson(data);
-        var row = findRowById(rows, idParam);
+    loadPromise
+      .then(function (row) {
         if (!row) {
           renderNotFound(idParam);
           return;
@@ -310,8 +315,8 @@
         renderDetail(row);
       })
       .catch(function (err) {
-        console.warn('[property] GAS load failed', err);
-        renderError(err && err.message ? err.message : String(err));
+        console.warn('[property] load failed', err);
+        renderNotFound(idParam);
       });
   })();
   </script>

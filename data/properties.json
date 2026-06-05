@@ -1,1 +1,98 @@
-[]
+[
+  {
+    "id": "nr-001",
+    "name": "NAGA Calm Residence 浦上",
+    "rent": "4.9万円",
+    "layout": "1K",
+    "city": "長崎市",
+    "area": "浦上",
+    "station": "浦上駅 徒歩8分",
+    "buildingAge": "築7年",
+    "parking": "なし",
+    "deposit": "0ヶ月",
+    "keyMoney": "1ヶ月",
+    "safetyLevel": "高い",
+    "tags": ["駅近", "静か", "単身向け"],
+    "atmosphere_tags": ["静か", "落ち着く", "夜も過ごしやすい"],
+    "nearby_tags": ["カフェ", "スーパー", "ドラッグストア"],
+    "lifestyle_tags": ["一人暮らし", "在宅ワーク"],
+    "story": "大通りから1本入った落ち着いた住環境。徒歩圏にカフェがあり、仕事帰りにも立ち寄りやすい。",
+    "shortReason": "静かな住環境とカフェ徒歩圏が魅力",
+    "images": [
+      "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=1280&q=80"
+    ],
+    "views": 38
+  },
+  {
+    "id": "nr-002",
+    "name": "NAGA Terrace 浜町",
+    "rent": "5.6万円",
+    "layout": "1LDK",
+    "city": "長崎市",
+    "area": "浜町",
+    "station": "観光通電停 徒歩4分",
+    "buildingAge": "築4年",
+    "parking": "なし",
+    "deposit": "0ヶ月",
+    "keyMoney": "1ヶ月",
+    "safetyLevel": "高い",
+    "tags": ["街中", "オートロック", "角部屋"],
+    "atmosphere_tags": ["明るい", "南向き", "開放感"],
+    "nearby_tags": ["カフェ", "商店街", "駅近"],
+    "lifestyle_tags": ["同棲", "二人暮らし"],
+    "story": "中心部ながらオートロック付きで安心感あり。南向きで日当たりもよく、休日はカフェ巡りがしやすい立地。",
+    "shortReason": "街中アクセスと日当たりの良さ",
+    "images": [
+      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1280&q=80"
+    ],
+    "views": 52
+  },
+  {
+    "id": "nr-003",
+    "name": "NAGA Hills 諫早",
+    "rent": "5.1万円",
+    "layout": "1DK",
+    "city": "諫早市",
+    "area": "諫早駅前",
+    "station": "諫早駅 徒歩9分",
+    "buildingAge": "築9年",
+    "parking": "1台可",
+    "deposit": "1ヶ月",
+    "keyMoney": "0ヶ月",
+    "safetyLevel": "高い",
+    "tags": ["駐車場あり", "駅徒歩圏", "築浅"],
+    "atmosphere_tags": ["静か", "落ち着く"],
+    "nearby_tags": ["スーパー", "カフェ", "公園"],
+    "lifestyle_tags": ["一人暮らし", "同棲"],
+    "story": "落ち着いた住宅街にありながら、駅と商業施設へアクセスしやすいバランス型。車利用のしやすさも魅力。",
+    "shortReason": "静かさと移動しやすさのバランス",
+    "images": [
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1280&q=80"
+    ],
+    "views": 27
+  },
+  {
+    "id": "nr-004",
+    "name": "NAGA Family Court 大村",
+    "rent": "6.3万円",
+    "layout": "2LDK",
+    "city": "大村市",
+    "area": "玖島",
+    "station": "大村駅 徒歩14分",
+    "buildingAge": "築6年",
+    "parking": "2台可",
+    "deposit": "1ヶ月",
+    "keyMoney": "1ヶ月",
+    "safetyLevel": "高い",
+    "tags": ["ファミリー向け", "駐車場2台", "角部屋"],
+    "atmosphere_tags": ["静か", "安心感", "日当たり良好"],
+    "nearby_tags": ["学校近い", "公園", "スーパー"],
+    "lifestyle_tags": ["ファミリー"],
+    "story": "学校や公園が近く、子育てしやすい環境。角部屋で採光も取りやすく、家族でゆったり暮らせます。",
+    "shortReason": "静かな子育て環境と生活利便性",
+    "images": [
+      "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=1280&q=80"
+    ],
+    "views": 41
+  }
+]

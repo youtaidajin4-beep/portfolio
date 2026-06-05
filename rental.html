@@ -7,52 +7,35 @@
   <title>お部屋探し | NAGA ROOM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/nagaroom-shared.css">
 </head>
-<body class="has-nr-header page-chat">
-  <header class="nr-header">
-    <div class="nr-header-inner">
-      <a href="index.html" class="nr-brand">NAGA ROOM</a>
-      <nav class="nr-nav" aria-label="主要ナビ">
-        <a href="rental.html" aria-current="page">会話で探す</a>
-        <a href="listings.html">一覧で見る</a>
-      </nav>
-    </div>
-  </header>
+<body class="page-rental-app">
+  <a class="hero-line-link" href="#" id="heroLineLink" target="_blank" rel="noopener noreferrer" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">LINEで相談</a>
 
-  <header class="hero" aria-label="NAGA ROOM 住まい探し">
-    <div class="hero-bg" aria-hidden="true">
-      <div class="hero-blob hero-blob--tr"></div>
-      <div class="hero-noise"></div>
-    </div>
-    <div class="hero-frost" aria-hidden="true"></div>
-    <div class="hero-inner">
-      <h1 class="hero-title">
-        <span class="hero-title-hook">探すより、話してみる。</span>
-        <span class="hero-title-sub">
-          それだけで<br>
-          自分に合う部屋が見えてきます
-        </span>
-      </h1>
-      <p class="hero-lead">
-        なんとなくでも大丈夫。<br>
-        話していく中で、<br>
-        自然と<span class="hero-em">「これがいいかも」</span>が見えてきます。
-      </p>
-      <div class="hero-divider" aria-hidden="true"></div>
-      <p class="hero-line-cta">
-        <a class="hero-line-link" href="#" id="heroLineLink" target="_blank" rel="noopener noreferrer">続きはメッセージで、ゆっくり一緒に整理できます</a>
-      </p>
-    </div>
-    <div class="hero-rule" aria-hidden="true"></div>
-  </header>
+  <div class="nr-rental-stage">
+    <div class="nr-rental-shell">
+      <header class="nr-rental-topbar" aria-label="NAGA ROOM">
+        <a href="index.html" class="nr-rental-brand">
+          <img
+            src="img/nr-logo-wordmark.png"
+            alt="NAGA ROOM ナガルーム"
+            class="nr-rental-brand-img"
+            width="200"
+            height="44"
+            decoding="async"
+          />
+        </a>
+        <button type="button" class="nr-rental-menu-btn" id="nrRentalMenuBtn" aria-label="メニューを開く" aria-expanded="false" aria-controls="nrRentalDrawer">
+          <span></span><span></span><span></span>
+        </button>
+      </header>
 
-  <main class="main">
-    <div class="chat-wrap">
+      <main class="nr-rental-main main">
+        <div class="chat-wrap">
       <div class="chat-intro">
-        <p class="chat-intro-title">会話から、あなたへのご提案につながります</p>
-        <p class="chat-intro-desc">お部屋探しの相談を、落ち着いたトーンで。下のカードから、今の気持ちに近いものをどうぞ。</p>
+        <p class="chat-intro-title">AIと会話して、条件を整理</p>
+        <p class="chat-intro-desc">下のカードから選ぶか、そのままメッセージを送ってください。</p>
       </div>
 
       <section class="chat-shell" aria-label="お部屋探しの会話">
@@ -163,8 +146,64 @@
           </div>
         </div>
       </section>
+        </div>
+      </main>
     </div>
-  </main>
+  </div>
+
+  <div id="nrRentalDrawerOverlay" class="nr-rental-overlay" hidden aria-hidden="true"></div>
+  <aside id="nrRentalDrawer" class="nr-rental-drawer" aria-label="メニュー" aria-hidden="true">
+    <div class="nr-rental-drawer-head">
+      <span class="nr-rental-drawer-title">メニュー</span>
+      <button type="button" class="nr-rental-drawer-close" id="nrRentalDrawerClose" aria-label="メニューを閉じる">×</button>
+    </div>
+    <nav class="nr-rental-drawer-nav">
+      <button type="button" class="nr-rental-nav-item" id="nrNavHowTo" data-action="howto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+        使い方
+      </button>
+      <a href="listings.html" class="nr-rental-nav-item" id="nrNavListings" data-action="listings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
+        物件一覧
+      </a>
+      <button type="button" class="nr-rental-nav-item" id="nrNavSaved" data-action="saved">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M12 20.5l-1.1-1C5.5 14.8 2 11.6 2 7.5 2 4.9 4 3 6.5 3c1.5 0 3 .9 3.7 2.2C11 3.9 12.5 3 14 3c2.5 0 4.5 1.9 4.5 4.5 0 4.1-3.5 7.3-8.9 11.9L12 20.5z"/></svg>
+        保存した物件
+      </button>
+      <button type="button" class="nr-rental-nav-item" id="nrNavRecent" data-action="recent">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        最近見た物件
+      </button>
+      <button type="button" class="nr-rental-nav-item" id="nrNavReset" data-action="reset">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M4 4v5h5M20 20v-5h-5"/><path d="M20 9A8 8 0 0 0 6 5.3L4 9M4 15a8 8 0 0 0 14 3.7l2-3.7"/></svg>
+        条件をリセット
+      </button>
+      <a href="#" class="nr-rental-nav-item nr-rental-nav-item--line" id="nrNavLine" target="_blank" rel="noopener noreferrer" data-action="line">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.5 3.5A10 10 0 0 0 3.6 17.1L2 22l4.9-1.5A10 10 0 1 0 19.5 3.5z"/></svg>
+        LINEで相談
+      </a>
+    </nav>
+    <div class="nr-rental-drawer-foot">
+      <a href="index.html#contact" class="nr-rental-partners-link">不動産会社の方へ</a>
+    </div>
+  </aside>
+
+  <div id="nrRentalHowTo" class="nr-rental-howto" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="nrHowToTitle">
+    <div class="nr-rental-howto-backdrop" id="nrHowToBackdrop" aria-hidden="true"></div>
+    <div class="nr-rental-howto-panel">
+      <div class="nr-rental-howto-head">
+        <h2 id="nrHowToTitle" class="nr-rental-howto-title">使い方</h2>
+        <button type="button" class="nr-rental-howto-close" id="nrHowToClose" aria-label="閉じる">×</button>
+      </div>
+      <ol class="nr-rental-howto-steps">
+        <li><span class="nr-rental-step-num">1</span><span class="nr-rental-step-text">条件を話す</span></li>
+        <li><span class="nr-rental-step-num">2</span><span class="nr-rental-step-text">AIが整理する</span></li>
+        <li><span class="nr-rental-step-num">3</span><span class="nr-rental-step-text">気になる物件を相談する</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <div id="nrRentalToast" class="nr-rental-toast" hidden aria-live="polite" aria-atomic="true"></div>
 
   <footer class="nr-page-footer">
     <a href="index.html">サービスTOP</a>
@@ -211,12 +250,15 @@
   </div>
 
   <script src="js/nagaroom-data.js"></script>
+  <script src="js/nr-favorites.js"></script>
+  <script src="js/properties-source.js"></script>
+  <script src="js/rental-shell.js"></script>
   <script>
   (function () {
     'use strict';
 
     var NR = window.NAGA_ROOM || { PROPERTIES: [], LINE_URL: '#', PROPERTIES_DATA_URL: 'data/properties.json' };
-    /** 全物件（GAS または properties.json）。フィルタの元データ */
+    /** 全物件（Firebase API または properties.json）。フィルタの元データ */
     var PROPERTY_LIST = [];
     /** 絞り込み後（描画用。applyPropertyFilters の結果と同等） */
     var FILTERED_PROPERTY_LIST = [];
@@ -224,15 +266,15 @@
     var properties = PROPERTY_LIST;
     /** 仕様上の `filteredProperties` と同義。refreshFilteredListing で FILTERED_PROPERTY_LIST と同期 */
     var filteredProperties = FILTERED_PROPERTY_LIST;
-    /** GAS GET が成功し 1 件以上あるときだけ true（一覧セクション表示用。フォールバック時は false） */
-    var gasListingShouldShow = false;
+    /** Firebase API が成功し 1 件以上あるときだけ true（JSONフォールバック時は false） */
+    var remoteListingShouldShow = false;
 
     var CONFIG = {
       LINE_URL: NR.LINE_URL,
       LINE_OA_URL_BASE: NR.LINE_OA_URL_BASE || '',
       PROPERTIES_DATA_URL: NR.PROPERTIES_DATA_URL || 'data/properties.json',
-      GAS_PROPERTIES_GET_URL:
-        typeof NR.GAS_PROPERTIES_GET_URL === 'string' ? NR.GAS_PROPERTIES_GET_URL.trim() : '',
+      PROPERTIES_API_URL: NR.PROPERTIES_API_URL || '/api/properties',
+      USE_FIREBASE_PROPERTIES: NR.USE_FIREBASE_PROPERTIES === true,
       USE_DIFY_CHAT: NR.USE_DIFY_CHAT === true,
       SHOW_LEAD_PROFILE_PROMPT: NR.SHOW_LEAD_PROFILE_PROMPT !== false,
       PRIVACY_POLICY_URL: typeof NR.PRIVACY_POLICY_URL === 'string' ? NR.PRIVACY_POLICY_URL.trim() : '',
@@ -245,6 +287,27 @@
         var n = Number(NR.DIFY_CHAR_MS);
         return !isNaN(n) && n >= 0 ? n : 22;
       })(),
+      EXTRACT_CONDITIONS_WITH_DIFY: NR.EXTRACT_CONDITIONS_WITH_DIFY === true,
+      SOFT_CONDITION_WEIGHTS: (function () {
+        var base = {
+          quiet: 2.8,
+          cafe_near: 2.4,
+          sunlight: 2.1,
+          station_access: 2.0,
+          security: 2.0,
+          corner: 1.2,
+          newish: 1.2,
+          reno: 1.1
+        };
+        var custom = NR.SOFT_CONDITION_WEIGHTS;
+        if (!custom || typeof custom !== 'object') return base;
+        Object.keys(custom).forEach(function (k) {
+          var v = Number(custom[k]);
+          if (!isNaN(v) && v >= 0) base[k] = v;
+        });
+        return base;
+      })(),
+      SOFT_SYNONYM_MAP: NR.SOFT_SYNONYM_MAP && typeof NR.SOFT_SYNONYM_MAP === 'object' ? NR.SOFT_SYNONYM_MAP : {},
       GAS_SHEET_WEBHOOK_URL:
         typeof NR.GAS_SHEET_WEBHOOK_URL === 'string' ? NR.GAS_SHEET_WEBHOOK_URL.trim() : ''
     };
@@ -432,26 +495,22 @@
       });
     }
 
-    /** GAS 返却 JSON の配列取り出し（対応: 素の配列 / { items } / { properties } のみ） */
-    function parseGasPropertiesJson(data) {
+    /** 物件API / JSON フォールバックの配列取り出し */
+    function parsePropertiesJson(data) {
       if (Array.isArray(data)) return data;
       if (data && Array.isArray(data.items)) return data.items;
       if (data && Array.isArray(data.properties)) return data.properties;
+      if (data && data.data && Array.isArray(data.data.items)) return data.data.items;
+      if (data && data.data && Array.isArray(data.data.properties)) return data.data.properties;
+      if (data && data.result && Array.isArray(data.result.items)) return data.result.items;
+      if (data && data.result && Array.isArray(data.result.properties)) return data.result.properties;
       return [];
     }
 
-    var GAS_PROPERTY_PLACEHOLDER_IMG =
+    var PROPERTY_PLACEHOLDER_IMG =
       'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=640&q=80&sat=-100';
 
-    function rentManFromGasValue(rentVal) {
-      if (typeof rentVal === 'number' && !isNaN(rentVal)) return rentVal;
-      var s = String(rentVal || '').replace(/[,，]/g, '');
-      var m = s.match(/(\d+(?:\.\d+)?)/);
-      return m ? parseFloat(m[1]) : NaN;
-    }
-
-    /** GAS / シートの真偽値を UI フィルタ用に統一 */
-    function gasTruthy(val) {
+    function parseBooleanMark(val) {
       if (val === true || val === 1) return true;
       if (val === false || val === 0 || val == null || val === '') return false;
       var s = String(val).trim().toLowerCase();
@@ -460,11 +519,65 @@
         s === 'yes' ||
         s === '1' ||
         s === 'はい' ||
+        s === 'あり' ||
+        s === '有' ||
+        s === '可' ||
         s === '○' ||
         s === '◯' ||
-        s === '済' ||
-        s === '可'
+        s === '⭕' ||
+        s === '⭕️'
       );
+    }
+
+    function parseRentYenValue(v) {
+      if (typeof v === 'number' && !isNaN(v)) return Math.round(v);
+      var s = String(v == null ? '' : v).replace(/[,\s，円]/g, '');
+      if (!s) return null;
+      var m = s.match(/(\d+(?:\.\d+)?)/);
+      if (!m) return null;
+      var n = parseFloat(m[1]);
+      if (isNaN(n)) return null;
+      if (n < 1000) return Math.round(n * 10000);
+      return Math.round(n);
+    }
+
+    function formatRentForCard(rentYen, fallback) {
+      if (rentYen != null && !isNaN(rentYen)) {
+        if (rentYen >= 10000) return Math.round(rentYen / 10000 * 10) / 10 + '万円';
+        return String(rentYen) + '円';
+      }
+      return String(fallback || '—');
+    }
+
+    function normalizeTagList(rawTags) {
+      if (Array.isArray(rawTags)) {
+        return rawTags
+          .map(function (v) { return String(v || '').trim(); })
+          .filter(Boolean);
+      }
+      return String(rawTags || '')
+        .split(/[,\n、，]/)
+        .map(function (v) { return String(v || '').trim(); })
+        .filter(Boolean);
+    }
+
+    function collectPropertyImages(raw) {
+      var keys = [
+        '画像1', '画像2', '画像3', '画像4', '画像5',
+        '画像6', '画像7', '画像8', '画像9', '画像10',
+        'image1', 'image2', 'image3', 'image4', 'image5',
+        'image6', 'image7', 'image8', 'image9', 'image10'
+      ];
+      var uniq = {};
+      var images = [];
+      keys.forEach(function (k) {
+        var v = raw && raw[k] != null ? String(raw[k]).trim() : '';
+        if (!v || uniq[v]) return;
+        uniq[v] = true;
+        images.push(v);
+      });
+      if (!images.length) images.push(PROPERTY_PLACEHOLDER_IMG);
+      return images;
     }
 
     /**
@@ -480,64 +593,113 @@
       return arr.slice(0, maxLen - 1).join('') + '…';
     }
 
-    /** GAS 1行 → 既存 property-card / renderPropertySuggest 用 */
-    function normalizeGasProperty(raw, rowIndex) {
+    /** 新物件マスタ / 旧JSON どちらからも同一内部形式へ正規化 */
+    function normalizePropertyRecord(raw, rowIndex, sourceType) {
       raw = raw || {};
-      var id = raw.id != null ? String(raw.id).trim() : '';
-      if (!id) id = 'gas-row-' + rowIndex;
-      var title = raw.title != null ? String(raw.title).trim() : '';
-      var rentVal = raw.rent;
-      var rentStr = '';
-      if (rentVal != null && rentVal !== '') {
-        rentStr = typeof rentVal === 'number' ? rentVal + '万円' : String(rentVal);
-      }
-      var layout = raw.layout != null ? String(raw.layout).trim() : '';
-      var city = raw.city != null ? String(raw.city).trim() : '';
-      var areaPart = raw.area != null ? String(raw.area).trim() : '';
-      var areaJoined = [city, areaPart].filter(Boolean).join(' ');
-      var area = areaJoined || areaPart || city || '—';
-      var imgRaw = raw.image1 != null ? String(raw.image1).trim() : '';
-      var image = imgRaw || GAS_PROPERTY_PLACEHOLDER_IMG;
-      var comment = raw.story_comment != null ? String(raw.story_comment).trim() : '';
-      var srFromGas = raw.short_reason != null ? String(raw.short_reason).trim() : '';
-      var shortReason = srFromGas || deriveShortReason(comment, 26);
-      var rentMan = rentManFromGasValue(rentVal);
-      var rentYen = null;
-      if (!isNaN(rentMan) && rentMan > 0) {
-        rentYen = Math.round(rentMan * 10000);
-      }
+      sourceType = sourceType || 'property';
+      var id = raw['物件ID'] != null ? String(raw['物件ID']).trim() : '';
+      if (!id && raw.id != null) id = String(raw.id).trim();
+      if (!id) id = sourceType + '-row-' + rowIndex;
+
+      var name = raw['物件名'] != null ? String(raw['物件名']).trim() : '';
+      if (!name && raw.title != null) name = String(raw.title).trim();
+      if (!name && raw.name != null) name = String(raw.name).trim();
+      if (!name) name = '物件';
+
+      var city = raw['市'] != null ? String(raw['市']).trim() : String(raw.city || '').trim();
+      var area = raw['エリア'] != null ? String(raw['エリア']).trim() : String(raw.area || '').trim();
+      var station = raw['最寄り駅'] != null ? String(raw['最寄り駅']).trim() : String(raw.station || '').trim();
+      var layout = raw['間取り'] != null ? String(raw['間取り']).trim() : String(raw.layout || '').trim();
+      var buildingAge = raw['築年数'] != null ? String(raw['築年数']).trim() : String(raw.buildingAge || '').trim();
+      var parking = raw['駐車場'] != null ? String(raw['駐車場']).trim() : String(raw.parking || '').trim();
+      var deposit = raw['敷金'] != null ? String(raw['敷金']).trim() : String(raw.deposit || '').trim();
+      var keyMoney = raw['礼金'] != null ? String(raw['礼金']).trim() : String(raw.keyMoney || '').trim();
+      var safetyLevel = raw['治安レベル'] != null ? String(raw['治安レベル']).trim() : String(raw.safetyLevel || '').trim();
+      var status = raw['公開状態'] != null ? String(raw['公開状態']).trim() : String(raw.status || '').trim();
+      var story = raw['ストーリー'] != null ? String(raw['ストーリー']).trim() : String(raw.story || raw.comment || '').trim();
+      var viewsRaw = raw['閲覧数'] != null ? raw['閲覧数'] : raw.views;
+      var views = Number(viewsRaw);
+      if (isNaN(views) || views < 0) views = 0;
+
+      var rentYen = parseRentYenValue(raw['家賃'] != null ? raw['家賃'] : raw.rentYen != null ? raw.rentYen : raw.rent);
+      var rentDisplay = formatRentForCard(rentYen, raw.rent);
+      var rentMan = rentYen != null ? Math.round((rentYen / 10000) * 10) / 10 : undefined;
+
+      var tags = normalizeTagList(raw['タグ'] != null ? raw['タグ'] : raw.tags);
+      var atmosphereTags = normalizeTagList(raw['雰囲気タグ'] != null ? raw['雰囲気タグ'] : raw.atmosphere_tags);
+      var nearbyTags = normalizeTagList(raw['周辺タグ'] != null ? raw['周辺タグ'] : raw.nearby_tags);
+      var lifestyleTags = normalizeTagList(raw['ライフスタイルタグ'] != null ? raw['ライフスタイルタグ'] : raw.lifestyle_tags);
+      var images = collectPropertyImages(raw);
+
+      var washstand = parseBooleanMark(raw['独立洗面台'] != null ? raw['独立洗面台'] : raw.independent_washstand);
+      var bathToiletSeparate = parseBooleanMark(
+        raw['風呂トイレ別'] != null ? raw['風呂トイレ別'] : raw.bath_toilet_separate
+      );
+      var petAllowed = parseBooleanMark(raw['ペット可'] != null ? raw['ペット可'] : raw.pet_ok);
+      var supermarketNearby = parseBooleanMark(raw['スーパー近い'] != null ? raw['スーパー近い'] : raw.super_near);
+      var schoolNearby = parseBooleanMark(raw['学校近い'] != null ? raw['学校近い'] : raw.school_near);
+
       return {
         id: id,
-        name: title || '物件',
-        image: image,
-        area: area,
-        rent: rentStr || '—',
-        rentMan: !isNaN(rentMan) ? rentMan : undefined,
+        name: name,
+        rent: rentDisplay,
         rentYen: rentYen,
+        rentMan: rentMan,
         layout: layout || '—',
-        layoutGroup: 'compact',
-        filterRegion: 'nagasaki',
-        features: [],
-        comment: comment,
-        shortReason: shortReason,
-        detailUrl: 'property.html?id=' + encodeURIComponent(id),
-        gasPetOk: gasTruthy(raw.pet_ok),
-        gasWashstand: gasTruthy(raw.independent_washstand),
-        gasBathToiletSeparate: gasTruthy(raw.bath_toilet_separate),
-        gasSuperNear: gasTruthy(raw.super_near),
-        gasSchoolNear: gasTruthy(raw.school_near)
+        city: city,
+        area: area || city || '—',
+        station: station,
+        buildingAge: buildingAge,
+        parking: parking,
+        deposit: deposit,
+        keyMoney: keyMoney,
+        washstand: washstand,
+        bathToiletSeparate: bathToiletSeparate,
+        petAllowed: petAllowed,
+        supermarketNearby: supermarketNearby,
+        schoolNearby: schoolNearby,
+        safetyLevel: safetyLevel,
+        tags: tags,
+        atmosphereTags: atmosphereTags,
+        nearbyTags: nearbyTags,
+        lifestyleTags: lifestyleTags,
+        story: story,
+        comment: story,
+        shortReason: deriveShortReason(story, 26),
+        images: images,
+        image: images[0],
+        status: status,
+        views: views,
+        detailUrl: 'property.html?id=' + encodeURIComponent(id)
       };
     }
 
     /** properties.json 行に rentYen を補完（フィルタ用） */
     function enrichPropertyForFilter(p) {
       if (!p || typeof p !== 'object') return p;
-      if (p.rentYen == null && p.rentMan != null && !isNaN(Number(p.rentMan))) {
-        p.rentYen = Math.round(Number(p.rentMan) * 10000);
+      if (p.rentYen == null) p.rentYen = parseRentYenValue(p.rent != null ? p.rent : p.rentMan);
+      if (p.rentYen != null && (p.rent == null || p.rent === '' || p.rent === '—')) {
+        p.rent = formatRentForCard(p.rentYen, p.rent);
       }
-      if (!p.shortReason && p.comment) {
-        p.shortReason = deriveShortReason(p.comment, 26);
-      }
+      if (!Array.isArray(p.images) || !p.images.length) p.images = collectPropertyImages(p);
+      if (!p.image) p.image = p.images[0] || PROPERTY_PLACEHOLDER_IMG;
+      if (p.views == null || isNaN(Number(p.views))) p.views = 0;
+      if (!p.story && p.comment) p.story = p.comment;
+      if (!p.comment && p.story) p.comment = p.story;
+      if (!p.tags) p.tags = [];
+      if (!Array.isArray(p.tags)) p.tags = normalizeTagList(p.tags);
+      if (!p.atmosphereTags) p.atmosphereTags = normalizeTagList(p.atmosphere_tags);
+      if (!Array.isArray(p.atmosphereTags)) p.atmosphereTags = normalizeTagList(p.atmosphereTags);
+      if (!p.nearbyTags) p.nearbyTags = normalizeTagList(p.nearby_tags);
+      if (!Array.isArray(p.nearbyTags)) p.nearbyTags = normalizeTagList(p.nearbyTags);
+      if (!p.lifestyleTags) p.lifestyleTags = normalizeTagList(p.lifestyle_tags);
+      if (!Array.isArray(p.lifestyleTags)) p.lifestyleTags = normalizeTagList(p.lifestyleTags);
+      if (!p.shortReason && (p.story || p.comment)) p.shortReason = deriveShortReason(p.story || p.comment, 26);
+      if (!p.features) p.features = [];
+      if (p.internetFree && p.features.indexOf('internet') === -1) p.features.push('internet');
+      if (p.autoLock && p.features.indexOf('security') === -1) p.features.push('security');
+      if (p.deliveryBox && p.features.indexOf('delivery_box') === -1) p.features.push('delivery_box');
+      if (p.supermarketNearby && p.features.indexOf('supermarket_near') === -1) p.features.push('supermarket_near');
       return p;
     }
 
@@ -548,39 +710,48 @@
           return res.json();
         })
         .then(function (data) {
-          return Array.isArray(data) ? data : [];
+          var rows = parsePropertiesJson(data);
+          return rows.map(function (raw, idx) {
+            return normalizePropertyRecord(raw, idx, 'json');
+          });
         })
         .catch(function (err) {
           console.log('[rental] properties load error:', err);
-          return Array.isArray(NR.PROPERTIES) ? NR.PROPERTIES : [];
+          return (Array.isArray(NR.PROPERTIES) ? NR.PROPERTIES : []).map(function (raw, idx) {
+            return normalizePropertyRecord(raw, idx, 'embedded');
+          });
         });
     }
 
+    function mapRawListToProperties(rows, sourceType) {
+      sourceType = sourceType || 'property';
+      return (rows || []).map(function (raw, idx) {
+        if (raw && raw.id && raw.name && raw.rent != null) {
+          return enrichPropertyForFilter(raw);
+        }
+        return enrichPropertyForFilter(normalizePropertyRecord(raw, idx, sourceType));
+      }).filter(function (p) {
+        if (!p) return false;
+        if (!p.status) return true;
+        return /公開|public|公開中/i.test(String(p.status));
+      });
+    }
+
     function loadPropertyList() {
-      var gasUrl = (CONFIG.GAS_PROPERTIES_GET_URL || '').trim();
-      gasListingShouldShow = false;
-      if (!gasUrl) {
-        return fetchLocalPropertiesJson();
-      }
-      return fetch(gasUrl, { method: 'GET', cache: 'no-store' })
-        .then(function (res) {
-          if (!res.ok) throw new Error('GAS properties HTTP ' + res.status);
-          return res.json();
-        })
-        .then(function (data) {
-          var rows = parseGasPropertiesJson(data);
-          var list = rows.map(function (raw, idx) {
-            return normalizeGasProperty(raw, idx);
-          });
+      remoteListingShouldShow = false;
+      var loader = window.NR_PROPERTY_LOADER;
+      if (loader && typeof loader.loadPropertyListWithFallback === 'function') {
+        return loader.loadPropertyListWithFallback(NR).then(function (result) {
+          var list = mapRawListToProperties(result.list, result.source === 'json' ? 'json' : 'firebase');
           if (list.length > 0) {
-            gasListingShouldShow = true;
+            remoteListingShouldShow = result.source === 'firebase';
           }
           return list;
-        })
-        .catch(function (err) {
-          console.log('[rental] GAS properties load failed, fallback to JSON', err);
-          return fetchLocalPropertiesJson();
         });
+      }
+      return fetchLocalPropertiesJson().then(function (rows) {
+        return mapRawListToProperties(rows, 'json');
+      });
     }
 
     /** 仕様名: 物件一覧取得（実体は loadPropertyList と同一・二重 fetch しない） */
@@ -657,16 +828,86 @@
      * Dify SSE の1行 data をパースして、answer の断片と conversation_id を取り出す
      */
     function extractDifySsePayload(obj) {
+      if (!obj || typeof obj !== 'object') return { delta: '', conversationId: null };
       var delta = '';
       if (obj.answer != null) delta += String(obj.answer);
-      if (obj.data && obj.data.answer != null) delta += String(obj.data.answer);
-      if (obj.message && obj.message.answer != null) delta += String(obj.message.answer);
+      if (obj.data && typeof obj.data === 'object') {
+        if (obj.data.answer != null) delta += String(obj.data.answer);
+        if (obj.data.text != null) delta += String(obj.data.text);
+        if (obj.data.delta != null) delta += String(obj.data.delta);
+      }
+      if (obj.message && typeof obj.message === 'object') {
+        if (obj.message.answer != null) delta += String(obj.message.answer);
+        if (obj.message.content != null) delta += String(obj.message.content);
+      }
+      if (obj.event === 'text_chunk' && obj.data && obj.data.text != null) {
+        delta += String(obj.data.text);
+      }
+      if (obj.event === 'agent_message' && obj.answer != null) {
+        delta += String(obj.answer);
+      }
       var cid =
         obj.conversation_id ||
         (obj.data && obj.data.conversation_id) ||
         (obj.message && obj.message.conversation_id) ||
         null;
       return { delta: delta, conversationId: cid };
+    }
+
+    function resolveDifyChatPurpose() {
+      if (difyChatPurpose) return difyChatPurpose;
+      if (flowMode === 'consult') return 'consult';
+      if (flowMode === 'find') return 'property';
+      return null;
+    }
+
+    /** エントリ未選択でも自由入力から Dify へつなぐ */
+    function ensureDifyChatPurpose() {
+      var p = resolveDifyChatPurpose();
+      if (p) {
+        difyChatPurpose = p;
+        return p;
+      }
+      if (!CONFIG.USE_DIFY_CHAT) return null;
+      difyChatPurpose = 'property';
+      if (flowMode === 'idle') flowMode = 'find';
+      return difyChatPurpose;
+    }
+
+    function applyDifyExtractionPatch(difyPatch) {
+      if (!difyPatch) return;
+      mergeExtractedConditions(difyPatch);
+      updateConditionSearchButton();
+      pushConditionFieldsToSheet();
+    }
+
+    function runDifyExtractionInBackground(userMessage, purpose) {
+      fetchDifyConditionExtraction(userMessage, purpose).then(applyDifyExtractionPatch);
+    }
+
+    function afterDifyFreeReplyHook() {
+      if (flowMode === 'idle' && findStep === 0) {
+        delay(260).then(appendSoftLineFromFree);
+      }
+    }
+
+    function finishDifyChatTurn(answer, streamBubble, userText) {
+      emitSheetChatSnapshot(userText);
+      if (streamBubble) {
+        streamBubble.classList.remove('bubble--bot--streaming');
+        if (!streamBubble.textContent.trim()) {
+          streamBubble.textContent =
+            answer && String(answer).trim() ? String(answer).trim() : '（返答が空でした）';
+        }
+        inputLocked = false;
+        setButtonsDisabled(false);
+        scrollToBottom();
+        afterDifyFreeReplyHook();
+        return;
+      }
+      removeTyping();
+      var body = answer && String(answer).trim() ? String(answer).trim() : '（返答が空でした）';
+      sayBotTypewriterAfterFetch(body, afterDifyFreeReplyHook);
     }
 
     /**
@@ -777,6 +1018,89 @@
       });
     }
 
+    function parseJsonObjectFromText(text) {
+      var src = String(text || '').trim();
+      if (!src) return null;
+      try {
+        return JSON.parse(src);
+      } catch (e) {}
+      var start = src.indexOf('{');
+      var end = src.lastIndexOf('}');
+      if (start === -1 || end <= start) return null;
+      try {
+        return JSON.parse(src.slice(start, end + 1));
+      } catch (e2) {
+        return null;
+      }
+    }
+
+    function normalizeExtractedConditionPayload(payload) {
+      if (!payload || typeof payload !== 'object') return null;
+      var hard = payload.hard && typeof payload.hard === 'object' ? payload.hard : {};
+      var soft = payload.soft && typeof payload.soft === 'object' ? payload.soft : {};
+      var avoid = payload.avoid && typeof payload.avoid === 'object' ? payload.avoid : {};
+      var patch = {
+        budget: hard.budget,
+        layout: hard.layout,
+        city: hard.city,
+        areas: hard.areas,
+        features: hard.features,
+        parking: hard.parking,
+        safetyLevel: hard.safetyLevel,
+        softPreferences: soft.preferences,
+        lifestyleTags: soft.lifestyleTags,
+        avoidFeatures: avoid.features,
+        hard: hard,
+        soft: soft,
+        avoid: avoid
+      };
+      var hasAny =
+        patch.budget != null ||
+        !!patch.layout ||
+        !!patch.city ||
+        (patch.areas && patch.areas.length) ||
+        (patch.features && patch.features.length) ||
+        (patch.softPreferences && patch.softPreferences.length) ||
+        (patch.avoidFeatures && patch.avoidFeatures.length);
+      return hasAny ? patch : null;
+    }
+
+    function fetchDifyConditionExtraction(userMessage, purpose) {
+      if (!CONFIG.USE_DIFY_CHAT) return Promise.resolve(null);
+      if (!CONFIG.EXTRACT_CONDITIONS_WITH_DIFY) return Promise.resolve(null);
+      if (purpose !== 'property') return Promise.resolve(null);
+      return fetch(apiUrl('/api/chat'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userMessage: userMessage,
+          userId: getOrCreateDifyUserId(),
+          chatPurpose: purpose,
+          mode: 'extract_conditions_json'
+        })
+      })
+        .then(function (res) {
+          if (!res.ok) return null;
+          return res.json().catch(function () {
+            return null;
+          });
+        })
+        .then(function (data) {
+          if (!data) return null;
+          if (data.extractedConditions && typeof data.extractedConditions === 'object') {
+            return normalizeExtractedConditionPayload(data.extractedConditions);
+          }
+          if (data.answer) {
+            var obj = parseJsonObjectFromText(data.answer);
+            return normalizeExtractedConditionPayload(obj);
+          }
+          return null;
+        })
+        .catch(function () {
+          return null;
+        });
+    }
+
     refreshStaticLineLinks();
     bindSheetStaticLineListeners();
 
@@ -784,24 +1108,93 @@
     var ctx = { lifestyle: '', rent: '', area: '' };
 
     /**
-     * ユーザー発言から抽出した条件（一覧URL等で再利用しやすい形）
-     * budget: 月額想定（円・数値） / layout: 正規化した間取り文字列 / features: 英字スラッグの配列
+     * ユーザー発言から抽出した条件。
+     * 互換性のためフラット項目を維持しつつ、hard/soft/avoid も保持する。
      */
-    var extractedConditions = { budget: null, layout: '', features: [], areas: [], lifestyleTags: [] };
+    var extractedConditions = {
+      budget: null,
+      layout: '',
+      city: '',
+      areas: [],
+      features: [],
+      keyword: '',
+      safetyLevel: '',
+      parking: false,
+      lifestyleTags: [],
+      softPreferences: [],
+      avoidFeatures: [],
+      hard: {
+        budget: null,
+        layout: '',
+        city: '',
+        areas: [],
+        features: [],
+        safetyLevel: '',
+        parking: false
+      },
+      soft: {
+        preferences: [],
+        lifestyleTags: []
+      },
+      avoid: {
+        features: []
+      }
+    };
+
+    var HARD_FEATURE_SLUGS = ['pet', 'washstand', 'separate_bath', 'supermarket_near', 'school_near', 'parking', 'safe_area'];
+    var SOFT_SLUG_ALIAS = {
+      south: 'sunlight',
+      station: 'station_access'
+    };
+    var SOFT_PREFERENCE_SYNONYMS = Object.assign(
+      {
+        quiet: ['静か', '閑静', '落ち着く', '騒音少ない'],
+        cafe_near: ['カフェ', '喫茶店', 'コーヒー', 'カフェ近い'],
+        sunlight: ['日当たり', '南向き', '明るい'],
+        station_access: ['駅近', '駅チカ', '徒歩圏', 'アクセス'],
+        security: ['オートロック', '防犯', 'セキュリティ', '安心'],
+        corner: ['角部屋'],
+        newish: ['新築', '築浅'],
+        reno: ['リノベ', 'リフォーム']
+      },
+      CONFIG.SOFT_SYNONYM_MAP || {}
+    );
 
     var FEATURE_RULES = [
       { test: /静か|閑静|静寂|騒音|落ち着いた/, slug: 'quiet' },
+      { test: /カフェ|喫茶|コーヒー|カフェ近/, slug: 'cafe_near' },
       { test: /ペット|犬|猫|動物/, slug: 'pet' },
       { test: /駅近|駅チカ|駅から近|徒歩\d+\s*分/, slug: 'station' },
       { test: /独立洗面|洗面\s*独立|洗\s*面\s*台/, slug: 'washstand' },
       { test: /風呂トイレ別|バス\s*トイレ別|バストイレ別|ＢＴ別/, slug: 'separate_bath' },
+      { test: /スーパー近|買い物便利|買物便利/, slug: 'supermarket_near' },
+      { test: /学校近|通学便利/, slug: 'school_near' },
       { test: /南向き|南東|日当たり/, slug: 'south' },
       { test: /駐車場|駐輪|車庫|車\s*あり/, slug: 'parking' },
+      { test: /治安|安心|安全|落ち着いたエリア/, slug: 'safe_area' },
       { test: /新築|築浅|築\s*\d+\s*年/, slug: 'newish' },
       { test: /リノベ|リフォーム/, slug: 'reno' },
       { test: /オートロック|セキュリティ/, slug: 'security' },
       { test: /角部屋|角\s*部屋/, slug: 'corner' }
     ];
+
+    function normalizeSoftSlug(slug) {
+      var s = String(slug || '').trim();
+      if (!s) return '';
+      return SOFT_SLUG_ALIAS[s] || s;
+    }
+
+    function uniqStrings(list) {
+      var seen = {};
+      var out = [];
+      (list || []).forEach(function (v) {
+        var s = String(v || '').trim();
+        if (!s || seen[s]) return;
+        seen[s] = true;
+        out.push(s);
+      });
+      return out;
+    }
 
     function normalizeDigits(str) {
       return String(str).replace(/[０-９]/g, function (c) {
@@ -881,22 +1274,114 @@
       return found;
     }
 
+    function extractAvoidFeaturesFromText(text) {
+      var t = String(text || '');
+      var avoid = [];
+      if (/うるさ|騒がし|騒音.*嫌|静か.*じゃない/.test(t)) avoid.push('quiet');
+      if (/駅.*遠い.*嫌|駅遠.*避け/.test(t)) avoid.push('station_access');
+      if (/暗い.*嫌|日当たり.*悪い.*避け/.test(t)) avoid.push('sunlight');
+      if (/古い.*嫌|築古.*避け/.test(t)) avoid.push('newish');
+      return uniqStrings(avoid.map(normalizeSoftSlug));
+    }
+
+    function extractCityFromText(text) {
+      var t = String(text || '');
+      if (/長崎市/.test(t)) return '長崎市';
+      if (/諫早市|諫早/.test(t)) return '諫早市';
+      if (/大村市|大村/.test(t)) return '大村市';
+      return '';
+    }
+
+    function extractSafetyLevelFromText(text) {
+      var t = String(text || '');
+      if (/治安.*高|安全|安心/.test(t)) return '高い';
+      if (/治安.*低|不安/.test(t)) return '低い';
+      return '';
+    }
+
+    function extractParkingFromText(text) {
+      var t = String(text || '');
+      if (/駐車|車/.test(t)) return true;
+      return false;
+    }
+
+    function extractKeywordFromText(text) {
+      var t = String(text || '').trim();
+      if (!t) return '';
+      if (t.length > 24) return '';
+      if (t.length <= 2) return '';
+      return t;
+    }
+
     function extractConditionsFromText(text) {
+      var allFeatures = extractFeaturesFromText(text);
+      var hardFeatures = allFeatures.filter(function (slug) {
+        return HARD_FEATURE_SLUGS.indexOf(slug) !== -1;
+      });
+      var softPreferences = allFeatures
+        .filter(function (slug) {
+          return HARD_FEATURE_SLUGS.indexOf(slug) === -1;
+        })
+        .map(normalizeSoftSlug);
+      var lifestyleTags = extractLifestyleTagsFromText(text);
+      var avoidFeatures = extractAvoidFeaturesFromText(text);
+      var budget = extractBudgetFromText(text);
+      var layout = extractLayoutFromText(text);
+      var city = extractCityFromText(text);
+      var areas = extractAreasFromText(text);
+      var keyword = extractKeywordFromText(text);
+      var safetyLevel = extractSafetyLevelFromText(text);
+      var parking = extractParkingFromText(text);
       return {
-        budget: extractBudgetFromText(text),
-        layout: extractLayoutFromText(text),
-        features: extractFeaturesFromText(text),
-        areas: extractAreasFromText(text),
-        lifestyleTags: extractLifestyleTagsFromText(text)
+        budget: budget,
+        layout: layout,
+        city: city,
+        features: hardFeatures,
+        areas: areas,
+        keyword: keyword,
+        safetyLevel: safetyLevel,
+        parking: parking,
+        lifestyleTags: lifestyleTags,
+        softPreferences: uniqStrings(softPreferences),
+        avoidFeatures: avoidFeatures,
+        hard: {
+          budget: budget,
+          layout: layout,
+          city: city,
+          areas: areas,
+          features: hardFeatures,
+          safetyLevel: safetyLevel,
+          parking: parking
+        },
+        soft: {
+          preferences: uniqStrings(softPreferences),
+          lifestyleTags: lifestyleTags
+        },
+        avoid: {
+          features: avoidFeatures
+        }
       };
     }
 
     function mergeExtractedConditions(patch) {
+      if (!patch || typeof patch !== 'object') return;
       if (patch.budget != null && !isNaN(patch.budget)) {
         extractedConditions.budget = patch.budget;
       }
       if (patch.layout) {
         extractedConditions.layout = patch.layout;
+      }
+      if (patch.city) {
+        extractedConditions.city = patch.city;
+      }
+      if (patch.keyword) {
+        extractedConditions.keyword = patch.keyword;
+      }
+      if (patch.safetyLevel) {
+        extractedConditions.safetyLevel = patch.safetyLevel;
+      }
+      if (patch.parking === true) {
+        extractedConditions.parking = true;
       }
       (patch.features || []).forEach(function (slug) {
         if (extractedConditions.features.indexOf(slug) === -1) {
@@ -913,16 +1398,147 @@
           extractedConditions.lifestyleTags.push(tag);
         }
       });
+      (patch.softPreferences || []).forEach(function (slug) {
+        var s = normalizeSoftSlug(slug);
+        if (!s) return;
+        if (extractedConditions.softPreferences.indexOf(s) === -1) {
+          extractedConditions.softPreferences.push(s);
+        }
+      });
+      (patch.avoidFeatures || []).forEach(function (slug) {
+        var s = normalizeSoftSlug(slug);
+        if (!s) return;
+        if (extractedConditions.avoidFeatures.indexOf(s) === -1) {
+          extractedConditions.avoidFeatures.push(s);
+        }
+      });
+      var hardPatch = patch.hard || {};
+      var softPatch = patch.soft || {};
+      var avoidPatch = patch.avoid || {};
+      if (hardPatch && typeof hardPatch === 'object') {
+        mergeExtractedConditions({
+          budget: hardPatch.budget,
+          layout: hardPatch.layout,
+          city: hardPatch.city,
+          areas: hardPatch.areas,
+          features: hardPatch.features,
+          safetyLevel: hardPatch.safetyLevel,
+          parking: hardPatch.parking
+        });
+      }
+      if (softPatch && typeof softPatch === 'object') {
+        mergeExtractedConditions({
+          softPreferences: softPatch.preferences,
+          lifestyleTags: softPatch.lifestyleTags
+        });
+      }
+      if (avoidPatch && typeof avoidPatch === 'object') {
+        mergeExtractedConditions({
+          avoidFeatures: avoidPatch.features
+        });
+      }
+      extractedConditions.softPreferences = uniqStrings(extractedConditions.softPreferences.map(normalizeSoftSlug));
+      extractedConditions.avoidFeatures = uniqStrings(extractedConditions.avoidFeatures.map(normalizeSoftSlug));
+      extractedConditions.hard = {
+        budget: extractedConditions.budget,
+        layout: extractedConditions.layout,
+        city: extractedConditions.city,
+        areas: extractedConditions.areas.slice(),
+        features: extractedConditions.features.slice(),
+        safetyLevel: extractedConditions.safetyLevel,
+        parking: extractedConditions.parking === true
+      };
+      extractedConditions.soft = {
+        preferences: extractedConditions.softPreferences.slice(),
+        lifestyleTags: extractedConditions.lifestyleTags.slice()
+      };
+      extractedConditions.avoid = {
+        features: extractedConditions.avoidFeatures.slice()
+      };
     }
 
     /** 会話・URL の features スラッグ → 物件オブジェクトの真偽キー（マップ外はフィルタ無視） */
-    var FEATURE_SLUG_TO_GAS = {
-      pet: 'gasPetOk',
-      washstand: 'gasWashstand',
-      separate_bath: 'gasBathToiletSeparate',
-      station: 'gasSuperNear',
-      school_near: 'gasSchoolNear'
+    var FEATURE_SLUG_TO_PROPERTY = {
+      pet: 'petAllowed',
+      washstand: 'washstand',
+      separate_bath: 'bathToiletSeparate',
+      supermarket_near: 'supermarketNearby',
+      school_near: 'schoolNearby',
+      parking: 'parking',
+      safe_area: 'safetyLevel',
+      internet: 'internetFree',
+      security: 'autoLock',
+      delivery_box: 'deliveryBox'
     };
+
+    function isParkingAvailable(property) {
+      var s = String((property && property.parking) || '').toLowerCase();
+      return /あり|有|可|ok|〇|○|⭕|1台|2台|3台|付き/.test(s);
+    }
+
+    function normalizeConditions(conditions) {
+      var ec = conditions || {};
+      var hard = ec.hard && typeof ec.hard === 'object' ? ec.hard : {};
+      var soft = ec.soft && typeof ec.soft === 'object' ? ec.soft : {};
+      var avoid = ec.avoid && typeof ec.avoid === 'object' ? ec.avoid : {};
+      var mergedAreas = (hard.areas || ec.areas || []).map(function (a) { return String(a || '').trim(); }).filter(Boolean);
+      var mergedFeatures = (hard.features || ec.features || []).map(function (s) { return String(s || '').trim(); }).filter(Boolean);
+      var softPrefs = uniqStrings(
+        (soft.preferences || ec.softPreferences || [])
+          .map(normalizeSoftSlug)
+          .filter(Boolean)
+      );
+      var avoidFeatures = uniqStrings(
+        (avoid.features || ec.avoidFeatures || [])
+          .map(normalizeSoftSlug)
+          .filter(Boolean)
+      );
+      return {
+        budget: hard.budget != null && hard.budget > 0
+          ? Number(hard.budget)
+          : ec.budget != null && ec.budget > 0
+            ? Number(ec.budget)
+            : null,
+        layout: hard.layout || ec.layout ? normalizeLayoutForCompare(hard.layout || ec.layout) : '',
+        city: String(hard.city || ec.city || '').trim(),
+        areas: mergedAreas,
+        features: uniqStrings(mergedFeatures),
+        keyword: String(ec.keyword || '').trim(),
+        safetyLevel: String(hard.safetyLevel || ec.safetyLevel || '').trim(),
+        parking: hard.parking === true || ec.parking === true,
+        lifestyleTags: uniqStrings((soft.lifestyleTags || ec.lifestyleTags || []).map(function (t) { return String(t || '').trim(); })),
+        softPreferences: softPrefs,
+        avoidFeatures: avoidFeatures
+      };
+    }
+
+    function includesPart(haystack, needle) {
+      var h = String(haystack || '').trim();
+      var n = String(needle || '').trim();
+      if (!h || !n) return false;
+      return h.indexOf(n) !== -1 || n.indexOf(h) !== -1;
+    }
+
+    function matchesKeyword(property, keyword) {
+      if (!keyword) return true;
+      var k = String(keyword).trim();
+      if (!k) return true;
+      var fields = [
+        property.name,
+        property.city,
+        property.area,
+        property.station,
+        (property.tags || []).join(' '),
+        (property.atmosphereTags || []).join(' '),
+        (property.nearbyTags || []).join(' '),
+        (property.lifestyleTags || []).join(' '),
+        property.story
+      ];
+      for (var i = 0; i < fields.length; i++) {
+        if (String(fields[i] || '').indexOf(k) !== -1) return true;
+      }
+      return false;
+    }
 
     function normalizeLayoutForCompare(str) {
       var t = normalizeDigits(String(str || '')).replace(/\s/g, '').toUpperCase();
@@ -938,30 +1554,245 @@
      * @param {object} [ecOverride] 省略時は extractedConditions（filterProperties から渡す用）
      */
     function applyPropertyFilters(fullList, ecOverride) {
-      var ec = ecOverride != null ? ecOverride : extractedConditions;
-      var budget = ec.budget != null && ec.budget > 0 ? ec.budget : null;
-      var layoutF = ec.layout ? normalizeLayoutForCompare(ec.layout) : '';
+      var ec = normalizeConditions(ecOverride != null ? ecOverride : extractedConditions);
+      var budget = ec.budget;
+      var layoutF = ec.layout;
       var feats = ec.features || [];
       return (fullList || []).filter(function (p) {
         if (budget != null) {
-          var ry = p.rentYen;
-          if (ry == null && p.rentMan != null && !isNaN(Number(p.rentMan))) {
-            ry = Math.round(Number(p.rentMan) * 10000);
-          }
+          var ry = p.rentYen != null ? Number(p.rentYen) : null;
+          if (ry == null || isNaN(ry)) ry = parseRentYenValue(p.rent);
           if (ry == null || ry > budget) return false;
         }
         if (layoutF) {
           var pl = normalizeLayoutForCompare(p.layout || '');
           if (pl !== layoutF) return false;
         }
+        if (ec.city && !includesPart(p.city, ec.city)) return false;
+        if (ec.areas && ec.areas.length) {
+          var okArea = ec.areas.some(function (a) {
+            return includesPart(p.area, a) || includesPart(p.city, a) || includesPart(p.station, a);
+          });
+          if (!okArea) return false;
+        }
+        if (ec.parking && !isParkingAvailable(p)) return false;
+        if (ec.safetyLevel && !includesPart(p.safetyLevel, ec.safetyLevel)) return false;
         for (var i = 0; i < feats.length; i++) {
           var slug = feats[i];
-          var propKey = FEATURE_SLUG_TO_GAS[slug];
+        var propKey = FEATURE_SLUG_TO_PROPERTY[slug];
           if (!propKey) continue;
+          if (propKey === 'parking') {
+            if (!isParkingAvailable(p)) return false;
+            continue;
+          }
+          if (propKey === 'safetyLevel') {
+            if (!includesPart(p.safetyLevel, '高')) return false;
+            continue;
+          }
           if (!p[propKey]) return false;
         }
+        if (!matchesKeyword(p, ec.keyword)) return false;
         return true;
       });
+    }
+
+    function buildPropertyTextBlob(property) {
+      return [
+        property && property.name,
+        property && property.city,
+        property && property.area,
+        property && property.station,
+        property && property.address,
+        property && property.busStop,
+        property && property.catchCopy,
+        property && property.story,
+        property && property.comment,
+        property && property.floorPlanDetail,
+        property && property.structure,
+        property && property.orientation,
+        property && property.nearbyNote,
+        property && property.targetPersona,
+        property && property.target_persona,
+        (property && property.tags || []).join(' '),
+        (property && property.atmosphereTags || []).join(' '),
+        (property && property.nearbyTags || []).join(' '),
+        (property && property.lifestyleTags || []).join(' '),
+        (property && property.appealPoints || property && property.appeal_points || []).join(' '),
+        (property && property.searchKeywords || property && property.search_keywords || []).join(' ')
+      ]
+        .filter(function (x) {
+          return x != null && String(x).trim() !== '';
+        })
+        .join(' ');
+    }
+
+    function matchSoftPreference(property, softSlug) {
+      var slug = normalizeSoftSlug(softSlug);
+      if (!slug) return false;
+      if (slug === 'quiet') {
+        return /静か|閑静|落ち着/.test(buildPropertyTextBlob(property));
+      }
+      if (slug === 'cafe_near') {
+        return /カフェ|喫茶|コーヒー/.test(buildPropertyTextBlob(property));
+      }
+      if (slug === 'sunlight') {
+        return /日当たり|南向|明るい/.test(buildPropertyTextBlob(property));
+      }
+      if (slug === 'station_access') {
+        return /駅近|駅チカ|徒歩/.test(buildPropertyTextBlob(property)) || includesPart(property.station, '駅');
+      }
+      if (slug === 'security') {
+        return property.security === true || /オートロック|防犯|セキュリティ|安心/.test(buildPropertyTextBlob(property));
+      }
+      if (slug === 'corner') {
+        return /角部屋/.test(buildPropertyTextBlob(property));
+      }
+      if (slug === 'newish') {
+        return /新築|築浅/.test(buildPropertyTextBlob(property));
+      }
+      if (slug === 'reno') {
+        return /リノベ|リフォーム/.test(buildPropertyTextBlob(property));
+      }
+      var synonyms = SOFT_PREFERENCE_SYNONYMS[slug] || [];
+      if (!synonyms.length) return false;
+      var blob = buildPropertyTextBlob(property);
+      for (var i = 0; i < synonyms.length; i++) {
+        if (String(blob).indexOf(String(synonyms[i])) !== -1) return true;
+      }
+      return false;
+    }
+
+    function buildMatchDetail(property, cond) {
+      var c = normalizeConditions(cond);
+      var score = 0;
+      var reasons = [];
+      var negatives = [];
+      if (c.areas && c.areas.length) {
+        var areaHit = c.areas.some(function (a) {
+          return includesPart(property.area, a) || includesPart(property.city, a) || includesPart(property.station, a);
+        });
+        if (areaHit) {
+          score += 5;
+          reasons.push('希望エリアに近い');
+        }
+      }
+      if (c.city && includesPart(property.city, c.city)) {
+        score += 4;
+        reasons.push(c.city + 'エリア');
+      }
+      if (c.layout && normalizeLayoutForCompare(property.layout) === c.layout) {
+        score += 4;
+        reasons.push('間取り一致');
+      }
+      if (c.budget != null) {
+        var ry = property.rentYen != null ? Number(property.rentYen) : parseRentYenValue(property.rent);
+        if (ry != null && ry <= c.budget) {
+          score += 3;
+          reasons.push('予算内');
+        }
+      }
+      (c.features || []).forEach(function (slug) {
+        var key = FEATURE_SLUG_TO_PROPERTY[slug];
+        if (!key) return;
+        if (key === 'parking') {
+          if (isParkingAvailable(property)) {
+            score += 2;
+            reasons.push('駐車場条件');
+          }
+          return;
+        }
+        if (key === 'safetyLevel') {
+          if (includesPart(property.safetyLevel, '高')) {
+            score += 2;
+            reasons.push('治安条件');
+          }
+          return;
+        }
+        if (property[key]) {
+          score += 2;
+          reasons.push('こだわり条件一致');
+        }
+      });
+      (c.softPreferences || []).forEach(function (slug) {
+        var softSlug = normalizeSoftSlug(slug);
+        if (!softSlug) return;
+        if (matchSoftPreference(property, softSlug)) {
+          var weight = CONFIG.SOFT_CONDITION_WEIGHTS[softSlug];
+          if (weight == null) weight = 1.0;
+          score += Number(weight);
+          reasons.push('雰囲気希望に近い');
+        }
+      });
+      (c.avoidFeatures || []).forEach(function (slug) {
+        var avoidSlug = normalizeSoftSlug(slug);
+        if (!avoidSlug) return;
+        if (matchSoftPreference(property, avoidSlug)) {
+          score -= 2.2;
+          negatives.push(avoidSlug);
+        }
+      });
+      if (matchesKeyword(property, c.keyword) && c.keyword) {
+        score += 2;
+        reasons.push('キーワード一致');
+      }
+      score += Number(property.views || 0) * 0.01;
+      var reasonText = uniqStrings(reasons).slice(0, 3).join('・');
+      if (!reasonText) reasonText = property.shortReason || '';
+      return {
+        score: score,
+        reasonText: reasonText,
+        avoidMatched: negatives
+      };
+    }
+
+    function scoreProperty(property, cond) {
+      return buildMatchDetail(property, cond).score;
+    }
+
+    function sortPropertiesByRelevance(list, cond) {
+      return (list || [])
+        .slice()
+        .map(function (p) {
+          var d = buildMatchDetail(p, cond);
+          p.__matchScore = d.score;
+          p.__matchReason = d.reasonText;
+          p.__avoidMatched = d.avoidMatched;
+          return p;
+        })
+        .sort(function (a, b) {
+          var sa = Number(a.__matchScore || 0);
+          var sb = Number(b.__matchScore || 0);
+          if (sb !== sa) return sb - sa;
+          return Number(b.views || 0) - Number(a.views || 0);
+        });
+    }
+
+    function getPropertyReasonText(property) {
+      return (property && property.__matchReason) || (property && property.shortReason) || '';
+    }
+
+    function getPropertyHighlightTags(property) {
+      var p = property || {};
+      var tags = [];
+      if (p.managementFeeYen === 0) tags.push('管理費0円');
+      if (p.internetFree) tags.push('ネット無料');
+      if (p.autoLock) tags.push('オートロック');
+      if (p.deliveryBox) tags.push('宅配BOX');
+      if (p.bathToiletSeparate) tags.push('風呂トイレ別');
+      if (p.washstand) tags.push('独立洗面台');
+      if (p.petAllowed || p.pet_ok) tags.push('ペット可');
+      if (p.supermarketNearby || p.super_near) tags.push('スーパー近い');
+      if (p.exclusiveAreaSqm) tags.push(String(p.exclusiveAreaSqm) + '㎡');
+      if (p.availableFrom) tags.push(String(p.availableFrom));
+      return uniqStrings(tags).slice(0, 5);
+    }
+
+    function renderPropertyHighlightTags(property) {
+      var tags = getPropertyHighlightTags(property);
+      if (!tags.length) return '';
+      return '<p class="property-card-meta">' + tags.map(function (tag) {
+        return '<span class="property-tag">' + escapeHtml(tag) + '</span>';
+      }).join('') + '</p>';
     }
 
     /** 仕様名: 条件オブジェクトで絞り込み（ec は budget / layout / features を想定） */
@@ -969,13 +1800,68 @@
       return applyPropertyFilters(PROPERTY_LIST, conditions);
     }
 
-    function hasUrlListingFilterParams() {
+    function parseQueryCompat(search) {
+      var out = {};
+      var src = String(search || '');
+      if (!src) return out;
+      var q = src.charAt(0) === '?' ? src.slice(1) : src;
+      if (!q) return out;
+      q.split('&').forEach(function (pair) {
+        if (!pair) return;
+        var idx = pair.indexOf('=');
+        var k = idx >= 0 ? pair.slice(0, idx) : pair;
+        var v = idx >= 0 ? pair.slice(idx + 1) : '';
+        if (!k) return;
+        var key = '';
+        var val = '';
+        try {
+          key = decodeURIComponent(k.replace(/\+/g, ' '));
+          val = decodeURIComponent(v.replace(/\+/g, ' '));
+        } catch (e) {
+          key = k;
+          val = v;
+        }
+        out[key] = val;
+      });
+      return out;
+    }
+
+    function readQueryParamCompat(name) {
+      var key = String(name || '');
+      if (!key) return '';
       try {
-        var q = new URLSearchParams(window.location.search);
-        return !!(q.get('budget') || q.get('layout') || q.get('features'));
-      } catch (e) {
-        return false;
-      }
+        if (typeof URLSearchParams !== 'undefined') {
+          var q = new URLSearchParams(window.location.search);
+          return q.get(key) || '';
+        }
+      } catch (e) {}
+      var parsed = parseQueryCompat(window.location.search);
+      return parsed[key] || '';
+    }
+
+    function buildQueryStringCompat(params) {
+      var pairs = [];
+      Object.keys(params || {}).forEach(function (k) {
+        var v = params[k];
+        if (v == null) return;
+        var s = String(v).trim();
+        if (!s) return;
+        pairs.push(encodeURIComponent(k) + '=' + encodeURIComponent(s));
+      });
+      return pairs.join('&');
+    }
+
+    function hasUrlListingFilterParams() {
+      return !!(
+        readQueryParamCompat('budget') ||
+        readQueryParamCompat('layout') ||
+        readQueryParamCompat('features') ||
+        readQueryParamCompat('soft') ||
+        readQueryParamCompat('avoid') ||
+        readQueryParamCompat('city') ||
+        readQueryParamCompat('area') ||
+        readQueryParamCompat('keyword')
+      );
     }
 
     function hasActiveListingFilters() {
@@ -983,43 +1869,68 @@
       if (ec.budget != null && ec.budget > 0) return true;
       if (ec.layout && String(ec.layout).trim()) return true;
       if (ec.features && ec.features.length > 0) return true;
+      if (ec.softPreferences && ec.softPreferences.length > 0) return true;
+      if (ec.city && String(ec.city).trim()) return true;
+      if (ec.areas && ec.areas.length > 0) return true;
+      if (ec.keyword && String(ec.keyword).trim()) return true;
       return hasUrlListingFilterParams();
     }
 
     function shouldShowPropertyListingSection() {
       if (!PROPERTY_LIST.length) return false;
-      if (gasListingShouldShow) return true;
+      if (remoteListingShouldShow) return true;
       return hasActiveListingFilters();
     }
 
     function applyUrlSearchParamsToExtractedConditions() {
-      try {
-        var q = new URLSearchParams(window.location.search);
-        var b = q.get('budget');
-        if (b != null && String(b).trim() !== '') {
-          var n = parseInt(String(b).replace(/,/g, ''), 10);
-          if (!isNaN(n) && n > 0) mergeExtractedConditions({ budget: n });
-        }
-        var lay = q.get('layout');
-        if (lay != null && String(lay).trim() !== '') {
-          mergeExtractedConditions({ layout: String(lay).trim() });
-        }
-        var feat = q.get('features');
-        if (feat != null && String(feat).trim() !== '') {
-          String(feat)
+      var b = readQueryParamCompat('budget');
+      if (b != null && String(b).trim() !== '') {
+        var n = parseInt(String(b).replace(/,/g, ''), 10);
+        if (!isNaN(n) && n > 0) mergeExtractedConditions({ budget: n });
+      }
+      var lay = readQueryParamCompat('layout');
+      if (lay != null && String(lay).trim() !== '') {
+        mergeExtractedConditions({ layout: String(lay).trim() });
+      }
+      var feat = readQueryParamCompat('features');
+      if (feat != null && String(feat).trim() !== '') {
+        String(feat)
+          .split(',')
+          .map(function (s) {
+            return s.trim();
+          })
+          .filter(Boolean)
+          .forEach(function (slug) {
+            mergeExtractedConditions({ features: [slug] });
+          });
+      }
+      var city = readQueryParamCompat('city');
+      if (city != null && String(city).trim() !== '') mergeExtractedConditions({ city: String(city).trim() });
+      var area = readQueryParamCompat('area');
+      if (area != null && String(area).trim() !== '') mergeExtractedConditions({ areas: [String(area).trim()] });
+      var keyword = readQueryParamCompat('keyword');
+      if (keyword != null && String(keyword).trim() !== '') mergeExtractedConditions({ keyword: String(keyword).trim() });
+      var soft = readQueryParamCompat('soft');
+      if (soft != null && String(soft).trim() !== '') {
+        mergeExtractedConditions({
+          softPreferences: String(soft)
             .split(',')
-            .map(function (s) {
-              return s.trim();
-            })
+            .map(function (s) { return normalizeSoftSlug(s); })
             .filter(Boolean)
-            .forEach(function (slug) {
-              mergeExtractedConditions({ features: [slug] });
-            });
-        }
-      } catch (e) {}
+        });
+      }
+      var avoid = readQueryParamCompat('avoid');
+      if (avoid != null && String(avoid).trim() !== '') {
+        mergeExtractedConditions({
+          avoidFeatures: String(avoid)
+            .split(',')
+            .map(function (s) { return normalizeSoftSlug(s); })
+            .filter(Boolean)
+        });
+      }
     }
 
-    /** load 後・条件更新時に差し替え（定義は renderGasListingSection の直後） */
+    /** load 後・条件更新時に差し替え（定義は renderPropertyListingSection の直後） */
     var refreshFilteredListing = function () {};
 
     applyUrlSearchParamsToExtractedConditions();
@@ -1071,6 +1982,8 @@
       if (extractedConditions.budget != null && extractedConditions.budget > 0) n++;
       if (extractedConditions.layout) n++;
       if (extractedConditions.features.length > 0) n++;
+      if (extractedConditions.softPreferences && extractedConditions.softPreferences.length > 0) n++;
+      if (extractedConditions.city) n++;
       if (extractedConditions.areas.length > 0) n++;
       return n;
     }
@@ -1081,6 +1994,9 @@
       if (extractedConditions.budget != null && extractedConditions.budget > 0) n++;
       if (extractedConditions.layout && String(extractedConditions.layout).trim()) n++;
       if (extractedConditions.features && extractedConditions.features.length > 0) n++;
+      if (extractedConditions.softPreferences && extractedConditions.softPreferences.length > 0) n++;
+      if (extractedConditions.city && String(extractedConditions.city).trim()) n++;
+      if (extractedConditions.areas && extractedConditions.areas.length > 0) n++;
       return n;
     }
 
@@ -1093,17 +2009,16 @@
     }
 
     function buildConditionSearchUrl() {
-      var params = new URLSearchParams();
-      if (extractedConditions.budget != null) {
-        params.set('budget', String(extractedConditions.budget));
-      }
-      if (extractedConditions.layout) {
-        params.set('layout', extractedConditions.layout);
-      }
-      if (extractedConditions.features.length) {
-        params.set('features', extractedConditions.features.join(','));
-      }
-      var q = params.toString();
+      var q = buildQueryStringCompat({
+        budget: extractedConditions.budget != null ? String(extractedConditions.budget) : '',
+        layout: extractedConditions.layout || '',
+        features: extractedConditions.features && extractedConditions.features.length ? extractedConditions.features.join(',') : '',
+        soft: extractedConditions.softPreferences && extractedConditions.softPreferences.length ? extractedConditions.softPreferences.join(',') : '',
+        avoid: extractedConditions.avoidFeatures && extractedConditions.avoidFeatures.length ? extractedConditions.avoidFeatures.join(',') : '',
+        city: extractedConditions.city || '',
+        area: extractedConditions.areas && extractedConditions.areas.length ? extractedConditions.areas[0] : '',
+        keyword: extractedConditions.keyword || ''
+      });
       return q ? 'rental.html?' + q : 'rental.html';
     }
 
@@ -1194,6 +2109,8 @@
         if (tags.indexOf(ls) === -1) tags.push(ls);
       }
       var feat = (extractedConditions.features || []).slice();
+      var soft = (extractedConditions.softPreferences || []).slice();
+      var avoid = (extractedConditions.avoidFeatures || []).slice();
       var summaryParts = [];
       if (ctx.lifestyle) summaryParts.push('暮らし方: ' + ctx.lifestyle);
       if (ctx.rent) summaryParts.push('家賃感: ' + ctx.rent);
@@ -1201,6 +2118,8 @@
       if (areas.length) summaryParts.push('エリア(抽出): ' + areas.join(','));
       if (extractedConditions.layout) summaryParts.push('間取り抽出: ' + extractedConditions.layout);
       if (feat.length) summaryParts.push('こだわり: ' + feat.join(','));
+      if (soft.length) summaryParts.push('雰囲気希望: ' + soft.join(','));
+      if (avoid.length) summaryParts.push('避けたい条件: ' + avoid.join(','));
       var snippet = (options.lastUserMessage || '').trim();
       if (snippet) {
         summaryParts.push('直近メッセージ: ' + snippet.slice(0, 200));
@@ -1340,6 +2259,15 @@
         }
         var propA = e.target.closest('a[href*="property.html"]');
         if (propA && propA.getAttribute('href')) {
+          var pid = '';
+          try {
+            var u = new URL(propA.href, window.location.href);
+            pid = u.searchParams.get('id') || '';
+          } catch (e3) {}
+          if (pid) {
+            var hit = findPropertyById(pid);
+            trackPropertyView(pid, hit && hit.area ? hit.area : '');
+          }
           try {
             sessionStorage.setItem('nr_rental_property_detail_clicked', '1');
           } catch (err) {}
@@ -1353,6 +2281,7 @@
     var findStep = 0;
     var inputLocked = false;
     var lineNudgeFromFreeShown = false;
+    var PROPERTY_VIEW_TRACK_TTL_MS = 30 * 60 * 1000;
 
     function scrollToBottom() {
       requestAnimationFrame(function () {
@@ -1364,6 +2293,63 @@
       var d = document.createElement('div');
       d.textContent = s;
       return d.innerHTML;
+    }
+
+    function findPropertyById(propertyId) {
+      var id = String(propertyId || '');
+      for (var i = 0; i < PROPERTY_LIST.length; i++) {
+        if (String(PROPERTY_LIST[i].id) === id) return PROPERTY_LIST[i];
+      }
+      return null;
+    }
+
+    function shouldSkipViewTrack(propertyId) {
+      var key = 'nr_view_track_' + String(propertyId || '');
+      try {
+        var raw = localStorage.getItem(key);
+        if (!raw) return false;
+        var ts = parseInt(raw, 10);
+        if (isNaN(ts)) return false;
+        return Date.now() - ts < PROPERTY_VIEW_TRACK_TTL_MS;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function markViewTracked(propertyId) {
+      var key = 'nr_view_track_' + String(propertyId || '');
+      try {
+        localStorage.setItem(key, String(Date.now()));
+      } catch (e) {}
+    }
+
+    function trackPropertyView(propertyId, area) {
+      if (!propertyId) return;
+      if (shouldSkipViewTrack(propertyId)) return;
+
+      if (CONFIG.USE_FIREBASE_PROPERTIES) {
+        var viewUrl = apiUrl('/api/properties/view');
+        fetch(viewUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            propertyId: String(propertyId),
+            area: String(area || '')
+          })
+        })
+          .then(function (res) {
+            if (!res || !res.ok) {
+              throw new Error('view API HTTP ' + (res ? res.status : 'unknown'));
+            }
+            markViewTracked(propertyId);
+          })
+          .catch(function (err) {
+            console.log('[rental] view API failed', err);
+          });
+        return;
+      }
+
+      markViewTracked(propertyId);
     }
 
     function truncateChatSuggestStory(text, maxChars) {
@@ -1480,7 +2466,7 @@
         article.innerHTML =
           '<div class="nr-chat-suggest-card-img">' +
           '<img src="' +
-          escapeHtml(p.image) +
+          escapeHtml(p.image || PROPERTY_PLACEHOLDER_IMG) +
           '" alt="" loading="lazy" width="320" height="200">' +
           '</div>' +
           '<div class="nr-chat-suggest-card-body">' +
@@ -1492,6 +2478,10 @@
           '</p>' +
           '<p class="nr-chat-suggest-card-meta">' +
           '<span>' +
+          escapeHtml(p.city || '—') +
+          '</span>' +
+          '<span class="nr-chat-suggest-card-meta-sep" aria-hidden="true">·</span>' +
+          '<span>' +
           escapeHtml(p.layout || '—') +
           '</span>' +
           '<span class="nr-chat-suggest-card-meta-sep" aria-hidden="true">·</span>' +
@@ -1499,14 +2489,23 @@
           escapeHtml(p.area || '—') +
           '</span>' +
           '</p>' +
+          renderPropertyHighlightTags(p) +
+          (p.station
+            ? '<p class="nr-chat-suggest-card-story">最寄り: ' + escapeHtml(p.station) + '</p>'
+            : '') +
           (story
             ? '<p class="nr-chat-suggest-card-story">' + escapeHtml(story) + '</p>'
             : '') +
-          (p.shortReason
+          (getPropertyReasonText(p)
             ? '<p class="nr-chat-suggest-card-reason">' +
               '<span class="nr-chat-suggest-card-reason-label">この物件が合う理由</span>' +
               '<span class="nr-chat-suggest-card-reason-text">' +
-              escapeHtml(p.shortReason) +
+              escapeHtml(getPropertyReasonText(p)) +
+              '</span></p>'
+            : '') +
+          (p.views != null
+            ? '<p class="nr-chat-suggest-card-reason"><span class="nr-chat-suggest-card-reason-label">閲覧数</span><span class="nr-chat-suggest-card-reason-text">' +
+              escapeHtml(String(p.views)) +
               '</span></p>'
             : '') +
           '<a class="nr-chat-suggest-card-detail" href="property.html?id=' +
@@ -1527,9 +2526,9 @@
 
     /**
      * 一覧セクション描画。list は絞り込み後（FILTERED_PROPERTY_LIST）。
-     * 表示可否: GAS 取得成功 or URL/会話でフィルタ条件あり。
+     * 表示可否: Firebase API 取得成功 or URL/会話でフィルタ条件あり。
      */
-    function renderGasListingSection(filteredList) {
+    function renderPropertyListingSection(filteredList) {
       var section = document.getElementById('gasListingSection');
       var grid = document.getElementById('gasListingGrid');
       var emptyEl = document.getElementById('gasListingEmpty');
@@ -1556,36 +2555,36 @@
         return;
       }
       filteredList.forEach(function (p) {
-        var a = document.createElement('a');
-        a.className = 'property-card gas-list-card';
-        a.href = 'property.html?id=' + encodeURIComponent(p.id);
-        a.setAttribute('data-property-id', p.id);
-        a.innerHTML =
-          '<div class="property-card-img"><img src="' + escapeHtml(p.image) + '" alt="' + escapeHtml(p.name) + 'のイメージ" loading="lazy" width="320" height="200"></div>' +
-          '<div class="property-card-body">' +
-            '<h3 class="property-card-name">' + escapeHtml(p.name) + '</h3>' +
-            '<p class="property-card-meta">' +
-            '<span class="property-tag">' + escapeHtml(p.area) + '</span>' +
-            '<span class="property-tag">' + escapeHtml(p.rent) + '</span>' +
-            '<span class="property-tag">' + escapeHtml(p.layout) + '</span></p>' +
-            '<p class="property-card-comment">' + escapeHtml(p.comment) + '</p>' +
-            (p.shortReason
-              ? '<p class="property-card-match-reason">' +
-                '<span class="property-card-match-reason-label">この物件が合う理由</span>' +
-                '<span class="property-card-match-reason-text">' +
-                escapeHtml(p.shortReason) +
-                '</span></p>'
-              : '') +
-          '</div>';
-        grid.appendChild(a);
+        var row = Object.assign({}, p, {
+          image: p.image || PROPERTY_PLACEHOLDER_IMG
+        });
+        var detailUrl = 'property.html?id=' + encodeURIComponent(p.id);
+        var art = document.createElement('article');
+        art.className = 'property-card property-card--listing gas-list-card';
+        art.setAttribute('data-property-id', p.id);
+        if (window.NR_FAVORITES && NR_FAVORITES.listingCardHtml) {
+          art.innerHTML = NR_FAVORITES.listingCardHtml(row, escapeHtml, detailUrl);
+        } else {
+          art.innerHTML =
+            '<a class="property-card-hit" href="' + escapeHtml(detailUrl) + '">' +
+            '<div class="property-card-img"><img src="' + escapeHtml(row.image) + '" alt=""></div>' +
+            '<div class="property-card-body"><p class="property-card-rent">' + escapeHtml(row.rent) + '</p></div></a>';
+        }
+        grid.appendChild(art);
       });
+      if (window.NR_FAVORITES && NR_FAVORITES.wireListingCards) {
+        NR_FAVORITES.wireListingCards(grid);
+      }
     }
 
     refreshFilteredListing = function () {
-      FILTERED_PROPERTY_LIST = applyPropertyFilters(PROPERTY_LIST);
+      FILTERED_PROPERTY_LIST = sortPropertiesByRelevance(
+        applyPropertyFilters(PROPERTY_LIST),
+        extractedConditions
+      );
       filteredProperties = FILTERED_PROPERTY_LIST;
       properties = PROPERTY_LIST;
-      renderGasListingSection(FILTERED_PROPERTY_LIST);
+      renderPropertyListingSection(FILTERED_PROPERTY_LIST);
       renderPropertyCards();
       refreshContextualLineCta();
     };
@@ -1814,14 +2813,9 @@
 
     /** 条件に応じて表示する物件を選ぶ（現在は物件検索フローを優先） */
     function pickPropertiesForContext() {
-      var list = PROPERTY_LIST.slice();
-      var areaHint = ctx && ctx.area ? String(ctx.area) : '';
-      if (areaHint.indexOf('大村') !== -1) {
-        var withArea = list.filter(function (p) { return (p.area || '').indexOf('大村') !== -1; });
-        var rest = list.filter(function (p) { return (p.area || '').indexOf('大村') === -1; });
-        return withArea.concat(rest).slice(0, 3);
-      }
-      return list.slice(0, 3);
+      var filtered = applyPropertyFilters(PROPERTY_LIST, extractedConditions);
+      var sorted = sortPropertiesByRelevance(filtered, extractedConditions);
+      return sorted.slice(0, 3);
     }
 
     function renderPropertySuggest() {
@@ -1840,21 +2834,18 @@
         var card = document.createElement('article');
         card.className = 'property-card';
         card.setAttribute('data-property-id', p.id);
+        var stationText = (p.station && String(p.station).trim()) || (p.area && String(p.area).trim()) || '—';
         card.innerHTML =
-          '<div class="property-card-img"><img src="' + escapeHtml(p.image) + '" alt="' + escapeHtml(p.name) + 'のイメージ" loading="lazy" width="320" height="200"></div>' +
+          '<div class="property-card-img"><img src="' + escapeHtml(p.image || PROPERTY_PLACEHOLDER_IMG) + '" alt="' + escapeHtml(p.name) + 'のイメージ" loading="lazy" width="320" height="200"></div>' +
           '<div class="property-card-body">' +
-            '<h3 class="property-card-name">' + escapeHtml(p.name) + '</h3>' +
-            '<p class="property-card-meta">' +
-            '<span class="property-tag">' + escapeHtml(p.area) + '</span>' +
-            '<span class="property-tag">' + escapeHtml(p.rent) + '</span>' +
-            '<span class="property-tag">' + escapeHtml(p.layout) + '</span></p>' +
-            '<p class="property-card-comment">' + escapeHtml(p.comment) + '</p>' +
-            (p.shortReason
-              ? '<p class="property-card-match-reason">' +
-                '<span class="property-card-match-reason-label">この物件が合う理由</span>' +
-                '<span class="property-card-match-reason-text">' +
-                escapeHtml(p.shortReason) +
-                '</span></p>'
+            '<p class="property-card-rent">' + escapeHtml(p.rent || '—') + '</p>' +
+            '<p class="property-card-layout">' + escapeHtml(p.layout || '—') + '</p>' +
+            '<p class="property-card-station">' + escapeHtml(stationText) + '</p>' +
+            '<p class="property-card-name-sub">' + escapeHtml(p.name) + '</p>' +
+            (getPropertyReasonText(p)
+              ? '<p class="property-card-match-reason-text" style="margin:0.35rem 0 0;font-size:0.78rem;color:var(--ink-muted);">' +
+                escapeHtml(getPropertyReasonText(p)) +
+                '</p>'
               : '') +
             '<div class="property-card-actions">' +
               '<a class="btn-ghost" href="' + escapeHtml(p.detailUrl) + '">詳細を見る</a>' +
@@ -2236,12 +3227,16 @@
       removeEntryPanel();
       appendUserBubble(text);
       pushConditionFieldsToSheet();
-      if (CONFIG.USE_DIFY_CHAT && difyChatPurpose) {
+      var activeDifyPurpose = ensureDifyChatPurpose();
+      if (CONFIG.USE_DIFY_CHAT && activeDifyPurpose) {
         var streamBubble = null;
+        if (activeDifyPurpose === 'property' && CONFIG.EXTRACT_CONDITIONS_WITH_DIFY) {
+          runDifyExtractionInBackground(text, activeDifyPurpose);
+        }
         inputLocked = true;
         setButtonsDisabled(true);
         showTyping();
-        fetchDifyChatReply(text, difyChatPurpose, {
+        fetchDifyChatReply(text, activeDifyPurpose, {
           onAccumulated: function (full) {
             if (!streamBubble) {
               removeTyping();
@@ -2253,44 +3248,21 @@
           }
         })
           .then(function (answer) {
-            emitSheetChatSnapshot(text);
-            if (streamBubble) {
-              streamBubble.classList.remove('bubble--bot--streaming');
-              if (!streamBubble.textContent.trim()) {
-                streamBubble.textContent =
-                  answer && String(answer).trim() ? String(answer).trim() : '（返答が空でした）';
-              }
-              inputLocked = false;
-              setButtonsDisabled(false);
-              scrollToBottom();
-              if (flowMode === 'idle' && findStep === 0) {
-                delay(260).then(appendSoftLineFromFree);
-              }
-            } else {
-              removeTyping();
-              var body = answer && answer.trim() ? answer : '（返答が空でした）';
-              sayBotTypewriterAfterFetch(body, function () {
-                if (flowMode === 'idle' && findStep === 0) {
-                  delay(260).then(appendSoftLineFromFree);
-                }
-              });
-            }
+            finishDifyChatTurn(answer, streamBubble, text);
           })
           .catch(function (err) {
-            console.error(err);
+            console.error('[rental] Dify chat error:', err);
             removeTyping();
             if (streamBubble && streamBubble.parentElement) {
               streamBubble.parentElement.remove();
               streamBubble = null;
             }
+            inputLocked = false;
+            setButtonsDisabled(false);
             var reason = (err && err.message) ? ('\n（原因: ' + err.message + '）') : '';
             sayBotTypewriterAfterFetch(
               'ただいま会話に接続しにくい状況です。\n時間をおいて試すか、下のLINEからお問い合わせください。' + reason,
-              function () {
-                if (flowMode === 'idle' && findStep === 0) {
-                  delay(260).then(appendSoftLineFromFree);
-                }
-              }
+              afterDifyFreeReplyHook
             );
           });
         return;
