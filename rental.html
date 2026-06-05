@@ -1412,10 +1412,22 @@
           extractedConditions.avoidFeatures.push(s);
         }
       });
-      var hardPatch = patch.hard || {};
-      var softPatch = patch.soft || {};
-      var avoidPatch = patch.avoid || {};
-      if (hardPatch && typeof hardPatch === 'object') {
+      var hardPatch = patch.hard;
+      var softPatch = patch.soft;
+      var avoidPatch = patch.avoid;
+      if (
+        hardPatch &&
+        typeof hardPatch === 'object' &&
+        (
+          hardPatch.budget != null ||
+          hardPatch.layout ||
+          hardPatch.city ||
+          hardPatch.safetyLevel ||
+          hardPatch.parking === true ||
+          (Array.isArray(hardPatch.areas) && hardPatch.areas.length) ||
+          (Array.isArray(hardPatch.features) && hardPatch.features.length)
+        )
+      ) {
         mergeExtractedConditions({
           budget: hardPatch.budget,
           layout: hardPatch.layout,
@@ -1426,13 +1438,25 @@
           parking: hardPatch.parking
         });
       }
-      if (softPatch && typeof softPatch === 'object') {
+      if (
+        softPatch &&
+        typeof softPatch === 'object' &&
+        (
+          (Array.isArray(softPatch.preferences) && softPatch.preferences.length) ||
+          (Array.isArray(softPatch.lifestyleTags) && softPatch.lifestyleTags.length)
+        )
+      ) {
         mergeExtractedConditions({
           softPreferences: softPatch.preferences,
           lifestyleTags: softPatch.lifestyleTags
         });
       }
-      if (avoidPatch && typeof avoidPatch === 'object') {
+      if (
+        avoidPatch &&
+        typeof avoidPatch === 'object' &&
+        Array.isArray(avoidPatch.features) &&
+        avoidPatch.features.length
+      ) {
         mergeExtractedConditions({
           avoidFeatures: avoidPatch.features
         });

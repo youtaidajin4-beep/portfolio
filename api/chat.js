@@ -55,6 +55,27 @@ function getFirstDefinedEnv(names) {
   return { key: null, value: '' };
 }
 
+function resolveDifyEnvByPurpose(chatPurpose) {
+  var urlCandidates;
+  var keyCandidates;
+  if (chatPurpose === 'property') {
+    // 物件検索専用があれば優先。未設定時は従来キーへフォールバック。
+    urlCandidates = ['DIFY_PROPERTY_API_URL', 'DIFY_API_URL'];
+    keyCandidates = ['DIFY_PROPERTY_API_KEY', 'DIFY_API_KEY'];
+  } else if (chatPurpose === 'consult') {
+    // 相談専用があれば優先。未設定時は物件検索キーへフォールバック。
+    urlCandidates = ['DIFY_API_URL', 'DIFY_PROPERTY_API_URL'];
+    keyCandidates = ['DIFY_API_KEY', 'DIFY_PROPERTY_API_KEY'];
+  } else {
+    urlCandidates = ['DIFY_API_URL', 'DIFY_PROPERTY_API_URL'];
+    keyCandidates = ['DIFY_API_KEY', 'DIFY_PROPERTY_API_KEY'];
+  }
+  return {
+    urlEnv: getFirstDefinedEnv(urlCandidates),
+    keyEnv: getFirstDefinedEnv(keyCandidates),
+  };
+}
+
 function normalizeDifyUrl(url) {
   if (!url) return '';
   var trimmed = String(url).trim();
@@ -163,18 +184,9 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'userMessage is required' });
   }
 
-  var difyUrlEnv;
-  var apiKeyEnv;
-  if (chatPurpose === 'property') {
-    difyUrlEnv = getFirstDefinedEnv(['DIFY_PROPERTY_API_URL']);
-    apiKeyEnv = getFirstDefinedEnv(['DIFY_PROPERTY_API_KEY']);
-  } else if (chatPurpose === 'consult') {
-    difyUrlEnv = getFirstDefinedEnv(['DIFY_API_URL']);
-    apiKeyEnv = getFirstDefinedEnv(['DIFY_API_KEY']);
-  } else {
-    difyUrlEnv = getFirstDefinedEnv(['DIFY_API_URL', 'DIFY_PROPERTY_API_URL']);
-    apiKeyEnv = getFirstDefinedEnv(['DIFY_API_KEY', 'DIFY_PROPERTY_API_KEY']);
-  }
+  var resolved = resolveDifyEnvByPurpose(chatPurpose);
+  var difyUrlEnv = resolved.urlEnv;
+  var apiKeyEnv = resolved.keyEnv;
 
   var difyUrl = normalizeDifyUrl(difyUrlEnv.value);
   var apiKey = apiKeyEnv.value;
@@ -183,15 +195,24 @@ module.exports = async function handler(req, res) {
     var missing;
     var errMsg;
     if (chatPurpose === 'property') {
-      missing = { DIFY_PROPERTY_API_URL: !difyUrl, DIFY_PROPERTY_API_KEY: !apiKey };
+      missing = {
+        DIFY_PROPERTY_API_URL_OR_DIFY_API_URL: !difyUrl,
+        DIFY_PROPERTY_API_KEY_OR_DIFY_API_KEY: !apiKey,
+      };
       errMsg =
-        'Server configuration error: for property flow (chatPurpose=property), set DIFY_PROPERTY_API_URL and DIFY_PROPERTY_API_KEY.';
+        'Server configuration error: for property flow (chatPurpose=property), set DIFY_PROPERTY_API_URL / DIFY_PROPERTY_API_KEY. If not using separate apps, DIFY_API_URL / DIFY_API_KEY can be used as fallback.';
     } else if (chatPurpose === 'consult') {
-      missing = { DIFY_API_URL: !difyUrl, DIFY_API_KEY: !apiKey };
+      missing = {
+        DIFY_API_URL_OR_DIFY_PROPERTY_API_URL: !difyUrl,
+        DIFY_API_KEY_OR_DIFY_PROPERTY_API_KEY: !apiKey,
+      };
       errMsg =
-        'Server configuration error: for consult flow (chatPurpose=consult), set DIFY_API_URL and DIFY_API_KEY.';
+        'Server configuration error: for consult flow (chatPurpose=consult), set DIFY_API_URL / DIFY_API_KEY. If not using separate apps, DIFY_PROPERTY_API_URL / DIFY_PROPERTY_API_KEY can be used as fallback.';
     } else {
-      missing = { DIFY_API_URL: !difyUrl, DIFY_API_KEY: !apiKey };
+      missing = {
+        DIFY_API_URL_OR_DIFY_PROPERTY_API_URL: !difyUrl,
+        DIFY_API_KEY_OR_DIFY_PROPERTY_API_KEY: !apiKey,
+      };
       errMsg =
         'Server configuration error: set DIFY_API_URL and DIFY_API_KEY (or DIFY_PROPERTY_*) in Vercel environment variables.';
     }

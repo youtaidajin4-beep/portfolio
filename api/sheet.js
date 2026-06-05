@@ -60,6 +60,11 @@ module.exports = async function handler(req, res) {
     return res.status(204).end();
   }
 
+  // Live reload / preview ツールの疎通確認で GET/HEAD が飛ぶことがあるため 200 を返す。
+  if (req.method === 'GET' || req.method === 'HEAD') {
+    return res.status(200).json({ ok: true, endpoint: '/api/sheet', method: req.method });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
